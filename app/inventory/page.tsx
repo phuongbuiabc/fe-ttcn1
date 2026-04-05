@@ -5,16 +5,16 @@ import {
   Search, 
   Filter, 
   Plus, 
-  MoreVertical, 
   ChevronRight,
-  Package
+  Package,
+  Edit2,
+  Trash2,
+  AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
-import Image from "next/image";
 import { InventoryModal } from "@/components/InventoryModal";
-import { AlertCircle, Edit2, Trash2, DollarSign, Hash, Tag } from "lucide-react";
 
 const categories = ["Tất cả", "Thức ăn", "Phân bón", "Thuốc", "Khác"];
 
@@ -27,8 +27,7 @@ const inventoryItems = [
     unit: "kg",
     price: "25.000đ",
     status: "Còn hàng",
-    lastUpdated: "2 giờ trước",
-    image: "https://picsum.photos/seed/corn/400/300"
+    lastUpdated: "2 giờ trước"
   },
   {
     id: "2",
@@ -38,8 +37,7 @@ const inventoryItems = [
     unit: "bao",
     price: "850.000đ",
     status: "Sắp hết",
-    lastUpdated: "5 giờ trước",
-    image: "https://picsum.photos/seed/fertilizer/400/300"
+    lastUpdated: "5 giờ trước"
   },
   {
     id: "3",
@@ -49,8 +47,7 @@ const inventoryItems = [
     unit: "chai",
     price: "120.000đ",
     status: "Hết hàng",
-    lastUpdated: "1 ngày trước",
-    image: "https://picsum.photos/seed/pesticide/400/300"
+    lastUpdated: "1 ngày trước"
   },
   {
     id: "4",
@@ -60,8 +57,7 @@ const inventoryItems = [
     unit: "kg",
     price: "18.000đ",
     status: "Còn hàng",
-    lastUpdated: "3 giờ trước",
-    image: "https://picsum.photos/seed/rice/400/300"
+    lastUpdated: "3 giờ trước"
   },
   {
     id: "5",
@@ -71,8 +67,7 @@ const inventoryItems = [
     unit: "kg",
     price: "12.000đ",
     status: "Còn hàng",
-    lastUpdated: "6 giờ trước",
-    image: "https://picsum.photos/seed/bran/400/300"
+    lastUpdated: "6 giờ trước"
   },
   {
     id: "6",
@@ -82,8 +77,7 @@ const inventoryItems = [
     unit: "bao",
     price: "45.000đ",
     status: "Còn hàng",
-    lastUpdated: "12 giờ trước",
-    image: "https://picsum.photos/seed/lime/400/300"
+    lastUpdated: "12 giờ trước"
   }
 ];
 
@@ -178,9 +172,6 @@ export default function InventoryPage() {
         </button>
       </div>
 
-      {/* Modals */}
-      {/* Removed old modal call */}
-
       {/* Filters & Search */}
       <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
         <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
@@ -214,87 +205,108 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {/* Inventory Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <AnimatePresence mode="popLayout">
-          {filteredItems.map((item, i) => (
-            <motion.div
-              key={item.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
-              className="group bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden flex flex-col"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <Image 
-                  src={item.image} 
-                  alt={item.name} 
-                  fill
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute top-4 left-4">
-                  <span className={cn(
-                    "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider backdrop-blur-md",
-                    item.status === "Còn hàng" ? "bg-emerald-500/90 text-white" :
-                    item.status === "Sắp hết" ? "bg-amber-500/90 text-white" : "bg-red-500/90 text-white"
-                  )}>
-                    {item.status}
-                  </span>
-                </div>
-                <div className="absolute top-4 right-4 flex gap-2">
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleEditItem(item);
-                    }}
-                    className="p-2 bg-white/80 backdrop-blur-md rounded-xl text-blue-600 hover:bg-white transition-all"
+      {/* Inventory Table */}
+      <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50/50">
+                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Vật tư</th>
+                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Danh mục</th>
+                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tồn kho</th>
+                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Đơn giá</th>
+                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Trạng thái</th>
+                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              <AnimatePresence mode="popLayout">
+                {filteredItems.map((item, i) => (
+                  <motion.tr
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.2, delay: i * 0.03 }}
+                    className="hover:bg-gray-50/50 transition-colors group cursor-pointer"
                   >
-                    <Edit2 size={16} />
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleDeleteClick(item);
-                    }}
-                    className="p-2 bg-white/80 backdrop-blur-md rounded-xl text-red-600 hover:bg-white transition-all"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="p-8 flex-1 flex flex-col">
-                <div className="flex justify-between items-start mb-2">
-                  <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{item.category}</p>
-                  <p className="text-[10px] font-medium text-gray-400">{item.lastUpdated}</p>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 font-manrope mb-4 group-hover:text-[#006c49] transition-colors">{item.name}</h3>
-                
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-gray-50 p-3 rounded-2xl">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tồn kho</p>
-                    <p className="text-lg font-bold text-gray-900">{item.stock} <span className="text-xs font-medium text-gray-500">{item.unit}</span></p>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-2xl">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Đơn giá</p>
-                    <p className="text-lg font-bold text-gray-900">{item.price}</p>
-                  </div>
-                </div>
-
-                <Link 
-                  href={`/inventory/${item.id}`}
-                  className="mt-auto w-full py-3 bg-[#006c49]/5 text-[#006c49] rounded-2xl text-sm font-bold hover:bg-[#006c49] hover:text-white transition-all flex items-center justify-center gap-2 group/btn"
-                >
-                  Xem chi tiết
-                  <ChevronRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+                    <td className="px-10 py-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center font-bold text-sm ring-2 ring-emerald-100/50">
+                          <Package size={20} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">{item.name}</p>
+                          <p className="text-[10px] font-medium text-gray-400 mt-0.5">Cập nhật: {item.lastUpdated}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-10 py-6">
+                      <span className={cn(
+                        "px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider",
+                        item.category === "Thức ăn" ? "bg-amber-50 text-amber-600" :
+                        item.category === "Thuốc" ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600"
+                      )}>
+                        {item.category}
+                      </span>
+                    </td>
+                    <td className="px-10 py-6">
+                      <p className="text-sm font-bold text-gray-900">{item.stock} <span className="text-xs font-medium text-gray-400">{item.unit}</span></p>
+                    </td>
+                    <td className="px-10 py-6">
+                      <p className="text-sm font-bold text-gray-900">{item.price}</p>
+                    </td>
+                    <td className="px-10 py-6">
+                      <span className={cn(
+                        "flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider",
+                        item.status === "Còn hàng" ? "text-emerald-600" :
+                        item.status === "Sắp hết" ? "text-amber-600" : "text-red-600"
+                      )}>
+                        <span className={cn(
+                          "w-1.5 h-1.5 rounded-full",
+                          item.status === "Còn hàng" ? "bg-emerald-600" :
+                          item.status === "Sắp hết" ? "bg-amber-600" : "bg-red-600"
+                        )} />
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="px-10 py-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link 
+                          href={`/inventory/${item.id}`}
+                          className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                        >
+                          <ChevronRight size={20} />
+                        </Link>
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleEditItem(item);
+                          }}
+                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDeleteClick(item);
+                          }}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Summary Section */}

@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
+import { LeaveModal } from "@/components/LeaveModal";
 
 const leaveRequests = [
   {
@@ -53,6 +54,28 @@ const leaveRequests = [
 ];
 
 export default function LeaveManagementPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("Tất cả trạng thái");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+
+  const handleCreate = () => {
+    setSelectedRequest(null);
+    setIsModalOpen(true);
+  };
+
+  const handleDetail = (req: any) => {
+    setSelectedRequest(req);
+    setIsModalOpen(true);
+  };
+
+  const filteredRequests = leaveRequests.filter(req => {
+    const matchesSearch = req.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         req.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "Tất cả trạng thái" || req.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="space-y-10">
       {/* Header */}
@@ -96,11 +119,17 @@ export default function LeaveManagementPage() {
             <input 
               type="text" 
               placeholder="Tìm kiếm tên nhân viên, ID đơn..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-6 py-3 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none text-slate-700 font-medium"
             />
           </div>
           <div className="relative">
-            <select className="appearance-none bg-slate-50 border-none rounded-xl pl-4 pr-10 py-3 text-xs font-bold text-slate-600 outline-none ring-1 ring-slate-200 focus:ring-emerald-500 transition-all cursor-pointer">
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="appearance-none bg-slate-50 border-none rounded-xl pl-4 pr-10 py-3 text-xs font-bold text-slate-600 outline-none ring-1 ring-slate-200 focus:ring-emerald-500 transition-all cursor-pointer"
+            >
               <option>Tất cả trạng thái</option>
               <option>Chờ duyệt</option>
               <option>Đã duyệt</option>
@@ -109,7 +138,10 @@ export default function LeaveManagementPage() {
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
           </div>
         </div>
-        <button className="px-6 py-3 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-2xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center gap-2">
+        <button 
+          onClick={handleCreate}
+          className="px-6 py-3 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-2xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center gap-2"
+        >
           <PlusCircle size={18} />
           Tạo đơn mới
         </button>
@@ -130,13 +162,14 @@ export default function LeaveManagementPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {leaveRequests.map((req, i) => (
+              {filteredRequests.map((req, i) => (
                 <motion.tr 
                   key={req.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                   className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                  onClick={() => handleDetail(req)}
                 >
                   <td className="py-6 px-8">
                     <span className="text-sm font-black text-emerald-600">{req.id}</span>
@@ -176,7 +209,13 @@ export default function LeaveManagementPage() {
                     </span>
                   </td>
                   <td className="py-6 px-8 text-right">
-                    <button className="text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDetail(req);
+                      }}
+                      className="text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all"
+                    >
                       Chi tiết
                     </button>
                   </td>
@@ -246,6 +285,12 @@ export default function LeaveManagementPage() {
           </div>
         </div>
       </div>
+
+      <LeaveModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        request={selectedRequest}
+      />
     </div>
   );
 }

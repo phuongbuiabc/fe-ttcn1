@@ -5,20 +5,23 @@ import {
   Search, 
   Filter, 
   Plus, 
-  Calendar as CalendarIcon, 
-  LayoutGrid, 
-  List, 
   AlertTriangle, 
   MoreVertical,
   ChevronRight,
   Zap,
   MapPin,
+  TrendingUp,
+  Calendar,
   Clock,
-  TrendingUp
+  User,
+  FileText,
+  Edit2,
+  Trash2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
+import { ScheduleModal } from "@/components/ScheduleModal";
 
 const scheduleItems = [
   {
@@ -68,7 +71,38 @@ const scheduleItems = [
 ];
 
 export default function SchedulePage() {
-  const [viewMode, setViewMode] = useState<"table" | "calendar">("table");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeShift, setActiveShift] = useState("Tất cả");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
+
+  const handleCreate = () => {
+    setSelectedSchedule(null);
+    setIsModalOpen(true);
+  };
+
+  const handleQuickAssign = () => {
+    setSelectedSchedule({
+      date: new Date().toLocaleDateString('vi-VN'),
+      day: "Hôm nay",
+      shift: "Ca Sáng (06:00 - 14:00)",
+      area: "Khu A / Chuồng 01",
+      note: "Phân công nhanh - Kiểm tra định kỳ"
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (schedule: any) => {
+    setSelectedSchedule(schedule);
+    setIsModalOpen(true);
+  };
+
+  const filteredSchedules = scheduleItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         item.area.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesShift = activeShift === "Tất cả" || item.shift === activeShift;
+    return matchesSearch && matchesShift;
+  });
 
   return (
     <div className="space-y-10">
@@ -84,11 +118,17 @@ export default function SchedulePage() {
           <p className="text-slate-500 mt-1 font-medium">Quản lý lịch trình vận hành hệ thống MDFARM.</p>
         </div>
         <div className="flex gap-3">
-          <button className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-emerald-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
+          <button 
+            onClick={handleQuickAssign}
+            className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-emerald-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
+          >
             <Zap size={18} />
             Phân công nhanh
           </button>
-          <button className="px-6 py-3 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-2xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center gap-2">
+          <button 
+            onClick={handleCreate}
+            className="px-6 py-3 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-2xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center gap-2"
+          >
             <Plus size={18} />
             Tạo lịch
           </button>
@@ -96,40 +136,36 @@ export default function SchedulePage() {
       </div>
 
       {/* Control Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <div className="flex bg-slate-100 p-1 rounded-2xl">
-          <button 
-            onClick={() => setViewMode("calendar")}
-            className={cn(
-              "px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-              viewMode === "calendar" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            <LayoutGrid size={18} />
-            Calendar View
-          </button>
-          <button 
-            onClick={() => setViewMode("table")}
-            className={cn(
-              "px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-              viewMode === "table" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            <List size={18} />
-            Table View
-          </button>
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-6 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+        <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none w-full lg:w-auto">
+          {["Tất cả", "Ca Sáng", "Ca Chiều", "Ca Đêm"].map((shift) => (
+            <button
+              key={shift}
+              onClick={() => setActiveShift(shift)}
+              className={cn(
+                "px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap",
+                activeShift === shift 
+                  ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100" 
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+              )}
+            >
+              {shift}
+            </button>
+          ))}
         </div>
         
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="relative flex-1 md:w-80 group">
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <div className="relative flex-1 lg:w-80 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors" size={18} />
             <input 
               type="text" 
               placeholder="Tìm kiếm nhân viên, khu vực..." 
-              className="w-full pl-12 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none text-slate-700 font-medium"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-6 py-3 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none text-slate-700 font-medium"
             />
           </div>
-          <button className="p-3 bg-white border border-slate-200 text-slate-500 rounded-2xl hover:bg-slate-50 transition-all">
+          <button className="p-3 bg-slate-50 text-slate-500 rounded-2xl hover:bg-slate-100 transition-all">
             <Filter size={20} />
           </button>
         </div>
@@ -150,7 +186,7 @@ export default function SchedulePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {scheduleItems.map((item, i) => (
+              {filteredSchedules.map((item, i) => (
                 <motion.tr 
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
@@ -209,9 +245,21 @@ export default function SchedulePage() {
                     )}
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all">
-                      <MoreVertical size={18} />
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => handleEdit(item)}
+                        className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                        title="Chỉnh sửa"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button 
+                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                        title="Xóa"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               ))}
@@ -255,6 +303,12 @@ export default function SchedulePage() {
           </div>
         </div>
       </div>
+
+      <ScheduleModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        schedule={selectedSchedule}
+      />
     </div>
   );
 }
