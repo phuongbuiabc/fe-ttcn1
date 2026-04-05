@@ -11,7 +11,8 @@ import {
   Instagram, 
   Linkedin,
   Globe,
-  ShieldCheck
+  ShieldCheck,
+  Sprout
 } from "lucide-react";
 import Link from "next/link";
 
@@ -19,15 +20,15 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-20 border-t border-slate-200 pt-16 pb-12">
+    <footer className="mt-20 bg-emerald-50/50 border border-emerald-100 rounded-[3rem] p-16 shadow-sm">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
         {/* Brand & Mission */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-[#006c49] to-[#10b981] rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/20">
-              <Leaf className="text-white" size={20} />
+              <Sprout className="text-white" size={20} />
             </div>
-            <span className="text-xl font-extrabold tracking-tight text-slate-900 font-manrope">Agri<span className="text-emerald-600">Intel</span></span>
+            <span className="text-xl font-extrabold tracking-tight text-slate-900 font-manrope">MD<span className="text-emerald-600">FARM</span></span>
           </div>
           <p className="text-slate-500 text-sm leading-relaxed font-medium">
             Nền tảng quản lý nông nghiệp thông minh, tối ưu hóa quy trình vận hành và nâng cao năng suất bằng công nghệ số hiện đại.
@@ -112,7 +113,7 @@ export function Footer() {
       <div className="pt-12 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-6">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-            © {currentYear} AgriIntel Digital Agriculture. All rights reserved.
+            © {currentYear} MDFARM Digital Agriculture. All rights reserved.
           </p>
         </div>
         <div className="flex items-center gap-8">

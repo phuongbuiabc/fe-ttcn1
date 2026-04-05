@@ -81,7 +81,7 @@ export default function SchedulePage() {
             <span className="text-emerald-600">Nhân sự</span>
           </nav>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Lịch làm việc toàn trang trại</h1>
-          <p className="text-slate-500 mt-1 font-medium">Quản lý lịch trình vận hành hệ thống AgriIntel.</p>
+          <p className="text-slate-500 mt-1 font-medium">Quản lý lịch trình vận hành hệ thống MDFARM.</p>
         </div>
         <div className="flex gap-3">
           <button className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-emerald-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">

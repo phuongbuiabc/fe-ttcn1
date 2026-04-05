@@ -20,14 +20,15 @@ import {
   Truck,
   UserCheck,
   ClipboardCheck,
-  CalendarX
+  CalendarX,
+  Sprout
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 
 const navItems = [
   { name: "Bảng điều khiển", icon: LayoutDashboard, href: "/" },
-  { name: "Quản lý Đàn lợn", icon: PawPrint, href: "/pigs" },
+  { name: "QUẢN LÝ LỢN GIỐNG", icon: PawPrint, href: "/pigs" },
   { name: "Sinh sản", icon: Baby, href: "/reproduction" },
   { name: "Sức khỏe", icon: Stethoscope, href: "/health" },
   { name: "Chuồng nuôi", icon: Warehouse, href: "/pens" },
@@ -50,10 +51,15 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 h-screen bg-slate-50 flex flex-col sticky top-0 border-r border-slate-200/50 z-50">
+    <aside className="w-64 h-screen bg-white flex flex-col sticky top-0 border-r border-slate-200/50 z-50">
       <div className="p-8 pb-6">
-        <h1 className="text-xl font-extrabold tracking-tight text-emerald-800 font-headline">AgriIntel</h1>
-        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-0.5">Quản lý Đàn lợn v2.0</p>
+        <div className="flex items-center gap-3 mb-1">
+          <div className="w-10 h-10 bg-gradient-to-br from-[#006c49] to-[#10b981] rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/20">
+            <Sprout className="text-white" size={20} />
+          </div>
+          <h1 className="text-2xl font-extrabold tracking-tighter text-emerald-800 font-headline">MDFARM</h1>
+        </div>
+        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-0.5">QUẢN LÝ LỢN GIỐNG v2.0</p>
       </div>
 
       <nav className="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">

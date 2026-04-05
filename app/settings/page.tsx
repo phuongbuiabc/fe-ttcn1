@@ -54,7 +54,7 @@ export default function SettingsPage() {
       <div className="flex items-end justify-between">
         <div>
           <h2 className="text-3xl font-bold text-gray-900 font-manrope tracking-tight">Cài đặt hệ thống</h2>
-          <p className="text-gray-500 mt-2 font-medium">Quản lý tài khoản và cấu hình ứng dụng AgriIntel của bạn.</p>
+          <p className="text-gray-500 mt-2 font-medium">Quản lý tài khoản và cấu hình ứng dụng MDFARM của bạn.</p>
         </div>
         <button className="px-6 py-3 bg-[#006c49] text-white rounded-2xl text-sm font-bold hover:bg-emerald-800 transition-all shadow-lg shadow-emerald-900/20 flex items-center gap-2">
           <Save size={18} />

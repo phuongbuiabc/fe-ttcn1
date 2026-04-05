@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 
 import { SupplierModal } from "@/components/SupplierModal";
+import { SupplierDetailModal } from "@/components/SupplierDetailModal";
 import { AlertCircle, Edit2, Trash2 } from "lucide-react";
 
 const suppliers = [
@@ -87,7 +88,9 @@ const suppliers = [
 export default function SuppliersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<any>(null);
+  const [selectedSupplierForDetail, setSelectedSupplierForDetail] = useState<any>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [supplierToDelete, setSupplierToDelete] = useState<any>(null);
 
@@ -106,6 +109,11 @@ export default function SuppliersPage() {
     setIsModalOpen(true);
   };
 
+  const handleViewDetail = (supplier: any) => {
+    setSelectedSupplierForDetail(supplier);
+    setIsDetailModalOpen(true);
+  };
+
   const handleDeleteClick = (supplier: any) => {
     setSupplierToDelete(supplier);
     setIsDeleteModalOpen(true);
@@ -117,6 +125,12 @@ export default function SuppliersPage() {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         supplier={selectedSupplier}
+      />
+
+      <SupplierDetailModal 
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        supplier={selectedSupplierForDetail}
       />
 
       {/* Delete Confirmation Modal */}
@@ -230,6 +244,7 @@ export default function SuppliersPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ delay: i * 0.05 }}
+                    onClick={() => handleViewDetail(supplier)}
                     className="hover:bg-gray-50/50 transition-colors group cursor-pointer"
                   >
                     <td className="px-10 py-6">
@@ -282,13 +297,19 @@ export default function SuppliersPage() {
                     <td className="px-10 py-6 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button 
-                          onClick={() => handleEditSupplier(supplier)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditSupplier(supplier);
+                          }}
                           className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                         >
                           <Edit2 size={20} />
                         </button>
                         <button 
-                          onClick={() => handleDeleteClick(supplier)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(supplier);
+                          }}
                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                         >
                           <Trash2 size={20} />
