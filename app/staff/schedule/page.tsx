@@ -117,17 +117,17 @@ export default function SchedulePage() {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Lịch làm việc toàn trang trại</h1>
           <p className="text-slate-500 mt-1 font-medium">Quản lý lịch trình vận hành hệ thống MDFARM.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button 
             onClick={handleQuickAssign}
-            className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-emerald-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
+            className="flex-1 sm:flex-none px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-emerald-600 hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2"
           >
             <Zap size={18} />
             Phân công nhanh
           </button>
           <button 
             onClick={handleCreate}
-            className="px-6 py-3 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-2xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center gap-2"
+            className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-2xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2"
           >
             <Plus size={18} />
             Tạo lịch

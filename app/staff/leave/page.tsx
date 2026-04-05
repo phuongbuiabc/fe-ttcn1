@@ -89,8 +89,8 @@ export default function LeaveManagementPage() {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Quản lý Nghỉ phép</h1>
           <p className="text-slate-500 mt-1 font-medium">Theo dõi và kiểm duyệt các yêu cầu nghỉ phép của nhân sự.</p>
         </div>
-        <div className="flex gap-4">
-          <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 border-l-4 border-emerald-500">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 border-l-4 border-emerald-500 flex-1">
             <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600">
               <Clock size={20} />
             </div>

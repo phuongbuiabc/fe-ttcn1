@@ -23,7 +23,8 @@ import {
   ClipboardCheck,
   CalendarX,
   Sprout,
-  User
+  User,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
@@ -56,19 +57,27 @@ const bottomItems = [
   { name: "Hỗ trợ", icon: HelpCircle, href: "/support" },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const [isStaffExpanded, setIsStaffExpanded] = useState(pathname.startsWith("/staff"));
 
   return (
-    <aside className="w-64 h-screen bg-[#0f172a] flex flex-col sticky top-0 border-r border-white/5 z-50">
-      <div className="p-8 pb-6">
+    <aside className="w-64 h-screen bg-[#0f172a] flex flex-col border-r border-white/5 z-50">
+      <div className="p-8 pb-6 flex items-center justify-between">
         <div className="flex items-center gap-3 mb-1">
           <div className="w-10 h-10 bg-gradient-to-br from-[#006c49] to-[#10b981] rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/40">
             <Sprout className="text-white" size={20} />
           </div>
           <h1 className="text-2xl font-extrabold tracking-tighter text-white font-headline">MDFARM</h1>
         </div>
+        <button 
+          onClick={onClose}
+          className="lg:hidden p-2 text-slate-400 hover:text-white transition-colors"
+        >
+          <X size={20} />
+        </button>
+      </div>
+      <div className="px-8 mb-6 lg:block hidden">
         <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-0.5">QUẢN LÝ LỢN GIỐNG v2.0</p>
       </div>
 

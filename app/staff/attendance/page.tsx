@@ -105,16 +105,16 @@ export default function AttendancePage() {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Quản lý Chấm công</h1>
           <p className="text-slate-500 mt-1 font-medium">Theo dõi thời gian làm việc và chuyên cần của đội ngũ MDFARM.</p>
         </div>
-        <div className="flex gap-3">
-          <button className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
+        <div className="flex flex-wrap gap-3">
+          <button className="flex-1 sm:flex-none px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2">
             <Download size={18} />
             Xuất báo cáo
           </button>
-          <button className="px-6 py-3 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-2xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center gap-2">
+          <button className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-2xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2">
             <Fingerprint size={18} />
             Chấm công vào
           </button>
-          <button className="px-6 py-3 bg-slate-100 text-red-600 rounded-2xl text-sm font-bold hover:bg-red-50 transition-all flex items-center gap-2">
+          <button className="flex-1 sm:flex-none px-6 py-3 bg-slate-100 text-red-600 rounded-2xl text-sm font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2">
             <LogOut size={18} />
             Chấm công ra
           </button>

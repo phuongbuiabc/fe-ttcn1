@@ -299,8 +299,8 @@ export default function StaffPage() {
         </div>
         
         {/* Pagination Footer */}
-        <div className="p-8 bg-slate-50/50 border-t border-slate-50 flex items-center justify-between">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Hiển thị {filteredStaff.length} trên 24 nhân viên</p>
+        <div className="p-8 bg-slate-50/50 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center sm:text-left">Hiển thị {filteredStaff.length} trên 24 nhân viên</p>
           <div className="flex items-center gap-2">
             <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 transition-all">
               <ChevronRight size={20} className="rotate-180" />
