@@ -2,23 +2,6 @@
 
 import React, { useState } from "react";
 import { 
-  Search, 
-  Notifications, 
-  Warning, 
-  AddCircle, 
-  CheckCircle, 
-  ChildCare, 
-  Pets, 
-  MoreVert, 
-  ChevronRight, 
-  Analytics,
-  Info
-} from "@mui/icons-material"; // Wait, the project uses Lucide-react based on previous turns.
-// Let me check the imports in other files. 
-// Actually, the user provided HTML used Material Symbols, but the summary says Lucide-react.
-// I will use Lucide-react as per the "Required Dependencies" and "Icons" section of the system instructions.
-
-import { 
   Search as SearchIcon, 
   Bell, 
   AlertTriangle, 
@@ -46,9 +29,33 @@ import {
   Cell
 } from "recharts";
 
-// --- Mock Data ---
+// --- Types ---
 
-const summaryStats = [
+interface SummaryStat {
+  label: string;
+  value: string;
+  subValue: string;
+  type: string;
+  color: string;
+}
+
+interface SowRecord {
+  id: string;
+  breed: string;
+  pen: string;
+  status: string;
+  statusColor: string;
+  matingDate: string;
+  days: number;
+  progress: number;
+}
+
+interface PerformanceData {
+  name: string;
+  value: number;
+}
+
+const summaryStats: SummaryStat[] = [
   { label: "Tổng số nái", value: "412", subValue: "85%", type: "progress", color: "emerald" },
   { label: "Đang mang thai", value: "284", subValue: "+12 so với tháng trước", type: "text", color: "slate" },
   { label: "Sắp đẻ (7 ngày)", value: "18", subValue: "Cần chú ý", type: "alert", color: "rose" },
@@ -56,7 +63,7 @@ const summaryStats = [
   { label: "Tỉ lệ đậu thai", value: "92.4%", subValue: "Mục tiêu: 95%", type: "chart", color: "emerald" },
 ];
 
-const sowData = [
+const sowData: SowRecord[] = [
   { id: "SOW-104", breed: "Yorkshire", pen: "B-04", status: "Sắp đẻ", statusColor: "rose", matingDate: "12/08/2023", days: 114, progress: 98 },
   { id: "SOW-092", breed: "Landrace", pen: "A-12", status: "Đang mang thai", statusColor: "emerald", matingDate: "25/08/2023", days: 102, progress: 88 },
   { id: "SOW-156", breed: "Duroc", pen: "C-02", status: "Chưa phối", statusColor: "slate", matingDate: "--/--/----", days: 0, progress: 0 },
@@ -64,7 +71,7 @@ const sowData = [
   { id: "SOW-088", breed: "Landrace", pen: "A-05", status: "Sắp đẻ", statusColor: "rose", matingDate: "10/08/2023", days: 116, progress: 100 },
 ];
 
-const performanceData = [
+const performanceData: PerformanceData[] = [
   { name: "Tháng 6", value: 45 },
   { name: "Tháng 7", value: 60 },
   { name: "Tháng 8", value: 75 },
@@ -353,9 +360,10 @@ export default function ReproductionManagementPage() {
                     cursor={{ fill: 'transparent' }}
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
+                        const data = payload[0].payload as PerformanceData;
                         return (
                           <div className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-xl">
-                            {payload[0].value}% hiệu suất
+                            {data.value}% hiệu suất
                           </div>
                         );
                       }

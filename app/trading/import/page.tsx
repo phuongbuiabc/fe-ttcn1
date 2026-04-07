@@ -22,9 +22,27 @@ import {
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
-// --- Mock Data ---
+// --- Types ---
 
-const importRecords = [
+interface ImportRecord {
+  id: string;
+  date: string;
+  supplier: string;
+  type: string;
+  quantity: number;
+  totalAmount: string;
+  status: string;
+  staff: string;
+}
+
+interface Stat {
+  label: string;
+  value: string;
+  icon: React.ElementType;
+  color: string;
+}
+
+const importRecords: ImportRecord[] = [
   { 
     id: "IMP-2024-001", 
     date: "20/05/2026", 
@@ -57,7 +75,7 @@ const importRecords = [
   },
 ];
 
-const stats = [
+const stats: Stat[] = [
   { label: "Tổng nhập tháng này", value: "415.2M", icon: Package, color: "emerald" },
   { label: "Đơn hàng chờ duyệt", value: "03", icon: Clock, color: "amber" },
   { label: "Đơn hàng đang giao", value: "05", icon: Truck, color: "blue" },

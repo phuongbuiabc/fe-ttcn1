@@ -28,48 +28,112 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 
-// --- Mock Data ---
+// --- Types ---
 
-const kpis = [
+interface KPI {
+  label: string;
+  value: string;
+  color: string;
+  icon: React.ElementType;
+  progress: number;
+}
+
+interface Barn {
+  id: string;
+  name: string;
+  sector: string;
+  pigs: number;
+  litters: number;
+}
+
+interface Pig {
+  id: string;
+  date: string;
+  breed: string;
+  back: string;
+  chest: string;
+  weight: string;
+  status: string;
+  statusColor: string;
+}
+
+interface Treatment {
+  id: string;
+  breed: string;
+  type: string;
+  weight: string;
+  disease: string;
+  date: string;
+  duration: string;
+  expected: string;
+  color: string;
+}
+
+interface Vaccination {
+  id: string;
+  date: string;
+  vaccine: string;
+  dose: string;
+  staff: string;
+}
+
+interface LitterVaccination extends Vaccination {
+  count: number;
+}
+
+interface Protocol {
+  date: string;
+  drug: string;
+  dose: string;
+  status: string;
+}
+
+interface MedicalHistory {
+  start: string;
+  end: string;
+  diagnosis: string;
+}
+
+const kpis: KPI[] = [
   { label: "Số lợn bất thường", value: "12", color: "rose", icon: AlertTriangle, progress: 75 },
   { label: "Số lượng bệnh", value: "45", color: "emerald", icon: Stethoscope, progress: 40 },
   { label: "Số lượng bỏ ăn", value: "08", color: "emerald", icon: Utensils, progress: 25 },
 ];
 
-const barns = [
+const barns: Barn[] = [
   { id: "A-01", name: "Chuồng A-01", sector: "Khu sinh sản", pigs: 96, litters: 42 },
   { id: "A-02", name: "Chuồng A-02", sector: "Khu sinh sản", pigs: 82, litters: 38 },
   { id: "B-01", name: "Chuồng B-01", sector: "Khu vỗ béo", pigs: 120, litters: 0 },
   { id: "B-02", name: "Chuồng B-02", sector: "Khu vỗ béo", pigs: 115, litters: 0 },
 ];
 
-const pigsInBarn = [
+const pigsInBarn: Pig[] = [
   { id: "#LD-9821", date: "20/05/2026", breed: "Landrace", back: "28 cm", chest: "112 cm", weight: "125 kg", status: "Khỏe mạnh", statusColor: "emerald" },
   { id: "#LD-9822", date: "20/05/2026", breed: "Yorkshire", back: "26 cm", chest: "108 cm", weight: "118 kg", status: "Theo dõi", statusColor: "amber" },
 ];
 
-const activeTreatments = [
+const activeTreatments: Treatment[] = [
   { id: "#LD-9901", breed: "Duroc", type: "Nái", weight: "105 kg", disease: "Sốt xuất huyết heo (ASF)", date: "21/05/2026", duration: "14 ngày", expected: "04/06", color: "rose" },
   { id: "#LD-9844", breed: "Yorkshire", type: "Thịt", weight: "92 kg", disease: "Hội chứng rối loạn hô hấp (PRRS)", date: "18/05/2026", duration: "21 ngày", expected: "08/06", color: "amber" },
 ];
 
-const pigVaccinations = [
+const pigVaccinations: Vaccination[] = [
   { id: "#LD-9821", date: "15/05/2026", vaccine: "FMD-Vac", dose: "2ml", staff: "Nguyễn An" },
   { id: "#LD-9901", date: "10/05/2026", vaccine: "PRRS-Live", dose: "1ml", staff: "Trần Bình" },
 ];
 
-const litterVaccinations = [
+const litterVaccinations: LitterVaccination[] = [
   { id: "#PIG-004", date: "18/05/2026", vaccine: "Circo-Vac", dose: "0.5ml", count: 12, staff: "Lê Văn C" },
   { id: "#PIG-009", date: "12/05/2026", vaccine: "Iron-Dextran", dose: "1ml", count: 10, staff: "Nguyễn An" },
 ];
 
-const treatmentProtocol = [
+const treatmentProtocol: Protocol[] = [
   { date: "21/05/2026", drug: "ENRO-10X", dose: "10ml", status: "Xong" },
   { date: "22/05/2026", drug: "VIT-C-GLU", dose: "5ml", status: "Xong" },
   { date: "23/05/2026", drug: "AMOX-LA", dose: "8ml", status: "Chờ" },
 ];
 
-const medicalHistory = [
+const medicalHistory: MedicalHistory[] = [
   { start: "12/02/2026", end: "15/02/2026", diagnosis: "Tiêu chảy cấp" },
   { start: "05/11/2025", end: "15/11/2025", diagnosis: "Viêm phổi nhẹ" },
 ];
@@ -78,9 +142,9 @@ export default function HealthManagementPage() {
   const [isMonitoringOpen, setIsMonitoringOpen] = useState(true);
   const [selectedBarn, setSelectedBarn] = useState("A-01");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTreatment, setSelectedTreatment] = useState<any>(null);
+  const [selectedTreatment, setSelectedTreatment] = useState<Treatment | null>(null);
 
-  const openModal = (treatment: any) => {
+  const openModal = (treatment: Treatment) => {
     setSelectedTreatment(treatment);
     setIsModalOpen(true);
   };

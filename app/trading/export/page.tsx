@@ -25,9 +25,28 @@ import {
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
-// --- Mock Data ---
+// --- Types ---
 
-const exportRecords = [
+interface ExportRecord {
+  id: string;
+  date: string;
+  customer: string;
+  type: string;
+  quantity: number;
+  weight: string;
+  totalAmount: string;
+  status: string;
+  staff: string;
+}
+
+interface Stat {
+  label: string;
+  value: string;
+  icon: React.ElementType;
+  color: string;
+}
+
+const exportRecords: ExportRecord[] = [
   { 
     id: "EXP-2024-001", 
     date: "21/05/2026", 
@@ -63,7 +82,7 @@ const exportRecords = [
   },
 ];
 
-const stats = [
+const stats: Stat[] = [
   { label: "Doanh thu tháng này", value: "1.56B", icon: TrendingUp, color: "emerald" },
   { label: "Tổng trọng lượng xuất", value: "22.2T", icon: Scale, color: "blue" },
   { label: "Đơn hàng chờ thanh toán", value: "02", icon: DollarSign, color: "amber" },
