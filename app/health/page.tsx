@@ -143,11 +143,22 @@ export default function HealthManagementPage() {
   const [selectedBarn, setSelectedBarn] = useState("A-01");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
+  const [isVaccineModalOpen, setIsVaccineModalOpen] = useState(false);
+  const [isLitterVaccineModalOpen, setIsLitterVaccineModalOpen] = useState(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isTreatQuickModalOpen, setIsTreatQuickModalOpen] = useState(false);
+  
   const [selectedTreatment, setSelectedTreatment] = useState<Treatment | null>(null);
   const [treatments, setTreatments] = useState<Treatment[]>(activeTreatments);
   const [editingTreatment, setEditingTreatment] = useState<Treatment | null>(null);
 
-  // Form State
+  const [pVaccinations, setPVaccinations] = useState<Vaccination[]>(pigVaccinations);
+  const [lVaccinations, setLVaccinations] = useState<LitterVaccination[]>(litterVaccinations);
+  
+  const [editingVaccine, setEditingVaccine] = useState<Vaccination | null>(null);
+  const [editingLitterVaccine, setEditingLitterVaccine] = useState<LitterVaccination | null>(null);
+
+  // Form States
   const [formData, setFormData] = useState<Partial<Treatment>>({
     id: "",
     breed: "Yorkshire",
@@ -160,9 +171,66 @@ export default function HealthManagementPage() {
     color: "amber"
   });
 
+  const [vaccineFormData, setVaccineFormData] = useState<Partial<LitterVaccination>>({
+    id: "",
+    date: new Date().toLocaleDateString("vi-VN"),
+    vaccine: "",
+    dose: "",
+    staff: "",
+    count: 0
+  });
+
   const openDetailModal = (treatment: Treatment) => {
     setSelectedTreatment(treatment);
     setIsDetailModalOpen(true);
+  };
+
+  const openAddVaccineModal = (isLitter: boolean) => {
+    const initialData = {
+      id: isLitter ? "#PIG-000" : "#LD-0000",
+      date: new Date().toLocaleDateString("vi-VN"),
+      vaccine: "",
+      dose: "",
+      staff: "Nguyễn An",
+      count: 10
+    };
+    setVaccineFormData(initialData);
+    if (isLitter) {
+      setEditingLitterVaccine(null);
+      setIsLitterVaccineModalOpen(true);
+    } else {
+      setEditingVaccine(null);
+      setIsVaccineModalOpen(true);
+    }
+  };
+
+  const handleSaveVaccine = (e: React.FormEvent, isLitter: boolean) => {
+    e.preventDefault();
+    if (isLitter) {
+      if (editingLitterVaccine) {
+        setLVaccinations(lVaccinations.map(v => v.id === editingLitterVaccine.id ? (vaccineFormData as LitterVaccination) : v));
+      } else {
+        setLVaccinations([...lVaccinations, vaccineFormData as LitterVaccination]);
+      }
+      setIsLitterVaccineModalOpen(false);
+    } else {
+      if (editingVaccine) {
+        setPVaccinations(pVaccinations.map(v => v.id === editingVaccine.id ? (vaccineFormData as Vaccination) : v));
+      } else {
+        setPVaccinations([...pVaccinations, vaccineFormData as Vaccination]);
+      }
+      setIsVaccineModalOpen(false);
+    }
+  };
+
+  const handleDeleteVaccine = (id: string, isLitter: boolean) => {
+    if (confirm("Bạn có chắc chắn muốn xóa bản ghi này không?")) {
+      if (isLitter) {
+        setLVaccinations(lVaccinations.filter(v => v.id !== id));
+      } else {
+        setPVaccinations(pVaccinations.filter(v => v.id !== id));
+      }
+    }
   };
 
   const openAddModal = () => {
@@ -367,8 +435,16 @@ export default function HealthManagementPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-[11px] text-slate-400 font-medium mr-2">1-10 của 45 lợn (Chuồng {selectedBarn})</p>
                       <button className="px-4 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors">Cập nhật</button>
-                      <button className="px-4 py-1.5 text-[11px] font-bold text-white bg-emerald-600 rounded-full hover:bg-emerald-700 shadow-sm transition-all">Chuyển chuồng</button>
-                      <button className="px-4 py-1.5 text-[11px] font-bold text-white bg-emerald-600 rounded-full hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-1.5">
+                      <button 
+                        onClick={() => setIsTransferModalOpen(true)}
+                        className="px-4 py-1.5 text-[11px] font-bold text-white bg-emerald-600 rounded-full hover:bg-emerald-700 shadow-sm transition-all"
+                      >
+                        Chuyển chuồng
+                      </button>
+                      <button 
+                        onClick={() => setIsTreatQuickModalOpen(true)}
+                        className="px-4 py-1.5 text-[11px] font-bold text-white bg-emerald-600 rounded-full hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-1.5"
+                      >
                         <PlusCircle size={14} /> Điều trị
                       </button>
                     </div>
@@ -505,8 +581,8 @@ export default function HealthManagementPage() {
                   <th className="px-4 py-3 w-20"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
-                {pigVaccinations.map((v, i) => (
+            <tbody className="divide-y divide-slate-50">
+                {pVaccinations.map((v, i) => (
                   <tr key={i} className="hover:bg-slate-50 transition-colors">
                     <td className="px-4 py-4 font-bold text-sm text-slate-900">{v.id}</td>
                     <td className="px-4 py-4 text-sm text-slate-500">{v.date}</td>
@@ -515,8 +591,22 @@ export default function HealthManagementPage() {
                     <td className="px-4 py-4 text-sm text-slate-500">{v.staff}</td>
                     <td className="px-4 py-4 text-right">
                       <div className="flex items-center justify-end gap-1 text-slate-400">
-                        <button className="p-1 hover:text-emerald-600 transition-colors"><Edit size={14} /></button>
-                        <button className="p-1 hover:text-rose-500 transition-colors"><Trash2 size={14} /></button>
+                        <button 
+                          onClick={() => {
+                            setEditingVaccine(v);
+                            setVaccineFormData(v);
+                            setIsVaccineModalOpen(true);
+                          }}
+                          className="p-1 hover:text-emerald-600 transition-colors"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteVaccine(v.id, false)}
+                          className="p-1 hover:text-rose-500 transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -538,7 +628,10 @@ export default function HealthManagementPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
           <div className="px-6 py-5 border-b border-slate-50 flex items-center justify-between">
             <h2 className="text-xl font-headline font-extrabold text-slate-900">Lịch sử tiêm phòng Lợn con</h2>
-            <button className="p-1.5 bg-emerald-600 text-white rounded-full shadow-sm hover:bg-emerald-700 transition-colors">
+            <button 
+              onClick={() => openAddVaccineModal(true)}
+              className="p-1.5 bg-emerald-600 text-white rounded-full shadow-sm hover:bg-emerald-700 transition-colors"
+            >
               <Plus size={18} />
             </button>
           </div>
@@ -566,7 +659,7 @@ export default function HealthManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {litterVaccinations.map((v, i) => (
+                {lVaccinations.map((v, i) => (
                   <tr key={i} className="hover:bg-slate-50 transition-colors">
                     <td className="px-4 py-4 font-bold text-sm text-slate-900">{v.id}</td>
                     <td className="px-4 py-4 text-sm text-slate-500">{v.date}</td>
@@ -576,8 +669,22 @@ export default function HealthManagementPage() {
                     <td className="px-4 py-4 text-sm text-slate-500">{v.staff}</td>
                     <td className="px-4 py-4 text-right">
                       <div className="flex items-center justify-end gap-1 text-slate-400">
-                        <button className="p-1 hover:text-emerald-600 transition-colors"><Edit size={14} /></button>
-                        <button className="p-1 hover:text-rose-500 transition-colors"><Trash2 size={14} /></button>
+                        <button 
+                          onClick={() => {
+                            setEditingLitterVaccine(v);
+                            setVaccineFormData(v);
+                            setIsLitterVaccineModalOpen(true);
+                          }}
+                          className="p-1 hover:text-emerald-600 transition-colors"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteVaccine(v.id, true)}
+                          className="p-1 hover:text-rose-500 transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -595,6 +702,197 @@ export default function HealthManagementPage() {
           </div>
         </div>
       </div>
+
+      {/* Transfer Modal */}
+      <AnimatePresence>
+        {isTransferModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="text-xl font-headline font-black text-emerald-900">Chuyển chuồng</h3>
+                <button onClick={() => setIsTransferModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                  <X size={20} className="text-slate-400" />
+                </button>
+              </div>
+              <div className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Chuồng đích</label>
+                  <select className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none">
+                    {barns.map(b => <option key={b.id} value={b.id}>{b.name} ({b.sector})</option>)}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Lý do chuyển</label>
+                  <textarea className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none min-h-[80px]" placeholder="Nhập lý do chuyển chuồng..."></textarea>
+                </div>
+                <button 
+                  onClick={() => setIsTransferModalOpen(false)}
+                  className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
+                >
+                  Xác nhận chuyển
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Quick Treat Modal */}
+      <AnimatePresence>
+        {isTreatQuickModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="text-xl font-headline font-black text-emerald-900">Lập hồ sơ điều trị nhanh</h3>
+                <button onClick={() => setIsTreatQuickModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                  <X size={20} className="text-slate-400" />
+                </button>
+              </div>
+              <div className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Bệnh chẩn đoán</label>
+                  <input type="text" className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" placeholder="Ví dụ: Tiêu chảy" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Phác đồ đề xuất</label>
+                  <select className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none">
+                    <option>Phác đồ tiêu chuẩn A (3 ngày)</option>
+                    <option>Phác đồ tiêu chuẩn B (5 ngày)</option>
+                    <option>Tự định nghĩa</option>
+                  </select>
+                </div>
+                <button 
+                  onClick={() => setIsTreatQuickModalOpen(false)}
+                  className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
+                >
+                  Bắt đầu điều trị
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Vaccination Modal */}
+      <AnimatePresence>
+        {(isVaccineModalOpen || isLitterVaccineModalOpen) && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white">
+                <h3 className="text-xl font-headline font-black text-emerald-900">
+                  {isLitterVaccineModalOpen ? "Ghi nhận tiêm phòng Đàn con" : "Ghi nhận tiêm phòng Lợn"}
+                </h3>
+                <button 
+                  onClick={() => { setIsVaccineModalOpen(false); setIsLitterVaccineModalOpen(false); }}
+                  className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors"
+                >
+                  <X size={24} className="text-slate-400" />
+                </button>
+              </div>
+
+              <form onSubmit={(e) => handleSaveVaccine(e, isLitterVaccineModalOpen)} className="p-8 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mã (ID)</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={vaccineFormData.id}
+                      onChange={(e) => setVaccineFormData({...vaccineFormData, id: e.target.value})}
+                      className="w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ngày tiêm</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={vaccineFormData.date}
+                      onChange={(e) => setVaccineFormData({...vaccineFormData, date: e.target.value})}
+                      className="w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tên Vaccine</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={vaccineFormData.vaccine}
+                    onChange={(e) => setVaccineFormData({...vaccineFormData, vaccine: e.target.value})}
+                    className="w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Liều lượng</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={vaccineFormData.dose}
+                      onChange={(e) => setVaccineFormData({...vaccineFormData, dose: e.target.value})}
+                      className="w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                  {isLitterVaccineModalOpen && (
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Số lượng con</label>
+                      <input 
+                        type="number" 
+                        required
+                        value={vaccineFormData.count}
+                        onChange={(e) => setVaccineFormData({...vaccineFormData, count: parseInt(e.target.value)})}
+                        className="w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nhân viên thực hiện</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={vaccineFormData.staff}
+                    onChange={(e) => setVaccineFormData({...vaccineFormData, staff: e.target.value})}
+                    className="w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-6">
+                  <button 
+                    type="button"
+                    onClick={() => { setIsVaccineModalOpen(false); setIsLitterVaccineModalOpen(false); }}
+                    className="px-6 py-2 bg-white text-slate-600 text-xs font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
+                  >
+                    Hủy
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-6 py-2 bg-emerald-600 text-white text-xs font-bold rounded-full shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
+                  >
+                    Lưu bản ghi
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Treatment Detail Modal */}
       <AnimatePresence>

@@ -24,21 +24,21 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <button className="p-2 text-slate-600 hover:text-emerald-600 transition-colors relative group">
+      <div className="flex items-center gap-2 md:gap-4">
+        <button className="p-2.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-all relative group active:scale-90">
           <Bell size={20} />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white group-hover:scale-110 transition-transform"></span>
+          <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white group-hover:scale-110 transition-transform"></span>
         </button>
-        <button className="p-2 text-slate-600 hover:text-emerald-600 transition-colors">
+        <button className="p-2.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-all active:scale-90">
           <Settings size={20} />
         </button>
-        <div className="h-8 w-px bg-slate-200 mx-2"></div>
-        <div className="flex items-center gap-3">
+        <div className="h-6 w-px bg-slate-200 mx-1 md:mx-2"></div>
+        <div className="flex items-center gap-3 pl-1 md:pl-2 group cursor-pointer">
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-bold text-slate-900 leading-none font-headline">Marcus Thorne</p>
-            <p className="text-[10px] text-slate-500 uppercase tracking-tighter mt-1 font-bold">Quản lý Trang trại</p>
+            <p className="text-xs font-black text-slate-900 leading-none font-headline group-hover:text-emerald-600 transition-colors">Marcus Thorne</p>
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-black">Admin</p>
           </div>
-          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-100 shrink-0">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-100 shrink-0 group-hover:border-emerald-500 transition-all shadow-sm">
             <Image 
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU8H1s-kjjlI2NWZ__-jyblSSG7AHeOmfBWSF8MxnkOItZRulZPOyAz2qjUhh1OL64lfdFM3kKVyoIqsyWJn5zjUx7eLL_HW8pI7vf7kinoqASkg8UI3plURqUft8OU90He4GSu8H6s1eeSLihn2CxkXvzfLfGOt1_K0f_R5CcwU5SWhzTWWSwqDfcNCrJcqrvpPZbGJ421OUkC2tzipzeMZWNrpeeEb8uqSfmGHmEmiduDR15CCVyTYCHUQc6re0vxz3nNLuM4UFJ"
               alt="Marcus Thorne"

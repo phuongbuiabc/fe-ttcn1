@@ -17,7 +17,10 @@ import {
   Clock,
   AlertCircle,
   FileText,
-  Download
+  Download,
+  Edit,
+  Trash2,
+  X
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -83,9 +86,18 @@ const stats: Stat[] = [
 
 export default function ImportPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("Tất cả");
   const [records, setRecords] = useState<ImportRecord[]>(importRecords);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<ImportRecord | null>(null);
+
+  // Filtered records
+  const filteredRecords = records.filter(record => {
+    const matchesSearch = record.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         record.supplier.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === "Tất cả" || record.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
 
   // Form State
   const [formData, setFormData] = useState<Partial<ImportRecord>>({
@@ -201,9 +213,33 @@ export default function ImportPage() {
             </button>
           </div>
           <div className="flex bg-slate-100 p-1 rounded-xl">
-            <button className="px-4 py-1.5 text-xs font-bold bg-white text-emerald-700 rounded-lg shadow-sm">Tất cả</button>
-            <button className="px-4 py-1.5 text-xs font-medium text-slate-500 hover:text-emerald-700 transition-colors">Chờ duyệt</button>
-            <button className="px-4 py-1.5 text-xs font-medium text-slate-500 hover:text-emerald-700 transition-colors">Đang giao</button>
+            <button 
+              onClick={() => setFilterStatus("Tất cả")}
+              className={cn(
+                "px-4 py-1.5 text-xs font-bold rounded-lg transition-all",
+                filterStatus === "Tất cả" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-emerald-700"
+              )}
+            >
+              Tất cả
+            </button>
+            <button 
+              onClick={() => setFilterStatus("Chờ duyệt")}
+              className={cn(
+                "px-4 py-1.5 text-xs font-bold rounded-lg transition-all",
+                filterStatus === "Chờ duyệt" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-emerald-700"
+              )}
+            >
+              Chờ duyệt
+            </button>
+            <button 
+              onClick={() => setFilterStatus("Đang giao")}
+              className={cn(
+                "px-4 py-1.5 text-xs font-bold rounded-lg transition-all",
+                filterStatus === "Đang giao" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-emerald-700"
+              )}
+            >
+              Đang giao
+            </button>
           </div>
         </div>
 
@@ -223,7 +259,7 @@ export default function ImportPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {records.map((record) => (
+              {filteredRecords.map((record) => (
                 <tr key={record.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-6 py-4">
                     <span className="font-bold text-slate-900 text-sm">{record.id}</span>
@@ -258,13 +294,13 @@ export default function ImportPage() {
                         onClick={() => openEditModal(record)}
                         className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
                       >
-                        <FileText size={18} />
+                        <Edit size={18} />
                       </button>
                       <button 
                         onClick={() => handleDelete(record.id)}
                         className="p-2 text-slate-400 hover:text-rose-600 transition-colors"
                       >
-                        <AlertCircle size={18} />
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </td>

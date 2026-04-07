@@ -86,8 +86,14 @@ const performanceData: PerformanceData[] = [
 export default function ReproductionManagementPage() {
   const [selectedSowId, setSelectedSowId] = useState("SOW-092");
   const [records, setRecords] = useState<SowRecord[]>(sowData);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("Tất cả");
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<SowRecord | null>(null);
+  
+  const [isPregnancyModalOpen, setIsPregnancyModalOpen] = useState(false);
+  const [isFarrowingModalOpen, setIsFarrowingModalOpen] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState<Partial<SowRecord>>({
@@ -99,6 +105,14 @@ export default function ReproductionManagementPage() {
     matingDate: "--/--/----",
     days: 0,
     progress: 0
+  });
+
+  // Filtered records
+  const filteredRecords = records.filter(record => {
+    const matchesSearch = record.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         record.breed.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === "Tất cả" || record.status === filterStatus;
+    return matchesSearch && matchesFilter;
   });
 
   const selectedSow = records.find(s => s.id === selectedSowId) || records[0];
@@ -171,6 +185,24 @@ export default function ReproductionManagementPage() {
         </button>
       </motion.div>
 
+      {/* Header & Search */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Quản lý Sinh sản</h1>
+          <p className="text-slate-500 text-sm mt-1">Theo dõi chu kỳ phối giống, thai kỳ và lứa đẻ của đàn nái.</p>
+        </div>
+        <div className="relative w-full md:w-72">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input 
+            type="text" 
+            placeholder="Tìm ID nái, giống..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-full text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"
+          />
+        </div>
+      </div>
+
       {/* Dashboard Summary */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {summaryStats.map((stat, idx) => (
@@ -238,10 +270,15 @@ export default function ReproductionManagementPage() {
               <h3 className="text-xl font-headline font-extrabold text-slate-900">Danh sách Đàn nái</h3>
               <div className="flex gap-3">
                 <div className="relative">
-                  <select className="appearance-none bg-slate-50 border-none rounded-full px-4 py-1.5 pr-10 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-emerald-500/20 outline-none cursor-pointer">
-                    <option>Trạng thái: Tất cả</option>
-                    <option>Đang mang thai</option>
-                    <option>Sắp đẻ</option>
+                  <select 
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="appearance-none bg-slate-50 border-none rounded-full px-4 py-1.5 pr-10 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-emerald-500/20 outline-none cursor-pointer"
+                  >
+                    <option value="Tất cả">Trạng thái: Tất cả</option>
+                    <option value="Đang mang thai">Đang mang thai</option>
+                    <option value="Sắp đẻ">Sắp đẻ</option>
+                    <option value="Chưa phối">Chưa phối</option>
                   </select>
                   <ChevronRightIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 rotate-90" size={14} />
                 </div>
@@ -260,7 +297,7 @@ export default function ReproductionManagementPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {records.map((sow) => (
+                  {filteredRecords.map((sow) => (
                     <tr 
                       key={sow.id}
                       onClick={() => setSelectedSowId(sow.id)}
@@ -336,11 +373,17 @@ export default function ReproductionManagementPage() {
               Thêm Bản ghi Phối giống
             </button>
             <div className="grid grid-cols-2 gap-3">
-              <button className="flex items-center justify-center gap-2 bg-white text-slate-700 py-3 rounded-2xl font-bold text-xs border border-slate-100 shadow-sm hover:bg-slate-50 transition-colors">
+              <button 
+                onClick={() => setIsPregnancyModalOpen(true)}
+                className="flex items-center justify-center gap-2 bg-white text-slate-700 py-3 rounded-2xl font-bold text-xs border border-slate-100 shadow-sm hover:bg-slate-50 transition-colors"
+              >
                 <CheckCircle2 size={16} className="text-emerald-600" />
                 Ghi nhận Kết quả Thai
               </button>
-              <button className="flex items-center justify-center gap-2 bg-white text-slate-700 py-3 rounded-2xl font-bold text-xs border border-slate-100 shadow-sm hover:bg-slate-50 transition-colors">
+              <button 
+                onClick={() => setIsFarrowingModalOpen(true)}
+                className="flex items-center justify-center gap-2 bg-white text-slate-700 py-3 rounded-2xl font-bold text-xs border border-slate-100 shadow-sm hover:bg-slate-50 transition-colors"
+              >
                 <Baby size={16} className="text-emerald-600" />
                 Ghi nhận Đẻ
               </button>
@@ -462,6 +505,93 @@ export default function ReproductionManagementPage() {
           </div>
         </section>
       </div>
+      {/* Pregnancy Check Modal */}
+      <AnimatePresence>
+        {isPregnancyModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="text-xl font-headline font-black text-emerald-900">Ghi nhận Kết quả Thai</h3>
+                <button onClick={() => setIsPregnancyModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                  <X size={20} className="text-slate-400" />
+                </button>
+              </div>
+              <div className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">ID Nái</label>
+                  <p className="font-bold text-slate-900">{selectedSow.id}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Kết quả kiểm tra</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button className="py-3 px-4 bg-emerald-50 text-emerald-700 border-2 border-emerald-500 rounded-xl font-bold text-sm">Đậu thai</button>
+                    <button className="py-3 px-4 bg-slate-50 text-slate-600 border-2 border-transparent rounded-xl font-bold text-sm hover:bg-slate-100">Trượt thai</button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Ghi chú</label>
+                  <textarea className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none min-h-[100px]" placeholder="Nhập ghi chú kiểm tra..."></textarea>
+                </div>
+                <button 
+                  onClick={() => setIsPregnancyModalOpen(false)}
+                  className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
+                >
+                  Xác nhận kết quả
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Farrowing Modal */}
+      <AnimatePresence>
+        {isFarrowingModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="text-xl font-headline font-black text-emerald-900">Ghi nhận Đẻ</h3>
+                <button onClick={() => setIsFarrowingModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                  <X size={20} className="text-slate-400" />
+                </button>
+              </div>
+              <div className="p-8 space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Số con sống</label>
+                    <input type="number" className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" placeholder="0" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Số con chết</label>
+                    <input type="number" className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" placeholder="0" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Trọng lượng trung bình (kg)</label>
+                  <input type="number" step="0.1" className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" placeholder="1.2" />
+                </div>
+                <button 
+                  onClick={() => setIsFarrowingModalOpen(false)}
+                  className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
+                >
+                  Hoàn tất ghi nhận
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Add/Edit Modal */}
       <AnimatePresence>
         {isModalOpen && (

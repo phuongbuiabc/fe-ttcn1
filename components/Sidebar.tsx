@@ -112,19 +112,26 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
                 <button
                   onClick={() => toggleExpand(item.name)}
                   className={cn(
-                    "w-full group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200",
+                    "w-full group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 relative overflow-hidden",
                     isActive && !isExpanded
-                      ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/20" 
+                      ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/30" 
                       : "text-slate-400 hover:bg-white/5 hover:text-white"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <item.icon size={20} className={cn("transition-colors", isActive && !isExpanded ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
-                    <span className="text-sm">{item.name}</span>
+                  {isActive && !isExpanded && (
+                    <motion.div 
+                      layoutId="sidebar-active-bg"
+                      className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 z-0"
+                    />
+                  )}
+                  <div className="flex items-center gap-3 relative z-10">
+                    <item.icon size={20} className={cn("transition-colors duration-300", isActive && !isExpanded ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
+                    <span className="text-sm tracking-tight">{item.name}</span>
                   </div>
                   <motion.div
                     animate={{ rotate: isExpanded ? 90 : 0 }}
                     transition={{ duration: 0.2 }}
+                    className="relative z-10"
                   >
                     <ChevronRight size={14} className={cn(isActive && !isExpanded ? "text-white" : "text-slate-600")} />
                   </motion.div>
@@ -146,14 +153,20 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              "flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200",
+                              "flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 group/child relative",
                               isChildActive 
                                 ? "text-white font-bold bg-white/10" 
                                 : "text-slate-500 hover:text-emerald-400 hover:bg-white/5"
                             )}
                           >
-                            <child.icon size={18} className={cn(isChildActive ? "text-emerald-400" : "text-slate-600")} />
-                            <span className="text-xs">{child.name}</span>
+                            <child.icon size={18} className={cn("transition-colors duration-300", isChildActive ? "text-emerald-400" : "text-slate-600 group-hover/child:text-emerald-400")} />
+                            <span className="text-xs tracking-tight">{child.name}</span>
+                            {isChildActive && (
+                              <motion.div 
+                                layoutId="sidebar-child-dot"
+                                className="absolute right-4 w-1 h-1 bg-emerald-400 rounded-full"
+                              />
+                            )}
                           </Link>
                         );
                       })}
@@ -169,18 +182,24 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200",
+                "group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 relative overflow-hidden",
                 isActive 
-                  ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/20" 
+                  ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/30" 
                   : "text-slate-400 hover:bg-white/5 hover:text-white"
               )}
             >
-              <div className="flex items-center gap-3">
-                <item.icon size={20} className={cn("transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
-                <span className="text-sm">{item.name}</span>
+              {isActive && (
+                <motion.div 
+                  layoutId="sidebar-active-bg"
+                  className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 z-0"
+                />
+              )}
+              <div className="flex items-center gap-3 relative z-10">
+                <item.icon size={20} className={cn("transition-colors duration-300", isActive ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
+                <span className="text-sm tracking-tight">{item.name}</span>
               </div>
               {isActive && (
-                <motion.div layoutId="active-indicator">
+                <motion.div layoutId="active-indicator" className="relative z-10">
                   <ChevronRight size={14} className="text-white" />
                 </motion.div>
               )}

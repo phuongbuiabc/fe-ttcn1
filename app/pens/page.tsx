@@ -118,6 +118,8 @@ export default function BarnManagementPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [items, setItems] = useState<Barn[]>(barns);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isSensorModalOpen, setIsSensorModalOpen] = useState(false);
   const [editingBarn, setEditingBarn] = useState<Barn | null>(null);
 
   // Form State
@@ -188,7 +190,10 @@ export default function BarnManagementPage() {
           <p className="text-slate-500 text-sm mt-1">Giám sát mật độ, môi trường và tình trạng vệ sinh các khu chuồng.</p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-white text-slate-600 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-slate-50 border border-slate-100 transition-all active:scale-95">
+          <button 
+            onClick={() => setIsSensorModalOpen(true)}
+            className="px-4 py-2 bg-white text-slate-600 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-slate-50 border border-slate-100 transition-all active:scale-95"
+          >
             <Settings2 size={16} /> Cấu hình cảm biến
           </button>
           <button 
@@ -319,6 +324,13 @@ export default function BarnManagementPage() {
                   </div>
                   <div className="flex gap-2">
                     <button 
+                      onClick={() => setIsTransferModalOpen(true)}
+                      className="p-2 text-slate-400 hover:text-emerald-600 transition-colors"
+                      title="Chuyển đàn"
+                    >
+                      <ArrowRightLeft size={18} />
+                    </button>
+                    <button 
                       onClick={() => openEditModal(barn)}
                       className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
                     >
@@ -402,6 +414,13 @@ export default function BarnManagementPage() {
                   <td className="px-6 py-5 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button 
+                        onClick={() => setIsTransferModalOpen(true)}
+                        className="p-2 text-slate-400 hover:text-emerald-600 transition-colors"
+                        title="Chuyển đàn"
+                      >
+                        <ArrowRightLeft size={18} />
+                      </button>
+                      <button 
                         onClick={() => openEditModal(barn)}
                         className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
                       >
@@ -454,6 +473,92 @@ export default function BarnManagementPage() {
           </div>
         </div>
       </div>
+      {/* Transfer Modal */}
+      <AnimatePresence>
+        {isTransferModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="text-xl font-headline font-black text-emerald-900">Chuyển đàn/Chuyển chuồng</h3>
+                <button onClick={() => setIsTransferModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                  <X size={20} className="text-slate-400" />
+                </button>
+              </div>
+              <div className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Chuồng nguồn</label>
+                  <p className="font-bold text-slate-900">Chuồng A-01</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Chuồng đích</label>
+                  <select className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none">
+                    {items.map(b => <option key={b.id} value={b.id}>{b.name} ({b.type})</option>)}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Số lượng chuyển</label>
+                  <input type="number" className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" placeholder="0" />
+                </div>
+                <button 
+                  onClick={() => setIsTransferModalOpen(false)}
+                  className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
+                >
+                  Xác nhận chuyển
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Sensor Config Modal */}
+      <AnimatePresence>
+        {isSensorModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="text-xl font-headline font-black text-emerald-900">Cấu hình cảm biến</h3>
+                <button onClick={() => setIsSensorModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                  <X size={20} className="text-slate-400" />
+                </button>
+              </div>
+              <div className="p-8 space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-slate-700">Ngưỡng nhiệt độ tối đa</span>
+                    <input type="number" className="w-20 px-3 py-1.5 bg-slate-50 border-none rounded-lg text-sm font-bold text-right" defaultValue={30} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-slate-700">Ngưỡng nhiệt độ tối thiểu</span>
+                    <input type="number" className="w-20 px-3 py-1.5 bg-slate-50 border-none rounded-lg text-sm font-bold text-right" defaultValue={22} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-slate-700">Ngưỡng độ ẩm tối đa</span>
+                    <input type="number" className="w-20 px-3 py-1.5 bg-slate-50 border-none rounded-lg text-sm font-bold text-right" defaultValue={80} />
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsSensorModalOpen(false)}
+                  className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
+                >
+                  Lưu cấu hình
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Add/Edit Modal */}
       <AnimatePresence>
         {isModalOpen && (
