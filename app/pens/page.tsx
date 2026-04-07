@@ -35,7 +35,7 @@ interface BarnSensor {
 interface Barn {
   id: string;
   name: string;
-  type: "Sinh sản" | "Vỗ béo" | "Cai sữa";
+  type: "Sinh sản" | "Vỗ béo" | "Cai sữa" | "Cách ly";
   capacity: number;
   currentPigs: number;
   sensors: BarnSensor[];
