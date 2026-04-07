@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { 
   User, 
   Bell, 
@@ -41,10 +42,19 @@ interface FarmSettings {
   };
 }
 
-export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("general");
+function SettingsContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const tabParam = searchParams.get("tab");
+  
+  const activeTab = tabParam || "general";
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleTabChange = (tabId: string) => {
+    router.push(`${pathname}?tab=${tabId}`);
+  };
 
   const [settings, setSettings] = useState<FarmSettings>({
     farmName: "AgriIntel Farm - Chi nhánh Miền Bắc",
@@ -120,7 +130,7 @@ export default function SettingsPage() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={cn(
                 "w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold transition-all",
                 activeTab === tab.id 
@@ -274,30 +284,58 @@ export default function SettingsPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="p-8 space-y-8"
+                  className="p-8 space-y-10"
                 >
-                  <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Thông tin Tài khoản</h3>
-                  <div className="flex items-center gap-8">
-                    <div className="relative group">
-                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-100 shadow-sm relative">
-                        <Image 
-                          src="https://picsum.photos/seed/owner/200/200" 
-                          alt="Owner" 
-                          fill 
-                          className="object-cover"
-                          referrerPolicy="no-referrer"
-                        />
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Thông tin Cá nhân</h3>
+                    <div className="flex flex-col md:flex-row items-center gap-10 mb-10">
+                      <div className="relative group">
+                        <div className="w-40 h-40 rounded-[2.5rem] overflow-hidden border-4 border-slate-100 shadow-xl relative bg-white">
+                          <Image 
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU8H1s-kjjlI2NWZ__-jyblSSG7AHeOmfBWSF8MxnkOItZRulZPOyAz2qjUhh1OL64lfdFM3kKVyoIqsyWJn5zjUx7eLL_HW8pI7vf7kinoqASkg8UI3plURqUft8OU90He4GSu8H6s1eeSLihn2CxkXvzfLfGOt1_K0f_R5CcwU5SWhzTWWSwqDfcNCrJcqrvpPZbGJ421OUkC2tzipzeMZWNrpeeEb8uqSfmGHmEmiduDR15CCVyTYCHUQc6re0vxz3nNLuM4UFJ" 
+                            alt="Owner" 
+                            fill 
+                            className="object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                        <button className="absolute -bottom-2 -right-2 p-3 bg-emerald-600 text-white rounded-2xl shadow-xl hover:scale-110 transition-all border-4 border-white">
+                          <Camera size={20} />
+                        </button>
                       </div>
-                      <button className="absolute bottom-0 right-0 p-2 bg-emerald-600 text-white rounded-full shadow-lg hover:scale-110 transition-all">
-                        <Camera size={16} />
-                      </button>
+                      <div className="flex-1 space-y-4 w-full">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Họ và tên</label>
+                            <input type="text" defaultValue="Marcus Thorne" className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Chức vụ</label>
+                            <input type="text" defaultValue="Quản lý Trang trại" className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tiểu sử ngắn</label>
+                          <textarea rows={3} defaultValue="Chuyên gia quản lý nông nghiệp với hơn 10 năm kinh nghiệm." className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none resize-none" />
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-2xl font-black text-slate-900">{settings.ownerName}</p>
-                      <p className="text-sm font-bold text-slate-400">{settings.email}</p>
-                      <div className="flex gap-2 mt-3">
-                        <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider rounded-full">Chủ trang trại</span>
-                        <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-wider rounded-full">Gói Pro</span>
+                  </div>
+
+                  <div className="pt-10 border-t border-slate-50">
+                    <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Liên kết Tài khoản</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm">
+                            <Globe size={24} className="text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-900">Google Account</p>
+                            <p className="text-xs text-slate-400 font-medium">marcus.thorne@gmail.com</p>
+                          </div>
+                        </div>
+                        <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest rounded-full">Đã kết nối</span>
                       </div>
                     </div>
                   </div>
@@ -319,7 +357,7 @@ export default function SettingsPage() {
                       { id: "push", label: "Thông báo đẩy (Push)", desc: "Nhận thông báo trực tiếp trên trình duyệt hoặc điện thoại." },
                       { id: "sms", label: "Thông báo qua SMS", desc: "Nhận tin nhắn khẩn cấp khi có sự cố nghiêm trọng." },
                     ].map((item) => (
-                      <div key={item.id} className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                      <div key={item.id} className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100 group hover:border-emerald-200 transition-all">
                         <div>
                           <p className="text-sm font-bold text-slate-900">{item.label}</p>
                           <p className="text-xs font-medium text-slate-400 mt-1">{item.desc}</p>
@@ -338,7 +376,7 @@ export default function SettingsPage() {
                           )}
                         >
                           <div className={cn(
-                            "absolute top-1 w-4 h-4 bg-white rounded-full transition-all",
+                            "absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm",
                             settings.notifications[item.id as keyof typeof settings.notifications] ? "left-7" : "left-1"
                           )} />
                         </button>
@@ -354,37 +392,64 @@ export default function SettingsPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="p-8 space-y-8"
+                  className="p-8 space-y-10"
                 >
-                  <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Bảo mật & Quyền riêng tư</h3>
-                  <div className="space-y-6">
-                    <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
-                          <Shield size={24} />
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Mật khẩu & Truy cập</h3>
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mật khẩu hiện tại</label>
+                          <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" />
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-900">Xác thực 2 yếu tố (2FA)</p>
-                          <p className="text-xs font-medium text-slate-400 mt-1">Tăng cường bảo mật cho tài khoản của bạn.</p>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mật khẩu mới</label>
+                          <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" />
                         </div>
                       </div>
-                      <button className="px-4 py-2 bg-white text-slate-600 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                        Thiết lập
+                      <button className="px-6 py-2.5 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all">
+                        Cập nhật mật khẩu
                       </button>
                     </div>
-                    <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
-                          <Database size={24} />
+                  </div>
+
+                  <div className="pt-10 border-t border-slate-50">
+                    <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Bảo mật nâng cao</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 flex flex-col justify-between">
+                        <div className="space-y-4">
+                          <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-sm">
+                            <Shield size={28} />
+                          </div>
+                          <div>
+                            <p className="text-base font-black text-slate-900">Xác thực 2 yếu tố (2FA)</p>
+                            <p className="text-xs text-slate-400 font-bold mt-1 leading-relaxed">Tăng cường bảo mật bằng cách yêu cầu mã xác thực từ điện thoại.</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-900">Sao lưu dữ liệu</p>
-                          <p className="text-xs font-medium text-slate-400 mt-1">Lần cuối: 2 giờ trước.</p>
+                        <div className="mt-8 flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Đang bật</span>
+                          <button className="px-4 py-2 bg-white text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
+                            Cấu hình
+                          </button>
                         </div>
                       </div>
-                      <button className="px-4 py-2 bg-white text-slate-600 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                        Tải bản sao lưu
-                      </button>
+                      <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 flex flex-col justify-between">
+                        <div className="space-y-4">
+                          <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-sm">
+                            <Database size={28} />
+                          </div>
+                          <div>
+                            <p className="text-base font-black text-slate-900">Sao lưu dữ liệu</p>
+                            <p className="text-xs text-slate-400 font-bold mt-1 leading-relaxed">Tự động sao lưu dữ liệu trang trại hàng ngày vào đám mây.</p>
+                          </div>
+                        </div>
+                        <div className="mt-8 flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lần cuối: 2h trước</span>
+                          <button className="px-4 py-2 bg-white text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
+                            Tải về
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -394,5 +459,13 @@ export default function SettingsPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading settings...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 }
