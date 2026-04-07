@@ -13,7 +13,10 @@ import {
   BarChart3,
   Info as InfoIcon,
   Activity,
-  PawPrint
+  PawPrint,
+  X,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -82,8 +85,70 @@ const performanceData: PerformanceData[] = [
 
 export default function ReproductionManagementPage() {
   const [selectedSowId, setSelectedSowId] = useState("SOW-092");
+  const [records, setRecords] = useState<SowRecord[]>(sowData);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<SowRecord | null>(null);
 
-  const selectedSow = sowData.find(s => s.id === selectedSowId) || sowData[1];
+  // Form State
+  const [formData, setFormData] = useState<Partial<SowRecord>>({
+    id: "",
+    breed: "Yorkshire",
+    pen: "",
+    status: "Chưa phối",
+    statusColor: "slate",
+    matingDate: "--/--/----",
+    days: 0,
+    progress: 0
+  });
+
+  const selectedSow = records.find(s => s.id === selectedSowId) || records[0];
+
+  const openAddModal = () => {
+    setEditingRecord(null);
+    setFormData({
+      id: `SOW-${Math.floor(100 + Math.random() * 900)}`,
+      breed: "Yorkshire",
+      pen: "",
+      status: "Chưa phối",
+      statusColor: "slate",
+      matingDate: "--/--/----",
+      days: 0,
+      progress: 0
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (record: SowRecord) => {
+    setEditingRecord(record);
+    setFormData(record);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm("Bạn có chắc chắn muốn xóa bản ghi này không?")) {
+      const newRecords = records.filter(r => r.id !== id);
+      setRecords(newRecords);
+      if (selectedSowId === id && newRecords.length > 0) {
+        setSelectedSowId(newRecords[0].id);
+      }
+    }
+  };
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    const statusColor = formData.status === "Sắp đẻ" ? "rose" : 
+                       formData.status === "Đang mang thai" ? "emerald" : "slate";
+    
+    const newRecord = { ...formData, statusColor } as SowRecord;
+
+    if (editingRecord) {
+      setRecords(records.map(r => r.id === editingRecord.id ? newRecord : r));
+    } else {
+      setRecords([newRecord, ...records]);
+      setSelectedSowId(newRecord.id);
+    }
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="space-y-8 pb-20">
@@ -195,7 +260,7 @@ export default function ReproductionManagementPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {sowData.map((sow) => (
+                  {records.map((sow) => (
                     <tr 
                       key={sow.id}
                       onClick={() => setSelectedSowId(sow.id)}
@@ -232,11 +297,25 @@ export default function ReproductionManagementPage() {
                         </div>
                       </td>
                       <td className="px-6 py-5 text-right">
-                        {selectedSowId === sow.id ? (
-                          <ChevronRightIcon className="text-emerald-600 ml-auto" size={18} />
-                        ) : (
-                          <MoreVertical className="text-slate-300 hover:text-slate-600 ml-auto" size={18} />
-                        )}
+                        <div className="flex items-center justify-end gap-2">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); openEditModal(sow); }}
+                            className="p-1.5 text-slate-400 hover:text-blue-600 transition-colors"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleDelete(sow.id); }}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                          {selectedSowId === sow.id ? (
+                            <ChevronRightIcon className="text-emerald-600" size={18} />
+                          ) : (
+                            <ChevronRightIcon className="text-slate-200" size={18} />
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -249,7 +328,10 @@ export default function ReproductionManagementPage() {
         {/* Sidebar Detail View */}
         <section className="lg:w-2/5 space-y-6">
           <div className="grid grid-cols-1 gap-3">
-            <button className="flex items-center justify-center gap-2 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white py-4 rounded-full font-bold shadow-lg shadow-emerald-900/20 hover:scale-[1.02] active:scale-95 transition-all">
+            <button 
+              onClick={openAddModal}
+              className="flex items-center justify-center gap-2 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white py-4 rounded-full font-bold shadow-lg shadow-emerald-900/20 hover:scale-[1.02] active:scale-95 transition-all"
+            >
               <PlusCircle size={20} />
               Thêm Bản ghi Phối giống
             </button>
@@ -380,6 +462,123 @@ export default function ReproductionManagementPage() {
           </div>
         </section>
       </div>
+      {/* Add/Edit Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white">
+                <h3 className="text-2xl font-headline font-black text-emerald-900">
+                  {editingRecord ? "Sửa bản ghi phối giống" : "Thêm bản ghi phối giống mới"}
+                </h3>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors"
+                >
+                  <X size={24} className="text-slate-400" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSave} className="p-8 space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">ID Nái</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.id}
+                      onChange={(e) => setFormData({...formData, id: e.target.value})}
+                      placeholder="SOW-XXX"
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Giống</label>
+                    <select 
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                      value={formData.breed}
+                      onChange={(e) => setFormData({...formData, breed: e.target.value as any})}
+                    >
+                      <option>Yorkshire</option>
+                      <option>Landrace</option>
+                      <option>Duroc</option>
+                      <option>Pietrain</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Ô/Chuồng</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.pen}
+                      onChange={(e) => setFormData({...formData, pen: e.target.value})}
+                      placeholder="Ví dụ: B-04"
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Trạng thái</label>
+                    <select 
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                      value={formData.status}
+                      onChange={(e) => setFormData({...formData, status: e.target.value as any})}
+                    >
+                      <option>Chưa phối</option>
+                      <option>Đang mang thai</option>
+                      <option>Sắp đẻ</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Ngày phối</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.matingDate}
+                      onChange={(e) => setFormData({...formData, matingDate: e.target.value})}
+                      placeholder="DD/MM/YYYY"
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Số ngày mang thai</label>
+                    <input 
+                      type="number" 
+                      required
+                      value={formData.days}
+                      onChange={(e) => {
+                        const days = parseInt(e.target.value);
+                        setFormData({...formData, days, progress: Math.min(100, Math.round((days / 114) * 100))});
+                      }}
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+                  <button 
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-8 py-2.5 bg-white text-slate-600 text-sm font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
+                  >
+                    Hủy
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-8 py-2.5 bg-emerald-600 text-white text-sm font-bold rounded-full shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
+                  >
+                    Lưu thông tin
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -9,6 +9,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
 
+  const isAuthPage = pathname === "/login" || pathname === "/register";
+
   // Close sidebar when route changes on mobile
   useEffect(() => {
     if (isSidebarOpen) {
@@ -16,6 +18,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       return () => clearTimeout(timer);
     }
   }, [pathname, isSidebarOpen]);
+
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen bg-white">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f8f9fa]">

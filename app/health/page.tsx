@@ -141,12 +141,66 @@ const medicalHistory: MedicalHistory[] = [
 export default function HealthManagementPage() {
   const [isMonitoringOpen, setIsMonitoringOpen] = useState(true);
   const [selectedBarn, setSelectedBarn] = useState("A-01");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
   const [selectedTreatment, setSelectedTreatment] = useState<Treatment | null>(null);
+  const [treatments, setTreatments] = useState<Treatment[]>(activeTreatments);
+  const [editingTreatment, setEditingTreatment] = useState<Treatment | null>(null);
 
-  const openModal = (treatment: Treatment) => {
+  // Form State
+  const [formData, setFormData] = useState<Partial<Treatment>>({
+    id: "",
+    breed: "Yorkshire",
+    type: "Thịt",
+    weight: "",
+    disease: "",
+    date: new Date().toLocaleDateString("vi-VN"),
+    duration: "7 ngày",
+    expected: "",
+    color: "amber"
+  });
+
+  const openDetailModal = (treatment: Treatment) => {
     setSelectedTreatment(treatment);
-    setIsModalOpen(true);
+    setIsDetailModalOpen(true);
+  };
+
+  const openAddModal = () => {
+    setEditingTreatment(null);
+    setFormData({
+      id: `#LD-${Math.floor(1000 + Math.random() * 9000)}`,
+      breed: "Yorkshire",
+      type: "Thịt",
+      weight: "90 kg",
+      disease: "",
+      date: new Date().toLocaleDateString("vi-VN"),
+      duration: "7 ngày",
+      expected: "30/05/2026",
+      color: "amber"
+    });
+    setIsAddEditModalOpen(true);
+  };
+
+  const openEditModal = (treatment: Treatment) => {
+    setEditingTreatment(treatment);
+    setFormData(treatment);
+    setIsAddEditModalOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm("Bạn có chắc chắn muốn xóa hồ sơ này không?")) {
+      setTreatments(treatments.filter(t => t.id !== id));
+    }
+  };
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingTreatment) {
+      setTreatments(treatments.map(t => t.id === editingTreatment.id ? (formData as Treatment) : t));
+    } else {
+      setTreatments([...treatments, formData as Treatment]);
+    }
+    setIsAddEditModalOpen(false);
   };
 
   return (
@@ -161,7 +215,10 @@ export default function HealthManagementPage() {
           <button className="px-4 py-2 bg-white text-slate-600 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-slate-50 border border-slate-100 transition-all active:scale-95">
             <Calendar size={16} /> Lịch tiêm
           </button>
-          <button className="px-6 py-2 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/20 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all">
+          <button 
+            onClick={openAddModal}
+            className="px-6 py-2 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/20 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all"
+          >
             <PlusCircle size={18} /> Lập hồ sơ mới
           </button>
         </div>
@@ -353,7 +410,7 @@ export default function HealthManagementPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {activeTreatments.map((item, idx) => (
+              {treatments.map((item, idx) => (
                 <tr key={idx} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4"><input type="checkbox" className="rounded text-emerald-600 focus:ring-emerald-600 w-4 h-4" /></td>
                   <td className="px-4 py-4 font-bold text-sm text-slate-900">{item.id}</td>
@@ -369,12 +426,29 @@ export default function HealthManagementPage() {
                   <td className="px-4 py-4 text-sm text-slate-500">{item.date}</td>
                   <td className="px-4 py-4 text-sm font-semibold text-emerald-600">{item.duration} (Dự kiến {item.expected})</td>
                   <td className="px-4 py-4 text-right">
-                    <button 
-                      onClick={() => openModal(item)}
-                      className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
-                    >
-                      <Eye size={18} />
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => openDetailModal(item)}
+                        className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                        title="Xem chi tiết"
+                      >
+                        <Eye size={18} />
+                      </button>
+                      <button 
+                        onClick={() => openEditModal(item)}
+                        className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                        title="Sửa"
+                      >
+                        <Edit size={18} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(item.id)}
+                        className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                        title="Xóa"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -524,7 +598,7 @@ export default function HealthManagementPage() {
 
       {/* Treatment Detail Modal */}
       <AnimatePresence>
-        {isModalOpen && (
+        {isDetailModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
@@ -545,7 +619,7 @@ export default function HealthManagementPage() {
                   </div>
                 </div>
                 <button 
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => setIsDetailModalOpen(false)}
                   className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors"
                 >
                   <X size={24} className="text-slate-400" />
@@ -647,7 +721,7 @@ export default function HealthManagementPage() {
 
               <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 sticky bottom-0 z-10">
                 <button 
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => setIsDetailModalOpen(false)}
                   className="px-8 py-2.5 bg-white text-slate-600 text-sm font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
                 >
                   Đóng
@@ -656,6 +730,118 @@ export default function HealthManagementPage() {
                   <Printer size={18} /> In hồ sơ
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Add/Edit Treatment Modal */}
+      <AnimatePresence>
+        {isAddEditModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white">
+                <h3 className="text-2xl font-headline font-black text-emerald-900">
+                  {editingTreatment ? "Sửa hồ sơ điều trị" : "Lập hồ sơ điều trị mới"}
+                </h3>
+                <button 
+                  onClick={() => setIsAddEditModalOpen(false)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors"
+                >
+                  <X size={24} className="text-slate-400" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSave} className="p-8 space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Số tai (ID)</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.id}
+                      onChange={(e) => setFormData({...formData, id: e.target.value})}
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Giống</label>
+                    <select 
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                      value={formData.breed}
+                      onChange={(e) => setFormData({...formData, breed: e.target.value})}
+                    >
+                      <option>Yorkshire</option>
+                      <option>Landrace</option>
+                      <option>Duroc</option>
+                      <option>Pietrain</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Bệnh điều trị</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.disease}
+                      onChange={(e) => setFormData({...formData, disease: e.target.value})}
+                      placeholder="Ví dụ: Sốt xuất huyết heo"
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Trọng lượng</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.weight}
+                      onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Thời gian dự kiến</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.duration}
+                      onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400">Mức độ</label>
+                    <select 
+                      className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                      value={formData.color}
+                      onChange={(e) => setFormData({...formData, color: e.target.value as any})}
+                    >
+                      <option value="amber">Trung bình</option>
+                      <option value="rose">Nghiêm trọng</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+                  <button 
+                    type="button"
+                    onClick={() => setIsAddEditModalOpen(false)}
+                    className="px-8 py-2.5 bg-white text-slate-600 text-sm font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
+                  >
+                    Hủy
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-8 py-2.5 bg-emerald-600 text-white text-sm font-bold rounded-full shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
+                  >
+                    Lưu hồ sơ
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </div>
         )}
