@@ -109,11 +109,6 @@ export default function SchedulePage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <nav className="flex text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold mb-2">
-            <span className="hover:text-emerald-600 cursor-pointer transition-colors">Cơ sở dữ liệu</span>
-            <span className="mx-2 text-slate-300">/</span>
-            <span className="text-emerald-600">Nhân sự</span>
-          </nav>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Lịch làm việc toàn trang trại</h1>
           <p className="text-slate-500 mt-1 font-medium">Quản lý lịch trình vận hành hệ thống MDFARM.</p>
         </div>

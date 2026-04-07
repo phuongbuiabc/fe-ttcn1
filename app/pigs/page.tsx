@@ -247,11 +247,6 @@ export default function PigManagementPage() {
       {/* Header Actions */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <nav className="flex items-center gap-2 text-sm text-slate-400 mb-1">
-            <span>Livestock</span>
-            <ChevronRight size={14} />
-            <span className="text-emerald-600 font-semibold">Quản lý Lợn</span>
-          </nav>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Quản lý Lợn</h1>
         </div>
         <div className="flex flex-wrap gap-2">

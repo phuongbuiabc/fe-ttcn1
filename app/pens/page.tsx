@@ -182,10 +182,6 @@ export default function BarnManagementPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-emerald-600 mb-1">
-            <LayoutGrid size={20} />
-            <span className="text-xs font-bold uppercase tracking-wider">Hạ tầng</span>
-          </div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Quản lý Chuồng nuôi</h1>
           <p className="text-slate-500 text-sm mt-1">Giám sát mật độ, môi trường và tình trạng vệ sinh các khu chuồng.</p>
         </div>

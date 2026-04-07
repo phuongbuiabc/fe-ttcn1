@@ -153,10 +153,6 @@ export default function ImportPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-emerald-600 mb-1">
-            <ArrowDownLeft size={20} />
-            <span className="text-xs font-bold uppercase tracking-wider">Giao dịch</span>
-          </div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Nhập hàng</h1>
           <p className="text-slate-500 text-sm mt-1">Quản lý các đơn hàng nhập giống, vật tư và thức ăn.</p>
         </div>
