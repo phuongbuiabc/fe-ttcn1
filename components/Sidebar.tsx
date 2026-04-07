@@ -24,21 +24,29 @@ import {
   CalendarX,
   Sprout,
   User,
-  X
+  X,
+  ArrowDownLeft,
+  ArrowUpRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 const navItems = [
   { name: "Bảng điều khiển", icon: LayoutDashboard, href: "/" },
-  { name: "QUẢN LÝ LỢN GIỐNG", icon: PawPrint, href: "/pigs" },
+  { name: "Quản lý Đàn lợn", icon: PawPrint, href: "/pigs" },
   { name: "Sinh sản", icon: Baby, href: "/reproduction" },
   { name: "Sức khỏe", icon: Stethoscope, href: "/health" },
   { name: "Chuồng nuôi", icon: Warehouse, href: "/pens" },
-  { name: "Quản lý Kho", icon: Database, href: "/inventory" },
-  { name: "Khách hàng", icon: UserCheck, href: "/customers" },
-  { name: "Nhà cung cấp", icon: Truck, href: "/suppliers" },
-  { name: "Mua bán", icon: ShoppingCart, href: "/trading" },
+  { name: "Vật tư", icon: Database, href: "/inventory" },
+  { 
+    name: "Mua bán", 
+    icon: ShoppingCart, 
+    href: "/trading",
+    children: [
+      { name: "Nhập hàng", icon: ArrowDownLeft, href: "/trading/import" },
+      { name: "Bán hàng", icon: ArrowUpRight, href: "/trading/export" },
+    ]
+  },
   { 
     name: "Nhân sự", 
     icon: Users, 
@@ -59,7 +67,18 @@ const bottomItems = [
 
 export function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
-  const [isStaffExpanded, setIsStaffExpanded] = useState(pathname.startsWith("/staff"));
+  const [expandedItems, setExpandedItems] = useState<string[]>(() => {
+    const expanded = [];
+    if (pathname.startsWith("/staff")) expanded.push("Nhân sự");
+    if (pathname.startsWith("/trading")) expanded.push("Mua bán");
+    return expanded;
+  });
+
+  const toggleExpand = (name: string) => {
+    setExpandedItems(prev => 
+      prev.includes(name) ? prev.filter(i => i !== name) : [...prev, name]
+    );
+  };
 
   return (
     <aside className="w-64 h-screen bg-[#0f172a] flex flex-col border-r border-white/5 z-50">
@@ -87,31 +106,32 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           const isActive = pathname === item.href || (hasChildren && pathname.startsWith(item.href));
           
           if (hasChildren) {
+            const isExpanded = expandedItems.includes(item.name);
             return (
               <div key={item.name} className="space-y-1">
                 <button
-                  onClick={() => setIsStaffExpanded(!isStaffExpanded)}
+                  onClick={() => toggleExpand(item.name)}
                   className={cn(
                     "w-full group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200",
-                    isActive && !isStaffExpanded
+                    isActive && !isExpanded
                       ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/20" 
                       : "text-slate-400 hover:bg-white/5 hover:text-white"
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon size={20} className={cn("transition-colors", isActive && !isStaffExpanded ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
+                    <item.icon size={20} className={cn("transition-colors", isActive && !isExpanded ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
                     <span className="text-sm">{item.name}</span>
                   </div>
                   <motion.div
-                    animate={{ rotate: isStaffExpanded ? 90 : 0 }}
+                    animate={{ rotate: isExpanded ? 90 : 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ChevronRight size={14} className={cn(isActive && !isStaffExpanded ? "text-white" : "text-slate-600")} />
+                    <ChevronRight size={14} className={cn(isActive && !isExpanded ? "text-white" : "text-slate-600")} />
                   </motion.div>
                 </button>
                 
                 <AnimatePresence initial={false}>
-                  {isStaffExpanded && (
+                  {isExpanded && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}

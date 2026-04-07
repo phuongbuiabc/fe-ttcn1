@@ -19,7 +19,15 @@ import {
   Thermometer,
   Leaf,
   BellRing,
-  ShoppingCart
+  ShoppingCart,
+  Venus,
+  Mars,
+  Warehouse,
+  History,
+  AlertTriangle,
+  Zap,
+  Syringe,
+  BellDot
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -29,143 +37,258 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell
 } from "recharts";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
-const herdData = [
-  { month: "Tháng 1", value: 1500 },
-  { month: "Tháng 2", value: 1800 },
-  { month: "Tháng 3", value: 1700 },
-  { month: "Tháng 4", value: 2100 },
-  { month: "Tháng 5", value: 2300 },
-  { month: "Tháng 6", value: 2500 },
+const weightGrowthData = [
+  { day: "Ng1", meat: 30, piglet: 10 },
+  { day: "Ng3", meat: 35, piglet: 12 },
+  { day: "Ng5", meat: 45, piglet: 15 },
+  { day: "Ng7", meat: 42, piglet: 18 },
+  { day: "Ng9", meat: 55, piglet: 20 },
+  { day: "Ng11", meat: 60, piglet: 22 },
+  { day: "Ng13", meat: 68, piglet: 25 },
+  { day: "Nay", meat: 120, piglet: 30 },
+];
+
+const feedConsumptionData = [
+  { day: "T2", value: 60 },
+  { day: "T3", value: 75 },
+  { day: "T4", value: 85 },
+  { day: "T5", value: 70 },
+  { day: "T6", value: 90 },
+  { day: "T7", value: 65 },
+  { day: "CN", value: 80 },
+];
+
+const fcrData = [
+  { week: "Tuần 1", value: 3.0 },
+  { week: "Tuần 2", value: 2.8 },
+  { week: "Tuần 3", value: 2.5 },
+  { week: "Tuần 4", value: 2.2 },
+  { week: "Hiện tại", value: 2.0 },
+];
+
+const weightDistData = [
+  { range: "0-20", count: 15 },
+  { range: "20-40", count: 25 },
+  { range: "40-60", count: 50 },
+  { range: "60-80", count: 85 },
+  { range: "80-100", count: 60 },
+  { range: "100-120", count: 35 },
+  { range: "120+", count: 10 },
+];
+
+const survivalData = [
+  { name: "Sống", value: 96, color: "#10b981" },
+  { name: "Rủi ro", value: 4, color: "#e2e8f0" },
 ];
 
 const stats = [
   { 
-    title: "Tổng số lợn", 
-    value: "2,500", 
-    change: "+4.2% so với tháng trước", 
+    title: "Số nái", 
+    value: "450", 
+    change: "+5%", 
     trend: "up", 
-    icon: Package,
-    color: "emerald",
-    accent: "bg-[#006c49]"
+    icon: Venus,
+    color: "primary",
+    accent: "bg-[#006c49]",
+    desc: ""
   },
   { 
-    title: "Tổng số lô", 
-    value: "45", 
-    change: "8 lô đang trong giai đoạn cai sữa", 
+    title: "Số nọc", 
+    value: "25", 
+    change: "Đang hoạt động tốt", 
     trend: "neutral", 
-    icon: LayoutGrid,
-    color: "teal",
-    accent: "bg-[#1b6b51]"
+    icon: Mars,
+    color: "secondary",
+    accent: "bg-[#1b6b51]",
+    desc: ""
   },
   { 
-    title: "Lợn đang mang thai", 
-    value: "320", 
-    change: "12 con dự sinh trong 48 giờ tới", 
+    title: "Số lợn con", 
+    value: "1,850", 
+    change: "Sống sót: 96%", 
     trend: "neutral", 
     icon: Baby,
-    color: "emerald-container",
-    accent: "bg-[#10b981]"
+    color: "primary-container",
+    accent: "bg-[#10b981]",
+    desc: ""
   },
   { 
-    title: "Bệnh / Cảnh báo", 
-    value: "12", 
-    change: "Yêu cầu chú ý ngay lập tức", 
-    trend: "down", 
+    title: "Mang thai", 
+    value: "120", 
+    change: "12 dự sinh tuần này", 
+    trend: "neutral", 
     icon: Stethoscope,
+    color: "emerald",
+    accent: "bg-emerald-600",
+    desc: ""
+  },
+  { 
+    title: "Thức ăn", 
+    value: "12.4k", 
+    unit: "kg",
+    change: "Đủ 14 ngày", 
+    trend: "neutral", 
+    icon: Package,
+    color: "primary",
+    accent: "bg-[#006c49]",
+    desc: ""
+  },
+  { 
+    title: "Bất thường", 
+    value: "12", 
+    change: "Cần kiểm tra", 
+    trend: "down", 
+    icon: AlertCircle,
     color: "error",
-    accent: "bg-[#ba1a1a]"
+    accent: "bg-[#ba1a1a]",
+    desc: ""
   },
 ];
 
-const activities = [
-  { id: "B-129", event: "Đã thêm lô mới", desc: "Nhập 250 lợn con", time: "2 giờ trước", icon: PlusCircle, iconColor: "text-emerald-600", bgColor: "bg-emerald-50" },
-  { id: "G-02", event: "Chuyển lợn sang Chuồng 5", desc: "Đã chuyển nái #882", time: "5 giờ trước", icon: MoveDown, iconColor: "text-blue-600", bgColor: "bg-blue-50" },
-  { id: "B-12", event: "Hoàn thành kiểm tra y tế", desc: "BS. Hans đã kiểm tra Ô 4", time: "Hôm qua", icon: AlertCircle, iconColor: "text-red-600", bgColor: "bg-red-50" },
-  { id: "KHO", event: "Xác nhận nhập thức ăn", desc: "5 tấn Hỗn hợp Ngũ cốc A", time: "24 thg 10", icon: Package, iconColor: "text-amber-600", bgColor: "bg-amber-50" },
+const alerts = [
+  { 
+    category: "Sức khỏe", 
+    time: "Vừa xong", 
+    title: "Đến hạn tiêm chủng Lô B-12", 
+    desc: "Lịch trình đã quá hạn 4 ngày. Cần xử lý ngay.", 
+    action: "Xử lý ngay", 
+    color: "text-[#ba1a1a]", 
+    bgColor: "bg-red-50/50", 
+    borderColor: "border-[#ba1a1a]" 
+  },
+  { 
+    category: "Kho bãi", 
+    time: "2 giờ trước", 
+    title: "Sắp hết thức ăn tại Chuồng 3", 
+    desc: "Mức dự trữ còn 12%. Dự kiến hết trong: 18 giờ.", 
+    action: "Đặt hàng", 
+    color: "text-amber-600", 
+    bgColor: "bg-slate-50", 
+    borderColor: "border-amber-500" 
+  },
+  { 
+    category: "Sinh sản", 
+    time: "5 giờ trước", 
+    title: "Nái #452 bắt đầu sinh", 
+    desc: "Ghi nhận 4 con khỏe mạnh.", 
+    action: "", 
+    color: "text-[#006c49]", 
+    bgColor: "bg-slate-50", 
+    borderColor: "border-[#006c49]" 
+  },
+  { 
+    category: "Môi trường", 
+    time: "8 giờ trước", 
+    title: "Nhiệt độ Chuồng 5 tăng cao", 
+    desc: "Cần điều chỉnh hệ thống làm mát.", 
+    action: "", 
+    color: "text-[#1b6b51]", 
+    bgColor: "bg-slate-50", 
+    borderColor: "border-[#1b6b51]" 
+  },
+];
+
+const recentActivities = [
+  { event: "Đã thêm lô mới", desc: "250 lợn con - B-129", time: "2h", icon: PlusCircle, iconColor: "text-emerald-600", bgColor: "bg-emerald-50" },
+  { event: "Chuyển sang Chuồng 5", desc: "Nái #882 - G-02", time: "5h", icon: MoveDown, iconColor: "text-blue-600", bgColor: "bg-blue-50" },
+  { event: "Cập nhật vật tư", desc: "Nhập 500kg thức ăn", time: "8h", icon: Package, iconColor: "text-amber-600", bgColor: "bg-amber-50" },
+  { event: "Tiêm chủng xong", desc: "Lô thịt C-42", time: "12h", icon: Stethoscope, iconColor: "text-purple-600", bgColor: "bg-purple-50" },
 ];
 
 export default function Dashboard() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Hero Statistics Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {stats.map((stat, i) => (
           <motion.div 
             key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="bg-white rounded-xl p-6 relative overflow-hidden group shadow-sm border border-slate-100"
+            transition={{ delay: i * 0.05 }}
+            className={cn(
+              "bg-white rounded-xl p-3 relative overflow-hidden group border border-slate-100 shadow-sm",
+              stat.color === "error" && "bg-red-50/10 border-red-100"
+            )}
           >
             <div className={cn("absolute top-0 left-0 w-1 h-full", stat.accent)}></div>
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">{stat.title}</p>
-                <h3 className={cn(
-                  "text-4xl font-extrabold tracking-tight font-headline",
-                  stat.color === "error" ? "text-[#ba1a1a]" : "text-slate-900"
-                )}>{stat.value}</h3>
-              </div>
+            <div className="flex justify-between items-start mb-1">
+              <p className={cn(
+                "text-[9px] font-bold uppercase tracking-wider",
+                stat.color === "error" ? "text-[#ba1a1a]" : "text-slate-400"
+              )}>{stat.title}</p>
               <div className={cn(
-                "p-3 rounded-full",
+                "p-1 rounded-full",
+                stat.color === "primary" ? "bg-emerald-50 text-emerald-600" :
+                stat.color === "secondary" ? "bg-teal-50 text-teal-600" :
+                stat.color === "primary-container" ? "bg-emerald-50 text-emerald-500" :
                 stat.color === "emerald" ? "bg-emerald-50 text-emerald-600" :
-                stat.color === "teal" ? "bg-teal-50 text-teal-600" :
-                stat.color === "emerald-container" ? "bg-emerald-50 text-emerald-500" :
                 "bg-red-50 text-red-600"
               )}>
-                <stat.icon size={24} />
+                <stat.icon size={16} />
               </div>
             </div>
+            <h3 className="text-xl font-extrabold text-slate-900 tracking-tight font-headline">
+              {stat.value}
+              {stat.unit && <span className="text-xs font-bold ml-0.5">{stat.unit}</span>}
+            </h3>
             <div className={cn(
-              "mt-4 flex items-center gap-2 text-xs font-semibold",
+              "mt-1 flex items-center gap-1 text-[9px] font-bold",
               stat.color === "error" ? "text-[#ba1a1a]" : 
-              stat.color === "emerald" ? "text-emerald-600" :
-              stat.color === "teal" ? "text-teal-700" : "text-emerald-500"
+              stat.color === "primary" ? "text-emerald-600" :
+              stat.color === "secondary" ? "text-teal-700" :
+              stat.color === "primary-container" ? "text-emerald-500" : "text-emerald-600"
             )}>
-              {stat.trend === "up" && <TrendingUp size={14} />}
-              {stat.color === "error" && <AlertCircle size={14} />}
-              <span>{stat.change}</span>
+              {stat.trend === "up" && <TrendingUp size={10} />}
+              {stat.color === "error" && <AlertCircle size={10} />}
+              <span className="truncate">{stat.change}</span>
             </div>
           </motion.div>
         ))}
       </section>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-12 gap-8">
-        {/* Middle: Main Chart (8 cols) */}
-        <div className="col-span-12 lg:col-span-8 space-y-8">
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-100">
-            <div className="flex justify-between items-end mb-8">
+      <div className="grid grid-cols-12 gap-6 items-start">
+        {/* Left Column: Charts Area (8 cols) */}
+        <div className="col-span-12 lg:col-span-8 space-y-6">
+          {/* Weight Growth Chart */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+            <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight font-headline">Biến động Tổng đàn theo Thời gian</h2>
-                <p className="text-sm text-slate-500">Xu hướng tăng trưởng (6 tháng qua)</p>
+                <h2 className="text-base font-bold text-slate-900 tracking-tight leading-tight font-headline">Tăng trưởng Cân nặng Trung bình</h2>
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">Xu hướng 14 ngày (kg)</p>
               </div>
-              <div className="flex gap-2 bg-slate-50 p-1 rounded-lg">
-                <button className="px-4 py-1.5 text-xs font-bold bg-white text-emerald-700 shadow-sm rounded-md">6 Tháng</button>
-                <button className="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-emerald-700">1 Năm</button>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#006c49]"></div>
+                  <span className="text-[9px] font-bold text-slate-600">Thịt</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#8bd6b6]"></div>
+                  <span className="text-[9px] font-bold text-slate-600">Con</span>
+                </div>
               </div>
             </div>
-            
-            <div className="h-64 w-full">
+            <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={herdData}>
-                  <defs>
-                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
+                <AreaChart data={weightGrowthData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis 
-                    dataKey="month" 
+                    dataKey="day" 
                     axisLine={false} 
                     tickLine={false} 
-                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
-                    dy={10}
+                    tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 700 }}
                   />
                   <YAxis hide />
                   <Tooltip 
@@ -178,132 +301,202 @@ export default function Dashboard() {
                   />
                   <Area 
                     type="monotone" 
-                    dataKey="value" 
+                    dataKey="meat" 
                     stroke="#006c49" 
-                    strokeWidth={4} 
-                    fillOpacity={1} 
-                    fill="url(#chartGradient)" 
+                    strokeWidth={2.5} 
+                    fill="transparent" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="piglet" 
+                    stroke="#8bd6b6" 
+                    strokeWidth={2.5} 
+                    fill="transparent" 
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Recent Activity */}
-          <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-100">
-            <div className="p-6 pb-0 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight font-headline">Hoạt động Gần đây</h2>
-              <button className="text-sm font-semibold text-emerald-600 hover:underline">Xem tất cả</button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Feed Consumption */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+              <div className="mb-4">
+                <h2 className="text-base font-bold text-slate-900 tracking-tight leading-tight font-headline">Tiêu thụ thức ăn theo ngày</h2>
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">Nhật ký hàng tuần (kg)</p>
+              </div>
+              <div className="h-40 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={feedConsumptionData}>
+                    <Bar dataKey="value" fill="#10b981" radius={[2, 2, 0, 0]} barSize={20} />
+                    <XAxis 
+                      dataKey="day" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 700 }}
+                    />
+                    <Tooltip cursor={{fill: 'transparent'}} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-            <div className="p-6">
-              <div className="space-y-0">
-                <div className="grid grid-cols-12 gap-4 pb-4 mb-4 border-b border-slate-100">
-                  <div className="col-span-5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Sự kiện</div>
-                  <div className="col-span-3 text-[10px] uppercase font-bold text-slate-400 tracking-wider text-center">Mã Lô</div>
-                  <div className="col-span-2 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Thời gian</div>
-                  <div className="col-span-2"></div>
-                </div>
-                
-                {activities.map((act, i) => (
-                  <div key={i} className="grid grid-cols-12 gap-4 items-center py-4 hover:bg-slate-50 transition-colors rounded-lg group">
-                    <div className="col-span-5 flex items-center gap-3">
-                      <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", act.bgColor, act.iconColor)}>
-                        <act.icon size={18} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-900">{act.event}</p>
-                        <p className="text-[11px] text-slate-500">{act.desc}</p>
-                      </div>
-                    </div>
-                    <div className="col-span-3 text-center">
-                      <span className="px-3 py-1 bg-slate-100 text-xs font-bold rounded-full text-slate-700">{act.id}</span>
-                    </div>
-                    <div className="col-span-2 text-xs font-medium text-slate-500">{act.time}</div>
-                    <div className="col-span-2 text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 text-slate-400 hover:text-emerald-600"><MoreVertical size={18} /></button>
-                    </div>
+
+            {/* FCR Index */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+              <div className="mb-4">
+                <h2 className="text-base font-bold text-slate-900 tracking-tight leading-tight font-headline">Chỉ số FCR theo tuần</h2>
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">Hiệu quả chuyển đổi thức ăn</p>
+              </div>
+              <div className="h-40 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={fcrData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="week" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 700 }}
+                    />
+                    <Tooltip />
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#1b6b51" 
+                      strokeWidth={2.5} 
+                      dot={{ r: 3, fill: '#1b6b51' }}
+                      activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Weight Distribution */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+              <div className="mb-4">
+                <h2 className="text-base font-bold text-slate-900 tracking-tight leading-tight font-headline">Phân bố trọng lượng đàn</h2>
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">Phân bổ trọng lượng đàn (kg)</p>
+              </div>
+              <div className="h-40 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={weightDistData}>
+                    <Bar dataKey="count" radius={[2, 2, 0, 0]}>
+                      {weightDistData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={index === 3 ? "#006c49" : "#e2e8f0"} />
+                      ))}
+                    </Bar>
+                    <XAxis 
+                      dataKey="range" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: '#94a3b8', fontSize: 8, fontWeight: 700 }}
+                    />
+                    <Tooltip cursor={{fill: 'transparent'}} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Survival Rate */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+              <div className="mb-4">
+                <h2 className="text-base font-bold text-slate-900 tracking-tight leading-tight font-headline">Tỷ lệ Sống sót trung bình</h2>
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">Lợn con sống sót khi sinh</p>
+              </div>
+              <div className="flex items-center justify-around h-40">
+                <div className="relative w-32 h-32">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={survivalData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={40}
+                        outerRadius={50}
+                        paddingAngle={0}
+                        dataKey="value"
+                        startAngle={90}
+                        endAngle={-270}
+                      >
+                        {survivalData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-xl font-black text-slate-900 leading-none">96%</span>
+                    <span className="text-[8px] font-bold text-slate-400 uppercase">Tỷ lệ</span>
                   </div>
-                ))}
+                </div>
+                <div className="space-y-2">
+                  {survivalData.map((item) => (
+                    <div key={item.name} className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: item.color }}></div>
+                      <div className="text-left">
+                        <p className="text-[8px] font-bold text-slate-600 uppercase">{item.name}</p>
+                        <p className="text-xs font-extrabold">{item.value}.0%</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Quick Alerts & Mini Stats (4 cols) */}
-        <div className="col-span-12 lg:col-span-4 space-y-8">
-          {/* Quick Alerts Section */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-2 mb-6">
-              <BellRing className="text-[#ba1a1a]" size={24} />
-              <h2 className="text-xl font-bold text-slate-900 font-headline">Cảnh báo Khẩn cấp</h2>
-            </div>
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-red-50/50 border-l-4 border-[#ba1a1a]">
-                <div className="flex justify-between items-start mb-1">
-                  <p className="text-xs font-bold text-[#ba1a1a] uppercase tracking-wider">Cảnh báo Sức khỏe</p>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Vừa xong</span>
-                </div>
-                <p className="text-sm font-bold text-slate-900">Đến hạn tiêm chủng Lô B-12</p>
-                <p className="text-xs text-slate-600 mt-1">Lịch trình đã quá hạn 4 ngày. Cần xử lý ngay để ngăn ngừa lây lan.</p>
-                <button className="mt-3 text-xs font-bold text-[#ba1a1a] flex items-center gap-1 hover:underline">
-                  <span>Xử lý ngay</span>
-                  <ArrowRight size={12} />
-                </button>
+        {/* Right Column: Alerts & Activity (4 cols) */}
+        <div className="col-span-12 lg:col-span-4 h-full">
+          <div className="sticky top-20 flex flex-col gap-4 bg-slate-100/50 p-4 rounded-2xl border border-slate-200/50 h-[calc(100vh-104px)]">
+            {/* Urgent Alerts Section (60%) */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200 flex flex-col h-[60%]">
+              <div className="flex items-center gap-2 mb-4 shrink-0">
+                <BellDot className="text-[#ba1a1a]" size={20} />
+                <h2 className="text-base font-bold text-slate-900 font-headline">Cảnh báo Khẩn cấp</h2>
               </div>
+              <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                {alerts.map((alert, i) => (
+                  <div key={i} className={cn("p-3 rounded-lg border-l-4", alert.bgColor, alert.borderColor)}>
+                    <div className="flex justify-between items-start mb-0.5">
+                      <p className={cn("text-[9px] font-bold uppercase tracking-wider", alert.color)}>{alert.category}</p>
+                      <span className="text-[8px] font-bold text-slate-400 uppercase">{alert.time}</span>
+                    </div>
+                    <p className="text-xs font-bold text-slate-900">{alert.title}</p>
+                    <p className="text-[10px] text-slate-600 mt-1 leading-tight">{alert.desc}</p>
+                    {alert.action && (
+                      <button className={cn("mt-2 text-[9px] font-bold flex items-center gap-1 hover:underline", alert.color)}>
+                        <span>{alert.action}</span>
+                        <ArrowRight size={12} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-              <div className="p-4 rounded-xl bg-slate-50 border-l-4 border-amber-500">
-                <div className="flex justify-between items-start mb-1">
-                  <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">Kho bãi</p>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">2 giờ trước</span>
-                </div>
-                <p className="text-sm font-bold text-slate-900">Sắp hết thức ăn tại Chuồng 3</p>
-                <p className="text-xs text-slate-600 mt-1">Mức dự trữ còn 12%. Dự kiến hết trong: 18 giờ.</p>
-                <button className="mt-3 text-xs font-bold text-amber-600 flex items-center gap-1 hover:underline">
-                  <span>Đặt hàng bổ sung</span>
-                  <ShoppingCart size={12} />
-                </button>
+            {/* Recent Activity Section (40%) */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200 flex flex-col h-[40%]">
+              <div className="flex items-center justify-between mb-4 shrink-0">
+                <h2 className="text-base font-bold text-slate-900 font-headline">Hoạt động Gần đây</h2>
+                <button className="text-[10px] font-bold text-emerald-600 hover:underline">Tất cả</button>
               </div>
-
-              <div className="p-4 rounded-xl bg-slate-50 border-l-4 border-[#006c49]">
-                <div className="flex justify-between items-start mb-1">
-                  <p className="text-xs font-bold text-[#006c49] uppercase tracking-wider">Nhiệm vụ</p>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">25 thg 10</span>
-                </div>
-                <p className="text-sm font-bold text-slate-900">Vệ sinh Chuồng 1</p>
-                <p className="text-xs text-slate-600 mt-1">Lịch làm sạch sâu định kỳ hàng quý vào sáng mai.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Secondary Insight Card */}
-          <div className="bg-gradient-to-br from-[#1b6b51] to-[#006c49] p-6 rounded-xl text-white shadow-xl shadow-emerald-900/10 relative overflow-hidden">
-            <div className="absolute -right-10 -bottom-10 opacity-10">
-              <Leaf size={180} />
-            </div>
-            <div className="relative z-10">
-              <p className="text-[11px] font-bold uppercase tracking-widest opacity-80 mb-2">Năng suất Bền vững</p>
-              <h3 className="text-3xl font-extrabold mb-4">98.2%</h3>
-              <p className="text-xs opacity-90 leading-relaxed mb-6">Chỉ số sức khỏe đàn lợn của bạn nằm trong top 5% khu vực. Chuyển đổi thức ăn hiệu quả và không có dịch bệnh bùng phát trong tháng này.</p>
-              <div className="w-full bg-white/20 h-1.5 rounded-full mb-1">
-                <div className="bg-white h-full rounded-full w-[98%]"></div>
-              </div>
-              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
-                <span>Hiệu suất</span>
-                <span>98%</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Weather Widget */}
-          <div className="bg-white rounded-xl p-6 flex items-center gap-4 shadow-sm border border-slate-100">
-            <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-emerald-600">
-              <Thermometer size={24} />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Nhiệt độ TB Chuồng</p>
-              <div className="flex items-center gap-2">
-                <span className="text-xl font-extrabold text-slate-900">22.4°C</span>
-                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full">Tối ưu</span>
+              <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+                {recentActivities.map((act, i) => (
+                  <div key={i} className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
+                    <div className={cn("w-7 h-7 shrink-0 rounded-full flex items-center justify-center", act.bgColor, act.iconColor)}>
+                      <act.icon size={14} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <p className="text-[11px] font-bold text-slate-900 truncate">{act.event}</p>
+                        <span className="text-[8px] text-slate-400 font-bold">{act.time}</span>
+                      </div>
+                      <p className="text-[9px] text-slate-500 truncate">{act.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
