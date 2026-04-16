@@ -73,16 +73,21 @@ interface Pig {
   penId: string;
   pen?: any;
   status: string;
+  type?: string;
+  date?: string;
+  growth?: string;
+  statusColor?: string;
 }
 
-// Stats would ideally come from a summary endpoint
-const defaultStats = [
-  { label: "Tổng số lợn", value: "0", change: "", trend: "neutral", color: "emerald" },
-  { label: "Lợn con", value: "0", change: "", trend: "neutral", color: "slate" },
-  { label: "Lợn nái", value: "0", change: "", trend: "neutral", color: "slate" },
-  { label: "Lợn nọc", value: "0", change: "", trend: "neutral", color: "slate" },
-  { label: "Bất thường", value: "0", change: "", trend: "neutral", color: "rose" },
-];
+interface Litter {
+  id: string;
+  motherId: string;
+  birthDate: string;
+  count: number;
+  status: string;
+  pen?: any;
+}
+
 
 export default function PigManagementPage() {
   const [activeTab, setActiveTab] = useState("individual");
@@ -91,6 +96,14 @@ export default function PigManagementPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+
+  const stats = [
+    { label: "Tổng số lợn", value: items.length.toString(), change: "", trend: "neutral", color: "emerald" },
+    { label: "Lợn con", value: items.filter(i => (i.type || "").toLowerCase().includes("con")).length.toString(), change: "", trend: "neutral", color: "slate" },
+    { label: "Lợn nái", value: items.filter(i => (i.type || "").toLowerCase().includes("nái")).length.toString(), change: "", trend: "neutral", color: "slate" },
+    { label: "Lợn nọc", value: items.filter(i => (i.type || "").toLowerCase().includes("nọc")).length.toString(), change: "", trend: "neutral", color: "slate" },
+    { label: "Bất thường", value: items.filter(i => i.healthStatus !== "Khỏe mạnh" && i.healthStatus !== "Bình thường" && i.healthStatus !== "N/A").length.toString(), change: "", trend: "neutral", color: "rose" },
+  ];
 
   const fetchData = async () => {
     setLoading(true);
@@ -145,7 +158,7 @@ export default function PigManagementPage() {
     breed: "Duroc",
     pen: "",
     date: new Date().toLocaleDateString("vi-VN"),
-    weight: "0 kg",
+    weight: 0,
     growth: "+0kg",
     status: "Bình thường",
     statusColor: "emerald"
@@ -170,7 +183,7 @@ export default function PigManagementPage() {
         breed: "Duroc",
         pen: "",
         date: new Date().toLocaleDateString("vi-VN"),
-        weight: "0 kg",
+        weight: 0,
         growth: "+0kg",
         status: "Bình thường",
         statusColor: "emerald"
@@ -903,10 +916,10 @@ export default function PigManagementPage() {
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-slate-400">Cân nặng (kg)</label>
                     <input 
-                      type="text" 
+                      type="number" 
                       required
                       value={formData.weight}
-                      onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                      onChange={(e) => setFormData({...formData, weight: parseFloat(e.target.value) || 0})}
                       className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
                     />
                   </div>
