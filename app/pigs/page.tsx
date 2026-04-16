@@ -98,7 +98,15 @@ export default function PigManagementPage() {
     try {
       const response = await pigApi.getAll();
       if (response.success) {
-        setItems(response.data);
+        // Map API fields (species, birthWeight, status) to UI model (breed, weight, healthStatus)
+        const mappedPigs = (response.data || []).map((p: any) => ({
+          ...p,
+          breed: p.species || "N/A",
+          weight: p.birthWeight || 0,
+          healthStatus: p.status || "N/A",
+          penId: p.penId || "C-01", // Fallback for demo
+        }));
+        setItems(mappedPigs);
       } else {
         setError(response.message || "Failed to fetch pigs");
       }

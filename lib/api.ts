@@ -1,6 +1,9 @@
 // lib/api.ts
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://maodien.bitoj.io.vn';
+if (typeof window !== 'undefined') {
+  console.log("API_URL being used:", API_URL);
+}
 
 export async function apiRequest(
   endpoint: string,
@@ -14,18 +17,26 @@ export async function apiRequest(
     ...options.headers,
   };
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  const fullUrl = `${API_URL}${endpoint}`;
 
-  const data = await response.json();
+  try {
+    const response = await fetch(fullUrl, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    throw new Error(data.message || 'Something went wrong');
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      console.error(`API Error [${response.status}] ${fullUrl}:`, data);
+      throw new Error(data.message || data.error || `Error ${response.status}: Something went wrong`);
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error(`Fetch Error ${fullUrl}:`, error);
+    throw error;
   }
-
-  return data;
 }
 
 // Auth APIs

@@ -32,9 +32,18 @@ export default function LoginPage() {
     setError(null);
     
     try {
+      console.log("Attempting login for:", email);
       await login({ email, password });
+      console.log("Login successful");
     } catch (err: any) {
-      setError(err.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại.");
+      console.error("Login catch error:", err);
+      // Give more specific feedback for network issues
+      if (err.message?.includes("Failed to fetch") || err.name === "TypeError") {
+        setError("Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối mạng hoặc CORS.");
+      } else {
+        setError(err.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+      }
+    } finally {
       setIsLoading(false);
     }
   };

@@ -52,14 +52,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [fetchUser]);
 
   const login = async (credentials: any) => {
-    const response = await authApi.login(credentials);
-    if (response.success && response.data.accessToken) {
-      localStorage.setItem('token', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-      setUser(response.data.user);
-      router.push('/');
-    } else {
-      throw new Error(response.message || 'Login failed');
+    try {
+      const response = await authApi.login(credentials);
+      if (response.success && response.data?.accessToken) {
+        localStorage.setItem('token', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken || '');
+        setUser(response.data.user);
+        router.push('/');
+      } else {
+        throw new Error(response.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+      }
+    } catch (error: any) {
+      console.error('Login error details:', error);
+      throw error;
     }
   };
 

@@ -36,12 +36,17 @@ export default function RegisterPage() {
     setError(null);
     
     try {
+      // Split fullName into givenName and familyName
+      const nameParts = fullName.trim().split(/\s+/);
+      const familyName = nameParts.length > 1 ? nameParts[0] : "";
+      const givenName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : nameParts[0];
+
       const response = await authApi.register({
-        fullName,
+        givenName,
+        familyName,
         email,
         password,
-        role,
-        username: email.split("@")[0] // Fallback username
+        avatarUrl: "" // Optional
       });
       
       if (response.success) {

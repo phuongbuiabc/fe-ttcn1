@@ -138,18 +138,20 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
             >
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-black text-slate-900 leading-none font-headline group-hover:text-emerald-600 transition-colors">
-                  {user.fullName || user.username}
+                  {user.name || `${user.familyName || ''} ${user.givenName || ''}`.trim() || user.username || "Người dùng"}
                 </p>
-                <p className="text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-black">{user.role}</p>
+                <p className="text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-black">
+                  {user.role || (user.roles?.[0]?.name) || "Thành viên"}
+                </p>
               </div>
               <div className={cn(
                 "relative w-10 h-10 rounded-full overflow-hidden border-2 shrink-0 transition-all shadow-sm flex items-center justify-center bg-emerald-100 text-emerald-600",
                 isUserMenuOpen ? "border-emerald-500" : "border-emerald-100 group-hover:border-emerald-500"
               )}>
-                {user.avatar ? (
+                {user.avatarUrl ? (
                   <Image 
-                    src={user.avatar}
-                    alt={user.fullName || user.username}
+                    src={user.avatarUrl}
+                    alt={user.name || user.username || "Avatar"}
                     fill
                     className="object-cover"
                     referrerPolicy="no-referrer"
@@ -177,7 +179,9 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                 className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
               >
                 <div className="p-4 bg-slate-50/50 border-b border-slate-100">
-                  <p className="text-xs font-black text-slate-900">{user.fullName || user.username}</p>
+                  <p className="text-xs font-black text-slate-900">
+                    {user.name || `${user.familyName || ''} ${user.givenName || ''}`.trim() || user.username || "Người dùng"}
+                  </p>
                   <p className="text-[10px] text-slate-500 mt-0.5">{user.email}</p>
                 </div>
                 <div className="p-2">
