@@ -1,9 +1,6 @@
 // lib/api.ts
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://maodien.bitoj.io.vn';
-if (typeof window !== 'undefined') {
-  console.log("API_URL being used:", API_URL);
-}
 
 export async function apiRequest(
   endpoint: string,
@@ -17,7 +14,12 @@ export async function apiRequest(
     ...options.headers,
   };
 
-  const fullUrl = `${API_URL}${endpoint}`;
+  // If in browser, use local proxy to avoid CORS issues
+  const baseUrl = typeof window !== 'undefined' ? '/api/proxy' : API_URL;
+  
+  // Clean endpoint: replace multiple / with single /
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const fullUrl = `${baseUrl}${cleanEndpoint}`.replace(/([^:]\/)\/+/g, "$1");
 
   try {
     const response = await fetch(fullUrl, {

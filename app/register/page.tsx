@@ -56,6 +56,7 @@ export default function RegisterPage() {
         familyName,
         email,
         password,
+        role,
         avatarUrl: "" // Optional
       });
       
