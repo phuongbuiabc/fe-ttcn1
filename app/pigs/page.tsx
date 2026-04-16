@@ -61,7 +61,6 @@ import {
   Cell
 } from "recharts";
 import { pigApi } from "@/lib/api";
-import { useAuth } from "@/components/AuthProvider";
 
 interface Pig {
   id: string;
@@ -95,7 +94,6 @@ export default function PigManagementPage() {
   const [items, setItems] = useState<Pig[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
 
   const stats = [
     { label: "Tổng số lợn", value: items.length.toString(), change: "", trend: "neutral", color: "emerald" },

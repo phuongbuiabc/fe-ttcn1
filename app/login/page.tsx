@@ -16,16 +16,25 @@ import {
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function LoginPage() {
+  const { user, loading: isAuthLoading, login } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthLoading && user) {
+      router.push("/");
+    }
+  }, [user, isAuthLoading, router]);
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   
-  const { login } = useAuth();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

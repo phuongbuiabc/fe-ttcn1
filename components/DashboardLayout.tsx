@@ -3,13 +3,23 @@
 import React, { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { TopBar } from "@/components/TopBar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
+import { Loader2 } from "lucide-react";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, loading } = useAuth();
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
+
+  useEffect(() => {
+    if (!loading && !user && !isAuthPage) {
+      router.push("/login");
+    }
+  }, [user, loading, isAuthPage, router]);
 
   // Close sidebar when route changes on mobile
   useEffect(() => {
@@ -26,6 +36,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-slate-50">
+        <Loader2 className="w-12 h-12 text-emerald-600 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f8f9fa]">

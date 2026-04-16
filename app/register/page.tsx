@@ -19,8 +19,19 @@ import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { authApi } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
+import { useEffect } from "react";
 
 export default function RegisterPage() {
+  const { user, loading: isAuthLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthLoading && user) {
+      router.push("/");
+    }
+  }, [user, isAuthLoading, router]);
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [role, setRole] = useState<string>("OWNER");
@@ -28,7 +39,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
