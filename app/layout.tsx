@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { TopBar } from "@/components/TopBar";
 import { Footer } from "@/components/Footer";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { AuthProvider } from "@/components/AuthProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,10 +29,12 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${inter.variable} ${manrope.variable}`}>
       <body className={`${inter.variable} ${manrope.variable} font-body bg-[#f8f9fa] text-on-background selection:bg-emerald-100 selection:text-emerald-900`}>
-        <DashboardLayout>
-          {children}
-          <Footer />
-        </DashboardLayout>
+        <AuthProvider>
+          <DashboardLayout>
+            {children}
+            <Footer />
+          </DashboardLayout>
+        </AuthProvider>
       </body>
     </html>
   );

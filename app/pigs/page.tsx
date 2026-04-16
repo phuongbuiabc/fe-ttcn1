@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   PlusCircle, 
   RefreshCw, 
@@ -43,7 +43,8 @@ import {
   Sprout,
   Venus,
   Mars,
-  Utensils
+  Utensils,
+  Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -59,73 +60,70 @@ import {
   Bar,
   Cell
 } from "recharts";
+import { pigApi } from "@/lib/api";
+import { useAuth } from "@/components/AuthProvider";
 
 interface Pig {
   id: string;
-  type: string;
+  pigCode: string;
   breed: string;
-  pen: string;
-  date: string;
-  weight: string;
-  growth: string;
-  status: string;
-  statusColor: string;
-}
-
-const stats = [
-  { label: "Tổng số lợn", value: "1,428", change: "+12%", trend: "up", color: "emerald" },
-  { label: "Lợn con", value: "842", change: "", trend: "neutral", color: "slate" },
-  { label: "Lợn nái", value: "544", change: "", trend: "neutral", color: "slate" },
-  { label: "Lợn nọc", value: "42", change: "", trend: "neutral", color: "slate" },
-  { label: "Bất thường", value: "07", change: "", trend: "down", color: "rose" },
-];
-
-interface Litter {
-  id: string;
-  motherId: string;
+  weight: number;
+  healthStatus: string;
   birthDate: string;
-  count: number;
+  penId: string;
+  pen?: any;
   status: string;
-  pen: string;
 }
 
-const individualPigs = [
-  { id: "SW-0921", type: "Lợn nái", breed: "Duroc", pen: "A1 - Box 12", date: "12/05/2023", weight: "112.5 kg", growth: "+2.4kg", status: "Bình thường", statusColor: "emerald" },
-  { id: "SW-0922", type: "Lợn nọc", breed: "Landrace", pen: "A1 - Box 01", date: "20/06/2023", weight: "156.2 kg", growth: "-0.5kg", status: "Cảnh báo Sức khỏe", statusColor: "rose" },
-  { id: "SW-0925", type: "Lợn nái", breed: "Yorkshire", pen: "B2 - Box 05", date: "15/05/2023", weight: "108.0 kg", growth: "+1.8kg", status: "Bình thường", statusColor: "emerald" },
-];
-
-const littersData: Litter[] = [
-  { id: "L-101", motherId: "SW-0921", birthDate: "01/03/2024", count: 12, status: "Khỏe mạnh", pen: "C1 - Box 02" },
-  { id: "L-102", motherId: "SW-0925", birthDate: "15/03/2024", count: 10, status: "Cần theo dõi", pen: "C1 - Box 05" },
-];
-
-const proposedSale = [
-  { staffId: "NV-102", pigId: "SW-1045", weight: "115 kg", reason: "Đạt trọng lượng xuất chuồng", status: "Chờ duyệt" },
-  { staffId: "NV-105", pigId: "SW-1088", weight: "120 kg", reason: "Đủ tuổi xuất bán", status: "Chờ duyệt" },
-];
-
-const proposedDisposal = [
-  { staffId: "NV-088", pigId: "SW-0822", reason: "Dịch bệnh tai xanh", status: "Khẩn cấp" },
-  { staffId: "NV-091", pigId: "SW-0911", reason: "Dị tật bẩm sinh", status: "Bình thường" },
-];
-
-const growthData = [
-  { name: "Tuần 1", weight: 30 },
-  { name: "Tuần 2", weight: 45 },
-  { name: "Tuần 3", weight: 40 },
-  { name: "Tuần 4", weight: 60 },
-  { name: "Tuần 5", weight: 75 },
-  { name: "Hôm nay", weight: 90 },
+// Stats would ideally come from a summary endpoint
+const defaultStats = [
+  { label: "Tổng số lợn", value: "0", change: "", trend: "neutral", color: "emerald" },
+  { label: "Lợn con", value: "0", change: "", trend: "neutral", color: "slate" },
+  { label: "Lợn nái", value: "0", change: "", trend: "neutral", color: "slate" },
+  { label: "Lợn nọc", value: "0", change: "", trend: "neutral", color: "slate" },
+  { label: "Bất thường", value: "0", change: "", trend: "neutral", color: "rose" },
 ];
 
 export default function PigManagementPage() {
   const [activeTab, setActiveTab] = useState("individual");
-  const [expandedRow, setExpandedRow] = useState<string | null>("SW-0921");
-  const [items, setItems] = useState<Pig[]>(individualPigs);
-  const [litters, setLitters] = useState<Litter[]>(littersData);
-  const [sales, setSales] = useState(proposedSale);
-  const [disposals, setDisposals] = useState(proposedDisposal);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [items, setItems] = useState<Pig[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await pigApi.getAll();
+      if (response.success) {
+        setItems(response.data);
+      } else {
+        setError(response.message || "Failed to fetch pigs");
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred while fetching data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  const [litters, setLitters] = useState<any[]>([]);
+  const [sales, setSales] = useState<any[]>([]);
+  const [disposals, setDisposals] = useState<any[]>([]);
+  
+  const growthData: any[] = [
+    { name: "Tuần 1", weight: 30 },
+    { name: "Tuần 2", weight: 45 },
+    { name: "Tuần 3", weight: 40 },
+    { name: "Tuần 4", weight: 60 },
+    { name: "Tuần 5", weight: 75 },
+    { name: "Hôm nay", weight: 90 },
+  ];
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPig, setEditingPig] = useState<Pig | null>(null);
@@ -401,7 +399,22 @@ export default function PigManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {items.map((pig) => (
+                {loading ? (
+                  <tr>
+                    <td colSpan={10} className="px-6 py-20 text-center">
+                      <div className="flex flex-col items-center gap-4">
+                        <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+                        <p className="text-slate-500 font-bold">Đang tải dữ liệu...</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : items.length === 0 ? (
+                  <tr>
+                    <td colSpan={10} className="px-6 py-20 text-center">
+                      <p className="text-slate-500 font-bold">Không có dữ liệu lợn nào.</p>
+                    </td>
+                  </tr>
+                ) : items.map((pig) => (
                   <React.Fragment key={pig.id}>
                     <tr 
                       onClick={() => setExpandedRow(expandedRow === pig.id ? null : pig.id)}
@@ -414,34 +427,27 @@ export default function PigManagementPage() {
                         <input type="checkbox" className="rounded text-emerald-600 focus:ring-emerald-600 w-4 h-4" />
                       </td>
                       <td className="px-4 py-5">
-                        <span className="text-emerald-600 font-bold hover:underline">{pig.id}</span>
+                        <span className="text-emerald-600 font-bold hover:underline">{pig.pigCode}</span>
                       </td>
+                      <td className="px-4 py-5 font-bold text-slate-900">{pig.breed}</td>
+                      <td className="px-4 py-5 font-medium text-slate-600">{pig.penId}</td>
+                      <td className="px-4 py-5 text-slate-500 text-sm">{new Date(pig.birthDate).toLocaleDateString('vi-VN')}</td>
+                      <td className="px-4 py-5 font-bold text-slate-900">{pig.weight} kg</td>
                       <td className="px-4 py-5">
                         <span className={cn(
-                          "px-3 py-1 text-[11px] font-bold rounded-full",
-                          pig.type === "Lợn nái" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
-                        )}>{pig.type}</span>
-                      </td>
-                      <td className="px-4 py-5 font-medium text-slate-600">{pig.breed}</td>
-                      <td className="px-4 py-5 font-medium text-slate-600">{pig.pen}</td>
-                      <td className="px-4 py-5 text-slate-500 text-sm">{pig.date}</td>
-                      <td className="px-4 py-5 font-bold text-slate-900">{pig.weight}</td>
-                      <td className="px-4 py-5">
-                        <span className={cn(
-                          "font-bold flex items-center gap-1 text-sm",
-                          pig.growth.startsWith("+") ? "text-emerald-600" : "text-rose-600"
+                          "font-bold flex items-center gap-1 text-sm text-emerald-600",
                         )}>
-                          {pig.growth.startsWith("+") ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                          {pig.growth}
+                          <TrendingUp size={14} />
+                          +0kg
                         </span>
                       </td>
                       <td className="px-4 py-5">
                         <div className={cn(
                           "flex items-center gap-2 text-sm font-bold",
-                          pig.statusColor === "emerald" ? "text-emerald-600" : "text-rose-600"
+                          pig.healthStatus === "Good" ? "text-emerald-600" : "text-rose-600"
                         )}>
-                          <span className={cn("w-2 h-2 rounded-full", pig.statusColor === "emerald" ? "bg-emerald-600" : "bg-rose-600")} />
-                          {pig.status}
+                          <span className={cn("w-2 h-2 rounded-full", pig.healthStatus === "Good" ? "bg-emerald-600" : "bg-rose-600")} />
+                          {pig.healthStatus}
                         </div>
                       </td>
                       <td className="px-6 py-5 text-right">
@@ -450,7 +456,7 @@ export default function PigManagementPage() {
                           <button className="hover:text-emerald-600 transition-colors"><Utensils size={18} /></button>
                           <button className="hover:text-emerald-600 transition-colors"><History size={18} /></button>
                           <button 
-                            onClick={(e) => { e.stopPropagation(); openEditModal(pig); }}
+                            onClick={(e) => { e.stopPropagation(); openEditModal(pig as any); }}
                             className="hover:text-blue-600 transition-colors"
                           >
                             <Edit size={18} />

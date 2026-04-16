@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/AuthProvider";
 
 const notifications = [
   {
@@ -39,6 +40,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -129,30 +131,45 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
         <div className="h-6 w-px bg-slate-200 mx-1 md:mx-2"></div>
         
         <div className="relative" ref={userMenuRef}>
-          <div 
-            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className="flex items-center gap-3 pl-1 md:pl-2 group cursor-pointer"
-          >
-            <div className="text-right hidden sm:block">
-              <p className="text-xs font-black text-slate-900 leading-none font-headline group-hover:text-emerald-600 transition-colors">Marcus Thorne</p>
-              <p className="text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-black">Admin</p>
+          {user ? (
+            <div 
+              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+              className="flex items-center gap-3 pl-1 md:pl-2 group cursor-pointer"
+            >
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-black text-slate-900 leading-none font-headline group-hover:text-emerald-600 transition-colors">
+                  {user.fullName || user.username}
+                </p>
+                <p className="text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-black">{user.role}</p>
+              </div>
+              <div className={cn(
+                "relative w-10 h-10 rounded-full overflow-hidden border-2 shrink-0 transition-all shadow-sm flex items-center justify-center bg-emerald-100 text-emerald-600",
+                isUserMenuOpen ? "border-emerald-500" : "border-emerald-100 group-hover:border-emerald-500"
+              )}>
+                {user.avatar ? (
+                  <Image 
+                    src={user.avatar}
+                    alt={user.fullName || user.username}
+                    fill
+                    className="object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <User size={20} />
+                )}
+              </div>
             </div>
-            <div className={cn(
-              "relative w-10 h-10 rounded-full overflow-hidden border-2 shrink-0 transition-all shadow-sm",
-              isUserMenuOpen ? "border-emerald-500" : "border-emerald-100 group-hover:border-emerald-500"
-            )}>
-              <Image 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU8H1s-kjjlI2NWZ__-jyblSSG7AHeOmfBWSF8MxnkOItZRulZPOyAz2qjUhh1OL64lfdFM3kKVyoIqsyWJn5zjUx7eLL_HW8pI7vf7kinoqASkg8UI3plURqUft8OU90He4GSu8H6s1eeSLihn2CxkXvzfLfGOt1_K0f_R5CcwU5SWhzTWWSwqDfcNCrJcqrvpPZbGJ421OUkC2tzipzeMZWNrpeeEb8uqSfmGHmEmiduDR15CCVyTYCHUQc6re0vxz3nNLuM4UFJ"
-                alt="Marcus Thorne"
-                fill
-                className="object-cover"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-          </div>
+          ) : (
+            <Link 
+              href="/login"
+              className="px-4 py-2 bg-emerald-600 text-white rounded-full text-xs font-bold hover:bg-emerald-700 transition-all"
+            >
+              Đăng nhập
+            </Link>
+          )}
 
           <AnimatePresence>
-            {isUserMenuOpen && (
+            {isUserMenuOpen && user && (
               <motion.div
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -160,8 +177,8 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                 className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
               >
                 <div className="p-4 bg-slate-50/50 border-b border-slate-100">
-                  <p className="text-xs font-black text-slate-900">Marcus Thorne</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">marcus@agriintel.vn</p>
+                  <p className="text-xs font-black text-slate-900">{user.fullName || user.username}</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">{user.email}</p>
                 </div>
                 <div className="p-2">
                   {[
@@ -182,7 +199,13 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                   ))}
                 </div>
                 <div className="p-2 border-t border-slate-100">
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                  <button 
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                  >
                     <LogOut size={16} />
                     Đăng xuất
                   </button>

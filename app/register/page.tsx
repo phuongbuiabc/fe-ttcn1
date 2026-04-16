@@ -17,17 +17,41 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { authApi } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [role, setRole] = useState<"owner" | "worker">("owner");
+  const [role, setRole] = useState<string>("OWNER");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate registration
-    setTimeout(() => setIsLoading(false), 2000);
+    setError(null);
+    
+    try {
+      const response = await authApi.register({
+        fullName,
+        email,
+        password,
+        role,
+        username: email.split("@")[0] // Fallback username
+      });
+      
+      if (response.success) {
+        router.push("/login?registered=true");
+      }
+    } catch (err: any) {
+      setError(err.message || "Đăng ký thất bại. Vui lòng thử lại.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -97,24 +121,31 @@ export default function RegisterPage() {
             <p className="text-slate-500 font-medium">Hoàn thành thông tin bên dưới để bắt đầu quản lý trang trại.</p>
           </div>
 
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
+              <AlertCircle className="text-red-500 shrink-0" size={20} />
+              <p className="text-sm font-bold text-red-800">{error}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4 p-1 bg-slate-100 rounded-2xl">
               <button 
                 type="button"
-                onClick={() => setRole("owner")}
+                onClick={() => setRole("OWNER")}
                 className={cn(
                   "flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
-                  role === "owner" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  role === "OWNER" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
                 )}
               >
                 <ShieldCheck size={16} /> Chủ trang trại
               </button>
               <button 
                 type="button"
-                onClick={() => setRole("worker")}
+                onClick={() => setRole("WORKER")}
                 className={cn(
                   "flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
-                  role === "worker" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  role === "WORKER" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
                 )}
               >
                 <Briefcase size={16} /> Công nhân
@@ -128,6 +159,8 @@ export default function RegisterPage() {
                 <input 
                   type="text" 
                   required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="Nguyễn Văn A" 
                   className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all"
                 />
@@ -141,6 +174,8 @@ export default function RegisterPage() {
                 <input 
                   type="email" 
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@company.com" 
                   className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all"
                 />
@@ -154,6 +189,8 @@ export default function RegisterPage() {
                 <input 
                   type={showPassword ? "text" : "password"} 
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Tối thiểu 8 ký tự" 
                   className="w-full pl-12 pr-12 py-4 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all"
                 />
