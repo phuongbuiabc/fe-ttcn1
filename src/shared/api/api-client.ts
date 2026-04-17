@@ -3,8 +3,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://maodien.bitoj.io.vn'
 
 export class ApiClient {
   private static instance: ApiClient;
-  
-  private constructor() {}
+
+  private constructor() { }
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -53,18 +53,18 @@ export class ApiClient {
   }
 
   public async post<T>(endpoint: string, data?: any, options: RequestInit = {}): Promise<T> {
-    return this.request<T>(endpoint, { 
-      ...options, 
-      method: 'POST', 
-      body: data ? JSON.stringify(data) : undefined 
+    return this.request<T>(endpoint, {
+      ...options,
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined
     });
   }
 
   public async put<T>(endpoint: string, data?: any, options: RequestInit = {}): Promise<T> {
-    return this.request<T>(endpoint, { 
-      ...options, 
-      method: 'PUT', 
-      body: data ? JSON.stringify(data) : undefined 
+    return this.request<T>(endpoint, {
+      ...options,
+      method: 'PUT',
+      body: data ? JSON.stringify(data) : undefined
     });
   }
 
