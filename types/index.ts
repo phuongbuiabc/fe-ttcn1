@@ -1,0 +1,67 @@
+// types/auth.ts
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+  errorCode?: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  givenName: string;
+  familyName: string;
+  role: 'ADMIN' | 'OWNER' | 'STAFF';
+  avatarUrl?: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  token?: string;
+  user?: User;
+  message?: string;
+}
+
+// types/pig.ts
+export interface Pig {
+  id: string;
+  pigCode: string;
+  breed: string;
+  weight: number;
+  healthStatus: 'HEALTHY' | 'SICK' | 'TREATING' | 'SOLD' | 'DECEASED';
+  birthDate: string;
+  penId: string;
+  penName?: string;
+  status: string;
+  entryDate: string;
+  ageDays?: number;
+  lastWeightUpdate?: string;
+}
+
+export interface PigStats {
+  total: number;
+  healthy: number;
+  sick: number;
+  treating: number;
+  growthRate: number;
+}
+
+// types/reproduction.ts
+export interface SowRecord {
+  id: string;
+  breed: string;
+  pen: string;
+  status: 'OPEN' | 'BRED' | 'PREGNANT' | 'FARROWING' | 'LACTATING' | 'WEANED';
+  matingDate?: string;
+  expectedFarrowDate?: string;
+  progress?: number;
+  daysInStatus?: number;
+}
+
+export interface ReproductionStats {
+  totalSows: number;
+  pregnantSows: number;
+  farrowingSoon: number;
+  monthlyLitters: number;
+  conceptionRate: number;
+}

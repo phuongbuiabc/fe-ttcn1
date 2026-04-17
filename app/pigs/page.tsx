@@ -1,50 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { 
   PlusCircle, 
   RefreshCw, 
   Upload, 
   Search, 
   Filter, 
-  ChevronRight, 
-  ChevronLeft,
-  Eye,
-  Scale,
-  History,
-  Edit,
-  Trash2,
-  MoveDown,
-  CheckCircle,
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-  Info,
-  ChartLine,
-  ClipboardList,
-  Stethoscope,
-  Syringe,
-  MoreVertical,
-  ArrowRight,
-  ArrowUpRight,
-  ArrowDownRight,
   X,
   Settings,
   HelpCircle,
-  Menu,
-  Bell,
-  LayoutDashboard,
-  PawPrint,
-  Baby,
-  Warehouse,
-  Database,
+  Edit,
+  Trash2,
   ShoppingCart,
-  Users,
-  Sprout,
-  Venus,
-  Mars,
-  Utensils,
-  Loader2
+  CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -56,81 +26,23 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  Cell
 } from "recharts";
-import { pigApi } from "@/lib/api";
-
-interface Pig {
-  id: string;
-  pigCode: string;
-  breed: string;
-  weight: number;
-  healthStatus: string;
-  birthDate: string;
-  penId: string;
-  pen?: any;
-  status: string;
-  type?: string;
-  date?: string;
-  growth?: string;
-  statusColor?: string;
-}
-
-interface Litter {
-  id: string;
-  motherId: string;
-  birthDate: string;
-  count: number;
-  status: string;
-  pen?: any;
-}
-
+import { usePigs } from "@/hooks/use-pigs";
+import { PigTable } from "@/components/features/pigs/PigTable";
+import { PigStats } from "@/components/features/pigs/PigStats";
+import { Pig } from "@/types";
 
 export default function PigManagementPage() {
+  const { pigs, stats, loading, refresh, removePig } = usePigs();
   const [activeTab, setActiveTab] = useState("individual");
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [items, setItems] = useState<Pig[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewingPig, setViewingPig] = useState<Pig | null>(null);
 
-  const stats = [
-    { label: "Tổng số lợn", value: items.length.toString(), change: "", trend: "neutral", color: "emerald" },
-    { label: "Lợn con", value: items.filter(i => (i.type || "").toLowerCase().includes("con")).length.toString(), change: "", trend: "neutral", color: "slate" },
-    { label: "Lợn nái", value: items.filter(i => (i.type || "").toLowerCase().includes("nái")).length.toString(), change: "", trend: "neutral", color: "slate" },
-    { label: "Lợn nọc", value: items.filter(i => (i.type || "").toLowerCase().includes("nọc")).length.toString(), change: "", trend: "neutral", color: "slate" },
-    { label: "Bất thường", value: items.filter(i => i.healthStatus !== "Khỏe mạnh" && i.healthStatus !== "Bình thường" && i.healthStatus !== "N/A").length.toString(), change: "", trend: "neutral", color: "rose" },
-  ];
-
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await pigApi.getAll();
-      if (response.success) {
-        // Map API fields (species, birthWeight, status) to UI model (breed, weight, healthStatus)
-        const mappedPigs = (response.data || []).map((p: any) => ({
-          ...p,
-          breed: p.species || "N/A",
-          weight: p.birthWeight || 0,
-          healthStatus: p.status || "N/A",
-          penId: p.penId || "C-01", // Fallback for demo
-        }));
-        setItems(mappedPigs);
-      } else {
-        setError(response.message || "Failed to fetch pigs");
-      }
-    } catch (err: any) {
-      setError(err.message || "An error occurred while fetching data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const filteredPigs = pigs.filter(p => 
+    p.pigCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.breed.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   const [litters, setLitters] = useState<any[]>([]);
   const [sales, setSales] = useState<any[]>([]);
   const [disposals, setDisposals] = useState<any[]>([]);
@@ -265,16 +177,17 @@ export default function PigManagementPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Quản lý Lợn</h1>
+          <p className="text-slate-500 text-sm">Theo dõi và quản lý đàn gia súc của bạn</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button className="px-4 py-2 bg-white text-slate-600 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-slate-50 border border-slate-100 transition-colors active:scale-95">
-            <RefreshCw size={16} /> Refresh
-          </button>
-          <button className="px-4 py-2 bg-white text-slate-600 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-slate-50 border border-slate-100 transition-colors active:scale-95">
-            <Upload size={16} /> Import
+          <button 
+            onClick={refresh}
+            className="px-4 py-2 bg-white text-slate-600 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-slate-50 border border-slate-100 transition-colors active:scale-95"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Làm mới
           </button>
           <button 
-            onClick={openAddModal}
+            onClick={() => setIsModalOpen(true)}
             className="px-6 py-2 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/20 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all"
           >
             <PlusCircle size={18} /> Thêm lợn
@@ -282,33 +195,8 @@ export default function PigManagementPage() {
         </div>
       </div>
 
-      {/* Bento Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {stats.map((stat, idx) => (
-          <div key={idx} className={cn(
-            "bg-white px-4 py-4 rounded-2xl relative overflow-hidden shadow-sm border border-slate-100",
-            stat.color === "rose" && "bg-rose-50/30 border-rose-100"
-          )}>
-            {stat.color === "emerald" && <div className="absolute left-0 top-0 w-1 h-full bg-emerald-600" />}
-            {stat.color === "rose" && <div className="absolute left-0 top-0 w-1 h-full bg-rose-500" />}
-            <p className={cn(
-              "text-[10px] uppercase tracking-widest font-bold mb-1",
-              stat.color === "rose" ? "text-rose-500" : "text-slate-400"
-            )}>{stat.label}</p>
-            <div className="flex items-baseline gap-2">
-              <h3 className={cn(
-                "text-2xl font-headline font-black",
-                stat.color === "rose" ? "text-rose-600" : "text-slate-900"
-              )}>{stat.value}</h3>
-              {stat.change && (
-                <div className="flex items-center text-emerald-600 text-[10px] font-bold gap-0.5">
-                  <TrendingUp size={12} /> {stat.change}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Stats Section */}
+      <PigStats stats={stats} />
 
       {/* Tab Navigation */}
       <div className="flex justify-center gap-4">
@@ -317,7 +205,7 @@ export default function PigManagementPage() {
           className={cn(
             "flex items-center gap-2 px-8 py-3 rounded-2xl transition-all font-bold",
             activeTab === "individual" 
-              ? "bg-white text-emerald-600 shadow-sm border-b-4 border-emerald-600" 
+              ? "bg-white text-emerald-600 shadow-sm border-b-4 border-emerald-600 shadow-emerald-100" 
               : "text-slate-500 hover:bg-slate-100"
           )}
         >
@@ -328,7 +216,7 @@ export default function PigManagementPage() {
           className={cn(
             "flex items-center gap-2 px-8 py-3 rounded-2xl transition-all font-bold",
             activeTab === "litters" 
-              ? "bg-white text-emerald-600 shadow-sm border-b-4 border-emerald-600" 
+              ? "bg-white text-emerald-600 shadow-sm border-b-4 border-emerald-600 shadow-emerald-100" 
               : "text-slate-500 hover:bg-slate-100"
           )}
         >
@@ -336,219 +224,35 @@ export default function PigManagementPage() {
         </button>
       </div>
 
-      {/* Filter Bar */}
-      <div className="bg-slate-100 p-4 rounded-2xl flex flex-wrap items-end gap-3">
-        <div className="flex-[2] min-w-[200px]">
-          <label className="block text-[10px] uppercase font-bold text-slate-500 mb-2 px-1">Tìm kiếm</label>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Số tai/ID..." 
-              className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl border-none focus:ring-2 focus:ring-emerald-500/20 text-sm outline-none"
-            />
-          </div>
+      {/* Search & Filter */}
+      <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+          <input 
+            type="text" 
+            placeholder="Tìm kiếm mã lợn, giống lợn..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-emerald-500/20 text-sm outline-none transition-all"
+          />
         </div>
-        <div className="flex-1 min-w-[120px]">
-          <label className="block text-[10px] uppercase font-bold text-slate-500 mb-2 px-1">Loại</label>
-          <select className="w-full px-4 py-2.5 bg-white rounded-xl border-none focus:ring-2 focus:ring-emerald-500/20 text-sm appearance-none outline-none">
-            <option>Tất cả loại</option>
-            <option>Lợn nái</option>
-            <option>Lợn nọc</option>
-          </select>
-        </div>
-        <div className="flex-1 min-w-[120px]">
-          <label className="block text-[10px] uppercase font-bold text-slate-500 mb-2 px-1">Giống</label>
-          <select className="w-full px-4 py-2.5 bg-white rounded-xl border-none focus:ring-2 focus:ring-emerald-500/20 text-sm appearance-none outline-none">
-            <option>Tất cả giống</option>
-            <option>Duroc</option>
-            <option>Landrace</option>
-            <option>Yorkshire</option>
-          </select>
-        </div>
-        <div className="flex-1 min-w-[120px]">
-          <label className="block text-[10px] uppercase font-bold text-slate-500 mb-2 px-1">Chuồng</label>
-          <select className="w-full px-4 py-2.5 bg-white rounded-xl border-none focus:ring-2 focus:ring-emerald-500/20 text-sm appearance-none outline-none">
-            <option>Khu vực A</option>
-            <option>Khu vực B</option>
-          </select>
-        </div>
-        <div className="flex-[1.5] min-w-[180px] px-2">
-          <label className="block text-[10px] uppercase font-bold text-slate-500 mb-2">Cân nặng (kg)</label>
-          <div className="relative h-2 bg-slate-200 rounded-full mt-4">
-            <div className="absolute left-1/4 right-1/4 h-full bg-emerald-600 rounded-full" />
-            <div className="absolute left-1/4 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-emerald-600 rounded-full cursor-pointer" />
-            <div className="absolute right-1/4 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-emerald-600 rounded-full cursor-pointer" />
-          </div>
-          <div className="flex justify-between mt-2 text-[10px] text-slate-400 font-bold">
-            <span>20kg</span>
-            <span>180kg</span>
-          </div>
-        </div>
-        <div className="flex-none flex gap-2">
-          <button className="py-2.5 bg-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-300 transition-all px-4">Reset</button>
-          <button className="p-2.5 bg-emerald-600 text-white rounded-xl flex items-center justify-center hover:bg-emerald-700 transition-all">
-            <Filter size={20} />
-          </button>
-        </div>
+        <button className="p-3 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-200 transition-colors">
+          <Filter size={20} />
+        </button>
       </div>
 
-      {/* Data Table Section */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100">
-        <div className="flex justify-end p-4 border-b border-slate-50">
-          <button className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold flex items-center gap-2 hover:bg-emerald-100 transition-all active:scale-95">
-            <Eye size={16} /> Xem chi tiết
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          {activeTab === "individual" ? (
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-6 py-4 w-12"><input type="checkbox" className="rounded text-emerald-600 focus:ring-emerald-600 w-4 h-4" /></th>
-                  <th className="px-4 py-4 text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Số Tai</th>
-                  <th className="px-4 py-4 text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Loại</th>
-                  <th className="px-4 py-4 text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Giống</th>
-                  <th className="px-4 py-4 text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Chuồng</th>
-                  <th className="px-4 py-4 text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Ngày nhập trại</th>
-                  <th className="px-4 py-4 text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Cân nặng</th>
-                  <th className="px-4 py-4 text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Tăng trưởng</th>
-                  <th className="px-4 py-4 text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Trạng thái</th>
-                  <th className="px-6 py-4 text-right text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Hành động</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {loading ? (
-                  <tr>
-                    <td colSpan={10} className="px-6 py-20 text-center">
-                      <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-                        <p className="text-slate-500 font-bold">Đang tải dữ liệu...</p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : items.length === 0 ? (
-                  <tr>
-                    <td colSpan={10} className="px-6 py-20 text-center">
-                      <p className="text-slate-500 font-bold">Không có dữ liệu lợn nào.</p>
-                    </td>
-                  </tr>
-                ) : items.map((pig) => (
-                  <React.Fragment key={pig.id}>
-                    <tr 
-                      onClick={() => setExpandedRow(expandedRow === pig.id ? null : pig.id)}
-                      className={cn(
-                        "hover:bg-slate-50 transition-colors group cursor-pointer",
-                        expandedRow === pig.id && "bg-emerald-50/20"
-                      )}
-                    >
-                      <td className="px-6 py-5" onClick={(e) => e.stopPropagation()}>
-                        <input type="checkbox" className="rounded text-emerald-600 focus:ring-emerald-600 w-4 h-4" />
-                      </td>
-                      <td className="px-4 py-5">
-                        <span className="text-emerald-600 font-bold hover:underline">{pig.pigCode}</span>
-                      </td>
-                      <td className="px-4 py-5 font-bold text-slate-900">{pig.breed}</td>
-                      <td className="px-4 py-5 font-medium text-slate-600">{pig.penId}</td>
-                      <td className="px-4 py-5 text-slate-500 text-sm">{new Date(pig.birthDate).toLocaleDateString('vi-VN')}</td>
-                      <td className="px-4 py-5 font-bold text-slate-900">{pig.weight} kg</td>
-                      <td className="px-4 py-5">
-                        <span className={cn(
-                          "font-bold flex items-center gap-1 text-sm text-emerald-600",
-                        )}>
-                          <TrendingUp size={14} />
-                          +0kg
-                        </span>
-                      </td>
-                      <td className="px-4 py-5">
-                        <div className={cn(
-                          "flex items-center gap-2 text-sm font-bold",
-                          pig.healthStatus === "Good" ? "text-emerald-600" : "text-rose-600"
-                        )}>
-                          <span className={cn("w-2 h-2 rounded-full", pig.healthStatus === "Good" ? "bg-emerald-600" : "bg-rose-600")} />
-                          {pig.healthStatus}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 text-right">
-                        <div className="flex justify-end gap-3 text-slate-400">
-                          <button className="hover:text-emerald-600 transition-colors"><Scale size={18} /></button>
-                          <button className="hover:text-emerald-600 transition-colors"><Utensils size={18} /></button>
-                          <button className="hover:text-emerald-600 transition-colors"><History size={18} /></button>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); openEditModal(pig as any); }}
-                            className="hover:text-blue-600 transition-colors"
-                          >
-                            <Edit size={18} />
-                          </button>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); handleDelete(pig.id); }}
-                            className="hover:text-rose-600 transition-colors"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                    
-                    {/* Expansion Details */}
-                    <AnimatePresence>
-                      {expandedRow === pig.id && (
-                        <motion.tr
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="bg-emerald-50/30"
-                        >
-                          <td colSpan={10} className="px-12 py-6">
-                            <div className="flex flex-col lg:flex-row gap-10">
-                              <div className="flex-1 bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
-                                <h4 className="text-[10px] uppercase font-bold text-slate-400 mb-6 flex items-center gap-2">
-                                  <ChartLine size={14} className="text-emerald-600" /> Biểu đồ tăng trưởng (30 ngày)
-                                </h4>
-                                <div className="h-40 w-full">
-                                  <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={growthData}>
-                                      <defs>
-                                        <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                                          <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                                        </linearGradient>
-                                      </defs>
-                                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
-                                      <YAxis hide />
-                                      <Tooltip 
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                      />
-                                      <Area type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorWeight)" />
-                                    </AreaChart>
-                                  </ResponsiveContainer>
-                                </div>
-                              </div>
-                              <div className="w-full lg:w-1/3 space-y-4">
-                                <h4 className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-2">
-                                  <ClipboardList size={14} className="text-emerald-600" /> Ghi chú cho ăn gần đây
-                                </h4>
-                                <div className="text-sm bg-white p-5 rounded-2xl border-l-4 border-emerald-400 shadow-sm">
-                                  <p className="text-slate-600 leading-relaxed italic">
-                                    &quot;Đã điều chỉnh tăng 15% cám hỗn hợp. Pig cho thấy sự háu ăn trở lại sau đợt tiêm phòng.&quot;
-                                  </p>
-                                  <div className="flex items-center gap-2 mt-4">
-                                    <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] font-bold text-emerald-700">M</div>
-                                    <p className="text-[10px] text-slate-400 font-bold">— 08:45 AM, Quản lý Minh</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      )}
-                    </AnimatePresence>
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          ) : (
+      {/* Main Content Area */}
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden min-h-[400px]">
+        {activeTab === "individual" ? (
+          <PigTable 
+            pigs={filteredPigs} 
+            loading={loading}
+            onView={(pig) => setViewingPig(pig)}
+            onEdit={(pig) => {}}
+            onDelete={removePig}
+          />
+        ) : (
+          <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
@@ -576,50 +280,16 @@ export default function PigManagementPage() {
                     </td>
                     <td className="px-6 py-5 text-right">
                       <div className="flex justify-end gap-3 text-slate-400">
-                        <button 
-                          onClick={() => openEditLitterModal(litter)}
-                          className="hover:text-blue-600 transition-colors"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteLitter(litter.id)}
-                          className="hover:text-rose-600 transition-colors"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        <button className="hover:text-blue-600 transition-colors"><Edit size={18} /></button>
+                        <button className="hover:text-rose-600 transition-colors"><Trash2 size={18} /></button>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          )}
-        </div>
-
-        {/* Bulk Actions & Pagination Footer */}
-        <div className="p-6 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-slate-100">
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-bold text-emerald-600 px-4 py-2 bg-emerald-100 rounded-full">Đã chọn 2 lợn</span>
-            <div className="h-6 w-px bg-slate-300 hidden md:block" />
-            <div className="flex gap-3">
-              <button className="text-[12px] font-bold text-slate-600 hover:text-emerald-600 transition-colors flex items-center gap-1 uppercase">
-                <MoveDown size={16} /> Chuyển chuồng
-              </button>
-              <button className="text-[12px] font-bold text-rose-500 hover:text-rose-600 transition-colors flex items-center gap-1 uppercase">
-                <Trash2 size={16} /> Xóa
-              </button>
-            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-medium text-slate-500 mr-2 whitespace-nowrap">1-10 trên 1,428</span>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200 text-slate-400 cursor-not-allowed"><ChevronLeft size={16} /></button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-emerald-600 text-white font-bold text-xs">1</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 font-bold text-xs transition-colors">2</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 font-bold text-xs transition-colors">3</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 transition-colors"><ChevronRight size={16} /></button>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Bottom Tables Grid */}
