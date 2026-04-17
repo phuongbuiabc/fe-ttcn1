@@ -17,7 +17,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "../../shared/lib/utils";
+import { cn } from "@/shared/lib/utils";
 import { 
   AreaChart, 
   Area, 
