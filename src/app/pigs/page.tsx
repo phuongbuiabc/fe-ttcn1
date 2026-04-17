@@ -17,7 +17,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "../../shared/lib/utils";
 import { 
   AreaChart, 
   Area, 
@@ -30,10 +30,11 @@ import {
 import { usePigs } from "@/features/pigs/hooks/use-pigs";
 import { PigTable } from "@/features/pigs/components/PigTable";
 import { PigStats } from "@/features/pigs/components/PigStats";
-import { Pig } from "@/shared/types";
+import { Pig, Litter } from "@/shared/types";
 
 export default function PigManagementPage() {
   const { pigs, stats, loading, refresh, removePig } = usePigs();
+  const [items, setItems] = useState<Pig[]>([]);
   const [activeTab, setActiveTab] = useState("individual");
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,6 +64,7 @@ export default function PigManagementPage() {
   // Form State for Pig
   const [formData, setFormData] = useState<Partial<Pig>>({
     id: "",
+    pigCode: "",
     type: "Lợn nái",
     breed: "Duroc",
     pen: "",

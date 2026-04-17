@@ -1,5 +1,5 @@
 // utils/mappers.ts
-import { Pig } from '@/types';
+import { Pig } from '@/shared/types';
 
 export const mapApiPigToUI = (apiData: any): Pig => ({
   id: apiData.id,
@@ -9,6 +9,7 @@ export const mapApiPigToUI = (apiData: any): Pig => ({
   healthStatus: apiData.status || "N/A",
   birthDate: apiData.birthDate,
   penId: apiData.penId || "C-01",
+  pen: apiData.penName || "Chuồng 1",
   status: apiData.status,
   entryDate: apiData.createdAt,
 });
