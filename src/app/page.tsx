@@ -46,7 +46,7 @@ import {
   Cell
 } from "recharts";
 import { motion } from "motion/react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "../shared/lib/utils";
 
 const weightGrowthData = [
   { day: "Ng1", meat: 30, piglet: 10 },
