@@ -37,6 +37,14 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/proxy/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://maodien.bitoj.io.vn'}/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

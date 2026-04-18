@@ -54,8 +54,6 @@ const navItems = [
     children: [
       { name: "Nhân viên", icon: User, href: "/staff" },
       { name: "Lịch làm việc", icon: Calendar, href: "/staff/schedule" },
-      { name: "Chấm công", icon: ClipboardCheck, href: "/staff/attendance" },
-      { name: "Nghỉ phép", icon: CalendarX, href: "/staff/leave" },
     ]
   },
 ];

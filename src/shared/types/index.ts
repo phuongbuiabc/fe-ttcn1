@@ -79,3 +79,33 @@ export interface ReproductionStats {
   monthlyLitters: number;
   conceptionRate: number;
 }
+
+// types/employee.ts
+export interface Employee {
+  id: string;
+  employeeCode: string;
+  firstName: string;
+  lastName: string;
+  fullName?: string;
+  gender: string;
+  dateOfBirth: string;
+  permanentAddress: string;
+  currentAddress: string;
+  phone: string;
+  email: string;
+  position: string;
+  employmentStatus?: string;
+}
+
+export interface CreateEmployeeRequest {
+  employeeCode: string;
+  firstName: string;
+  lastName: string;
+  gender: string;
+  dateOfBirth: string;
+  permanentAddress: string;
+  currentAddress: string;
+  phone: string;
+  email: string;
+  position: string;
+}

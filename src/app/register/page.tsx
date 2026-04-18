@@ -2,13 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { 
-  Sprout, 
-  Mail, 
-  Lock, 
-  User, 
-  ArrowRight, 
-  ShieldCheck, 
+import {
+  Sprout,
+  Mail,
+  Lock,
+  User,
+  ArrowRight,
+  ShieldCheck,
   Briefcase,
   AlertCircle,
   Eye,
@@ -38,13 +38,26 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
+    if (password.length < 6) {
+      setError("Mật khẩu phải có ít nhất 6 ký tự.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       // Split fullName into givenName and familyName
       const nameParts = fullName.trim().split(/\s+/);
@@ -56,10 +69,9 @@ export default function RegisterPage() {
         familyName,
         email,
         password,
-        role,
         avatarUrl: "" // Optional
       });
-      
+
       if (response.success) {
         router.push("/login?registered=true");
       }
@@ -80,14 +92,14 @@ export default function RegisterPage() {
         </div>
 
         <div className="relative z-10 max-w-lg">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="mb-8 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-xs font-black uppercase tracking-widest"
           >
             <CheckCircle2 size={14} /> Gia nhập cộng đồng 500+ trang trại
           </motion.div>
-          <motion.h3 
+          <motion.h3
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
@@ -95,14 +107,14 @@ export default function RegisterPage() {
           >
             Bắt đầu hành trình <br /> <span className="text-emerald-400 italic">số hóa trang trại.</span>
           </motion.h3>
-          
+
           <div className="space-y-6">
             {[
               { title: "Quản lý tập trung", desc: "Theo dõi mọi hoạt động từ xa, mọi lúc mọi nơi." },
               { title: "Báo cáo thông minh", desc: "Phân tích dữ liệu để tối ưu hóa lợi nhuận." },
               { title: "Bảo mật tuyệt đối", desc: "Dữ liệu của bạn được mã hóa và bảo vệ an toàn." }
             ].map((item, idx) => (
-              <motion.div 
+              <motion.div
                 key={idx}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -146,7 +158,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4 p-1 bg-slate-100 rounded-2xl">
-              <button 
+              <button
                 type="button"
                 onClick={() => setRole("OWNER")}
                 className={cn(
@@ -156,7 +168,7 @@ export default function RegisterPage() {
               >
                 <ShieldCheck size={16} /> Chủ trang trại
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => setRole("WORKER")}
                 className={cn(
@@ -172,12 +184,12 @@ export default function RegisterPage() {
               <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Họ và tên</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Nguyễn Văn A" 
+                  placeholder="Nguyễn Văn A"
                   className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all"
                 />
               </div>
@@ -187,12 +199,12 @@ export default function RegisterPage() {
               <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Email</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com" 
+                  placeholder="name@company.com"
                   className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all"
                 />
               </div>
@@ -202,21 +214,36 @@ export default function RegisterPage() {
               <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Mật khẩu</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                  type={showPassword ? "text" : "password"} 
+                <input
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Tối thiểu 8 ký tự" 
+                  placeholder="Tối thiểu 6 ký tự"
                   className="w-full pl-12 pr-12 py-4 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all"
                 />
-                <button 
+                <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Xác nhận mật khẩu</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Nhập lại mật khẩu"
+                  className="w-full pl-12 pr-12 py-4 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all"
+                />
               </div>
             </div>
 
@@ -227,7 +254,7 @@ export default function RegisterPage() {
               </p>
             </div>
 
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
