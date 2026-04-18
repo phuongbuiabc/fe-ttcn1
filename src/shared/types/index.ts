@@ -109,3 +109,34 @@ export interface CreateEmployeeRequest {
   email: string;
   position: string;
 }
+
+export interface WorkSchedule {
+  id: string;
+  employeeCode: string;
+  employeeName?: string;
+  task: string;
+  sectionId: string;
+  sectionName?: string;
+  workDate: string;
+  shift: 'MORNING' | 'AFTERNOON' | 'NIGHT';
+  status: string;
+}
+
+export interface CreateScheduleRequest {
+  employeeCode: string;
+  task: string;
+  sectionId: string;
+  workDate: string;
+  shift: 'MORNING' | 'AFTERNOON' | 'NIGHT';
+  status: string;
+}
+
+export interface Supplier {
+  id: string;
+  supplierCode: string;
+  name: string;
+  type: string;
+  address: string;
+  phone: string;
+  email: string;
+}

@@ -47,6 +47,7 @@ const navItems = [
       { name: "Bán hàng", icon: ArrowUpRight, href: "/trading/export" },
     ]
   },
+  { name: "Nhà cung cấp", icon: Truck, href: "/suppliers" },
   { 
     name: "Nhân sự", 
     icon: Users, 

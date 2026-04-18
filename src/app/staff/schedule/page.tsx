@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Search, 
   Filter, 
@@ -22,85 +22,69 @@ import { cn } from "@/shared/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import { ScheduleModal } from "@/shared/components/ScheduleModal";
-
-const scheduleItems = [
-  {
-    date: "24/10/2023",
-    day: "Thứ Ba",
-    name: "Nguyễn Văn An",
-    role: "Kỹ thuật viên",
-    shift: "Ca Sáng",
-    area: "Khu A / Chuồng 04",
-    note: "Kiểm tra sức khỏe đàn bê sơ sinh.",
-    avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuDL8c1W25-6XZMX2fYA7OvVQGBpcy6PtDUUteEbC-HDP_e2NMi7ndT7cUcY6w5OY6mZTMXIOF51j53HnXDoh3ROxZwuYcuuHMWK7zy5eiS6XdtqnqicRx3sfom1d_XqcOEE09hLF0PRWi8pumphRnjHZOHi2CfGscXUSNZfosfKWu8Bbm5tYr_VeLIP4FvN-r2kQe5YeqUJwXXgdCFWwJn1utNQNsuF-h8mG3lfQLLS_Dtrd-wLF6mx6ZLWgGBoCREFWj6xDJp9Wpz3",
-    status: "normal"
-  },
-  {
-    date: "24/10/2023",
-    day: "Thứ Ba",
-    name: "Lê Thị Mai",
-    role: "Quản kho",
-    shift: "Ca Chiều",
-    area: "Khu C / Kho 01",
-    note: "Trùng lịch trực tại Khu B",
-    avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuDpJ6-TabenEt6-WZjaJMYLbzMmnIviehuNRMG79Nk-UFTAjXvgRYamqRIU9suMfEOQ5nAwFXnNMPaJQelD6TXKgbVrx5jmupyPuVY2QFv_ifYX02b3Im7c51cvUUpnIhs3G6zSxVw10uoGrbyQ1HJUDEQN98LnYrniqnEUbwIqNzwyd3aN2Y-egWl_oGr3pLEepME3Zdcb9peVQ60kxuJZsmRtRvpg7drfjzUw3o5K2uQ9IZzRixXYNPQrjTD2NODbxe8RVogLZqaD",
-    status: "warning"
-  },
-  {
-    date: "25/10/2023",
-    day: "Thứ Tư",
-    name: "Trần Minh Hoàng",
-    role: "Bác sĩ thú y",
-    shift: "Ca Sáng",
-    area: "Khu A / Chuồng 12",
-    note: "Tiêm vaccine định kỳ cho đàn nái.",
-    avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAGhFL7zJy-E4jieXYYztWGZ0PD8rImanB_qGT_7DLvLYyHt21dtyixTLz4Q713aM26FxoLXYKSkyUCx4jEUrnjmBAEQbCW2kKV3z5bRAjphCWN3hYEchC-8SE2gYiFMwAN9gnW8aHUY6etfpAuxTmc62eEOb9nlONu6zIh1WYyRHzPk46aStyIKQ9HLOb3DewY97Q1q72lsxWGZrY4fTcDNWJoA62zpBj9hatFuD5HDMqZWk3wgosBNfSVdrngG4lCgjkkH6_iHWET",
-    status: "normal"
-  },
-  {
-    date: "25/10/2023",
-    day: "Thứ Tư",
-    name: "Phạm Quốc Cường",
-    role: "Bảo vệ",
-    shift: "Ca Đêm",
-    area: "Toàn trang trại",
-    note: "Tuần tra vòng ngoài và trạm điện.",
-    avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuD3HfDe2ypumLgfgyPYOG7Ru2N8zxWcO7ggeOa7s75gcXpucmvUoTV-GK2k96rkE9S8RVuB4Anqgp0zBUuyw-e77KpC5C3o70Ujjc5IRJHBuOzALh_dsLY3Rid0xiHhqEJmBwbRzTQOqjvg_UbZCbwOabH317vhq1PY2Wq3xkPl6fhxai-c5Iq-bvbIwf7OoKhvPULzTmgx84ZCCf3DjoWgTtcVpEXRqSCDAZaqjYwkvyQr_qS_AK6HYCq7WuL4d_Xboqr-2Ep1vIyb",
-    status: "normal"
-  }
-];
+import { scheduleService } from "@/entities/staff/api/schedule.service";
+import { WorkSchedule } from "@/shared/types";
 
 export default function SchedulePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeShift, setActiveShift] = useState("Tất cả");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
+  const [selectedSchedule, setSelectedSchedule] = useState<WorkSchedule | null>(null);
+  const [schedules, setSchedules] = useState<WorkSchedule[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSchedules = async () => {
+    try {
+      setLoading(true);
+      const response = await scheduleService.getSchedules();
+      if (response.success) {
+        setSchedules(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch schedules:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSchedules();
+  }, []);
 
   const handleCreate = () => {
     setSelectedSchedule(null);
     setIsModalOpen(true);
   };
 
-  const handleQuickAssign = () => {
-    setSelectedSchedule({
-      date: new Date().toLocaleDateString('vi-VN'),
-      day: "Hôm nay",
-      shift: "Ca Sáng (06:00 - 14:00)",
-      area: "Khu A / Chuồng 01",
-      note: "Phân công nhanh - Kiểm tra định kỳ"
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (schedule: any) => {
+  const handleEdit = (schedule: WorkSchedule) => {
     setSelectedSchedule(schedule);
     setIsModalOpen(true);
   };
 
-  const filteredSchedules = scheduleItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         item.area.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesShift = activeShift === "Tất cả" || item.shift === activeShift;
+  const handleDelete = async (id: string) => {
+    if (confirm("Xác nhận xóa lịch làm việc này?")) {
+      try {
+        await scheduleService.deleteSchedule(id);
+        fetchSchedules();
+      } catch (error) {
+        alert("Xóa thất bại!");
+      }
+    }
+  };
+
+  const filteredSchedules = schedules.filter(item => {
+    const matchesSearch = 
+      item.employeeCode.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      item.task.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.sectionId.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const shiftMap: Record<string, string> = {
+      "Ca Sáng": "MORNING",
+      "Ca Chiều": "AFTERNOON",
+      "Ca Đêm": "NIGHT"
+    };
+
+    const matchesShift = activeShift === "Tất cả" || item.shift === shiftMap[activeShift];
     return matchesSearch && matchesShift;
   });
 
@@ -114,18 +98,11 @@ export default function SchedulePage() {
         </div>
         <div className="flex flex-wrap gap-3">
           <button 
-            onClick={handleQuickAssign}
-            className="flex-1 sm:flex-none px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-emerald-600 hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2"
-          >
-            <Zap size={18} />
-            Phân công nhanh
-          </button>
-          <button 
             onClick={handleCreate}
             className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-2xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2"
           >
             <Plus size={18} />
-            Tạo lịch
+            Tạo lịch mới
           </button>
         </div>
       </div>
@@ -154,7 +131,7 @@ export default function SchedulePage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors" size={18} />
             <input 
               type="text" 
-              placeholder="Tìm kiếm nhân viên, khu vực..." 
+              placeholder="Tìm kiếm NV, Khu vực, Công việc..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-6 py-3 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none text-slate-700 font-medium"
@@ -175,69 +152,49 @@ export default function SchedulePage() {
                 <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ngày</th>
                 <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nhân viên</th>
                 <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ca làm</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Khu & Chuồng</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ghi chú</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Khu vực</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Công việc</th>
                 <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredSchedules.map((item, i) => (
-                <motion.tr 
-                  key={i}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className={cn(
-                    "hover:bg-slate-50/50 transition-colors group",
-                    item.status === "warning" && "bg-red-50/30 border-l-4 border-red-500"
-                  )}
-                >
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-8 py-10 text-center text-slate-400 font-medium">Đang tải dữ liệu...</td>
+                </tr>
+              ) : filteredSchedules.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-8 py-10 text-center text-slate-400 font-medium">Chưa có lịch làm việc nào được thiết lập.</td>
+                </tr>
+              ) : filteredSchedules.map((item, i) => (
+                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-8 py-6">
-                    <p className="text-sm font-bold text-slate-900">{item.date}</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">{item.day}</p>
+                    <p className="text-sm font-bold text-slate-900">{item.workDate}</p>
                   </td>
                   <td className="px-8 py-6">
-                    <div className="flex items-center gap-4">
-                      <div className="relative w-10 h-10 rounded-xl overflow-hidden ring-2 ring-slate-100">
-                        <Image 
-                          src={item.avatar} 
-                          alt={item.name} 
-                          fill 
-                          className="object-cover"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-900">{item.name}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">{item.role}</p>
-                      </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">{item.employeeName || "Mã NV: " + item.employeeCode}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Mã nhân viên: {item.employeeCode}</p>
                     </div>
                   </td>
                   <td className="px-8 py-6">
                     <span className={cn(
                       "px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider",
-                      item.shift.includes("Sáng") ? "bg-amber-50 text-amber-600" :
-                      item.shift.includes("Chiều") ? "bg-blue-50 text-blue-600" : 
-                      item.shift.includes("Đêm") ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600"
+                      item.shift === "MORNING" ? "bg-amber-50 text-amber-600" :
+                      item.shift === "AFTERNOON" ? "bg-blue-50 text-blue-600" : 
+                      item.shift === "NIGHT" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600"
                     )}>
-                      {item.shift}
+                      {item.shift === "MORNING" ? "Sáng" : item.shift === "AFTERNOON" ? "Chiều" : "Đêm"}
                     </span>
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-2">
                       <MapPin size={14} className="text-emerald-500" />
-                      <p className="text-sm font-bold text-slate-700">{item.area}</p>
+                      <p className="text-sm font-bold text-slate-700">{item.sectionName || item.sectionId}</p>
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    {item.status === "warning" ? (
-                      <div className="flex items-center gap-2 text-red-600 font-bold text-xs">
-                        <AlertTriangle size={14} />
-                        {item.note}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-slate-500 italic">{item.note}</p>
-                    )}
+                    <p className="text-sm text-slate-500 italic max-w-xs truncate">{item.task}</p>
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">
@@ -249,6 +206,7 @@ export default function SchedulePage() {
                         <Edit2 size={16} />
                       </button>
                       <button 
+                        onClick={() => handleDelete(item.id)}
                         className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                         title="Xóa"
                       >
@@ -256,52 +214,17 @@ export default function SchedulePage() {
                       </button>
                     </div>
                   </td>
-                </motion.tr>
+                </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Stats Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nhân sự trực hôm nay</label>
-          <div className="flex items-end justify-between mt-2">
-            <h3 className="text-3xl font-black text-emerald-600">24</h3>
-            <span className="text-emerald-500 text-xs font-bold flex items-center gap-1 mb-1">
-              <TrendingUp size={14} /> 100%
-            </span>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Số ca làm việc</label>
-          <div className="flex items-end justify-between mt-2">
-            <h3 className="text-3xl font-black text-slate-900">42</h3>
-            <p className="text-slate-400 text-xs font-bold mb-1">Ca/Tuần</p>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Cảnh báo trùng lịch</label>
-          <div className="flex items-end justify-between mt-2">
-            <h3 className="text-3xl font-black text-red-500">02</h3>
-            <span className="text-red-400 text-xs font-bold mb-1">Cần xử lý</span>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm border-l-4 border-emerald-500">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Tỷ lệ lấp đầy ca</label>
-          <div className="flex items-end justify-between mt-2">
-            <h3 className="text-3xl font-black text-slate-900">94%</h3>
-            <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden mb-3">
-              <div className="bg-emerald-500 h-full w-[94%]" />
-            </div>
-          </div>
-        </div>
-      </div>
-
       <ScheduleModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+        onSuccess={fetchSchedules}
         schedule={selectedSchedule}
       />
     </div>
