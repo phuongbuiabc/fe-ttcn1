@@ -26,7 +26,7 @@ interface BarnTableProps {
 
 export function BarnTable({ barns, onView, onEdit, onDelete }: BarnTableProps) {
   return (
-    <div className="overflow-x-auto">
+    <div className="responsive-table">
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50/50">
           <tr>

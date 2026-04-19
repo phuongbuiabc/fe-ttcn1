@@ -21,7 +21,7 @@ export function StaffTable({ staffs, loading, onEdit, onDelete, onView }: StaffT
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="responsive-table">
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50/50">
           <tr>

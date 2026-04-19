@@ -118,7 +118,7 @@ export default function SchedulePage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden responsive-table">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50">
@@ -171,29 +171,29 @@ export default function SchedulePage() {
                 <button onClick={() => setIsDetailModalOpen(false)} className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100"><X /></button>
               </div>
 
-              <div className="grid grid-cols-2 gap-8 mb-10 pb-8 border-b border-slate-50">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 pb-8 border-b border-slate-50">
                 <div className="space-y-1"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Thời gian trực</p><div className="flex items-center gap-2 text-sm font-bold text-slate-800"><Calendar size={16} className="text-[#00a67d]" />{selectedSchedule.work_date}</div></div>
                 <div className="space-y-1"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Ca thực hiện</p><div className="flex items-center gap-2 text-sm font-bold text-slate-800"><Clock size={16} className="text-blue-500" />{selectedSchedule.shift === "MORNING" ? "Ca Sáng" : "Ca Chiều"}</div></div>
-                <div className="col-span-2 space-y-1"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Địa điểm & Nhiệm vụ</p><div className="p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 flex items-start gap-4"><MapPin size={20} className="text-rose-500 mt-1" /><div><p className="text-sm font-bold text-slate-800">{selectedSchedule.section_name}</p><p className="text-xs text-slate-500 font-medium mt-2 leading-relaxed">{selectedSchedule.task}</p></div></div></div>
+                <div className="md:col-span-2 space-y-1"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Địa điểm & Nhiệm vụ</p><div className="p-4 md:p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 flex items-start gap-4"><MapPin size={20} className="text-rose-500 mt-1" /><div><p className="text-sm font-bold text-slate-800">{selectedSchedule.section_name}</p><p className="text-xs text-slate-500 font-medium mt-2 leading-relaxed">{selectedSchedule.task}</p></div></div></div>
               </div>
 
               {/* Staff Detail */}
               {getStaffDetail(selectedSchedule.employee_id) && (
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Nhân lực phụ trách</h4>
-                  <div className="p-6 bg-[#fbfcfd] rounded-[2.5rem] border border-slate-100 flex items-center gap-6">
-                    <div className="w-20 h-20 bg-[#e2f7f1] text-[#00a67d] rounded-[1.5rem] flex items-center justify-center text-3xl font-black">{selectedSchedule.full_name.charAt(0)}</div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
+                  <div className="p-4 md:p-6 bg-[#fbfcfd] rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 flex flex-col md:flex-row items-center gap-4 md:gap-6">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-[#e2f7f1] text-[#00a67d] rounded-[1.2rem] md:rounded-[1.5rem] flex items-center justify-center text-2xl md:text-3xl font-black">{selectedSchedule.full_name.charAt(0)}</div>
+                    <div className="flex-1 text-center md:text-left w-full">
+                      <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-1">
                         <div>
-                          <p className="text-xl font-extrabold text-slate-800 tracking-tight">{selectedSchedule.full_name}</p>
-                          <p className="text-xs font-bold text-[#00a67d] uppercase tracking-widest mt-0.5">{getStaffDetail(selectedSchedule.employee_id).position}</p>
+                          <p className="text-lg md:text-xl font-extrabold text-slate-800 tracking-tight">{selectedSchedule.full_name}</p>
+                          <p className="text-[10px] md:text-xs font-bold text-[#00a67d] uppercase tracking-widest mt-0.5">{getStaffDetail(selectedSchedule.employee_id).position}</p>
                         </div>
-                        <div className="text-right"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">ID: {selectedSchedule.employee_id}</p></div>
+                        <div className="text-right"><p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">ID: {selectedSchedule.employee_id}</p></div>
                       </div>
-                      <div className="mt-4 flex gap-4">
-                        <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-100"><GraduationCap size={15} className="text-[#00a67d]" /> {getStaffDetail(selectedSchedule.employee_id).qualification}</div>
-                        <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-100"><Phone size={14} className="text-[#00a67d]" /> {getStaffDetail(selectedSchedule.employee_id).phone}</div>
+                      <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-3 md:gap-4">
+                        <div className="flex items-center gap-2 text-[10px] md:text-[11px] font-bold text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-100 shadow-sm"><GraduationCap size={15} className="text-[#00a67d]" /> {getStaffDetail(selectedSchedule.employee_id).qualification}</div>
+                        <div className="flex items-center gap-2 text-[10px] md:text-[11px] font-bold text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-100 shadow-sm"><Phone size={14} className="text-[#00a67d]" /> {getStaffDetail(selectedSchedule.employee_id).phone}</div>
                       </div>
                     </div>
                   </div>

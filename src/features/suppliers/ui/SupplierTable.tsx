@@ -23,7 +23,7 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="responsive-table">
       <table className="w-full text-left">
         <thead className="bg-slate-50/50">
           <tr>
@@ -53,12 +53,12 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
                   </div>
                 </div>
               </td>
-              <td className="px-6 py-1.5">
+              <td className="px-6 py-3">
                 <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-black rounded-lg uppercase tracking-wider">
                   {item.type}
                 </span>
               </td>
-              <td className="px-6 py-1.5">
+              <td className="px-6 py-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5 text-[13px] font-bold text-slate-600">
                     <Phone size={12} className="text-slate-300" /> {item.phone}

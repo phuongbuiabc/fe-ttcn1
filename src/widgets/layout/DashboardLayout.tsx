@@ -51,18 +51,23 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden bg-[#f8f9fa]">
       {/* Sidebar Overlay for mobile */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-      `}>
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-[70] transform transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] lg:relative lg:translate-x-0 lg:z-0",
+        isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+      )}>
         <Sidebar onClose={() => setIsSidebarOpen(false)} />
       </div>
 
