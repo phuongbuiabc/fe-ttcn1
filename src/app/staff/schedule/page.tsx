@@ -93,7 +93,7 @@ export default function SchedulePage() {
   });
 
   return (
-    <div className="space-y-10 bg-[#fbfcfd] min-h-screen -m-8 p-8">
+    <div className="space-y-6 bg-[#fbfcfd] min-h-screen -m-8 p-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -165,7 +165,7 @@ export default function SchedulePage() {
       <AnimatePresence>
         {isDetailModalOpen && selectedSchedule && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden p-10">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-2xl bg-white rounded-[1.75rem] shadow-2xl overflow-hidden p-10">
               <div className="flex justify-between items-start mb-8">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-[#e2f7f1] text-[#00a67d] rounded-3xl flex items-center justify-center shadow-inner"><Clock size={32} /></div>
@@ -213,3 +213,4 @@ export default function SchedulePage() {
     </div>
   );
 }
+

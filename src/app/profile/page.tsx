@@ -41,7 +41,7 @@ export default function ProfilePage() {
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20">
       {/* Profile Header Card */}
-      <div className="relative bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
+      <div className="relative bg-white rounded-[1.75rem] border border-slate-100 shadow-sm overflow-hidden">
         <div className="h-48 bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-500 relative">
           <div className="absolute inset-0 opacity-30 pointer-events-none">
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_70%)]" />
@@ -49,7 +49,7 @@ export default function ProfilePage() {
           </div>
         </div>
         
-        <div className="px-10 pb-10">
+        <div className="px-8 pb-10">
           <div className="relative flex flex-col md:flex-row items-end gap-8 -mt-20 mb-8">
             <div className="relative group">
               <div className="w-40 h-40 rounded-[2.5rem] overflow-hidden border-8 border-white shadow-2xl relative bg-white transition-transform duration-500 group-hover:scale-[1.02]">
@@ -256,3 +256,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

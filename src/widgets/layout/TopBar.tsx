@@ -56,20 +56,20 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   }, []);
 
   return (
-    <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-40">
+    <header className="h-12 bg-white border-b border-slate-100 flex items-center justify-between px-4 md:px-4 sticky top-0 z-40">
       <div className="flex items-center gap-4 flex-1 max-w-md">
         <button 
           onClick={onMenuClick}
           className="lg:hidden p-2 text-slate-600 hover:text-emerald-600 transition-colors"
         >
-          <Menu size={20} />
+          <Menu size={18} />
         </button>
         <div className="relative w-full group hidden md:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors" size={14} />
           <input 
             type="text" 
             placeholder="Tìm kiếm đàn, chuồng hoặc nhật ký..." 
-            className="w-full bg-slate-50 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all placeholder:text-slate-400 outline-none text-slate-700"
+            className="w-full bg-slate-50 border-none rounded-full py-1.5 pl-8 pr-4 text-[13px] focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all placeholder:text-slate-400 outline-none text-slate-700"
           />
         </div>
       </div>
@@ -79,12 +79,12 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           <button 
             onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
             className={cn(
-              "p-2.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-all relative group active:scale-90",
+              "p-2 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-all relative group active:scale-90",
               isNotificationsOpen && "bg-emerald-50 text-emerald-600"
             )}
           >
-            <Bell size={20} />
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white group-hover:scale-110 transition-transform"></span>
+            <Bell size={18} />
+            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-rose-500 rounded-full border-2 border-white group-hover:scale-110 transition-transform"></span>
           </button>
 
           <AnimatePresence>
@@ -128,7 +128,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           </AnimatePresence>
         </div>
 
-        <div className="h-6 w-px bg-slate-200 mx-1 md:mx-2"></div>
+        <div className="h-6 w-px bg-slate-200 mx-1 md:mx-1"></div>
         
         <div className="relative" ref={userMenuRef}>
           {user ? (
@@ -137,15 +137,15 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
               className="flex items-center gap-3 pl-1 md:pl-2 group cursor-pointer"
             >
               <div className="text-right hidden sm:block">
-                <p className="text-xs font-black text-slate-900 leading-none font-headline group-hover:text-emerald-600 transition-colors">
+                <p className="text-[11px] font-black text-slate-900 leading-none font-headline group-hover:text-emerald-600 transition-colors">
                   {user.name || `${user.familyName || ''} ${user.givenName || ''}`.trim() || user.username || "Người dùng"}
                 </p>
-                <p className="text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-black">
+                <p className="text-[9px] text-slate-400 uppercase tracking-widest mt-1 font-black">
                   {user.role || (user.roles?.[0]?.name) || "Thành viên"}
                 </p>
               </div>
               <div className={cn(
-                "relative w-10 h-10 rounded-full overflow-hidden border-2 shrink-0 transition-all shadow-sm flex items-center justify-center bg-emerald-100 text-emerald-600",
+                "relative w-8 h-8 rounded-full overflow-hidden border shrink-0 transition-all shadow-sm flex items-center justify-center bg-emerald-100 text-emerald-600",
                 isUserMenuOpen ? "border-emerald-500" : "border-emerald-100 group-hover:border-emerald-500"
               )}>
                 {user.avatarUrl ? (
@@ -157,7 +157,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <User size={20} />
+                  <User size={16} />
                 )}
               </div>
             </div>
@@ -222,3 +222,4 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
     </header>
   );
 }
+

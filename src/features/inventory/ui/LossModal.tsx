@@ -23,7 +23,7 @@ export function LossModal({ isOpen, onClose, onSave, supply, lossForm, setLossFo
           initial={{ scale: 0.9, opacity: 0 }} 
           animate={{ scale: 1, opacity: 1 }} 
           exit={{ scale: 0.9, opacity: 0 }} 
-          className="bg-white rounded-[3rem] w-full max-w-lg shadow-2xl p-10 border-t-8 border-rose-500"
+          className="bg-white rounded-[1.75rem] w-full max-w-lg shadow-2xl p-10 border-t-8 border-rose-500"
         >
           <div className="flex justify-between items-start mb-6">
             <div>
@@ -73,3 +73,4 @@ export function LossModal({ isOpen, onClose, onSave, supply, lossForm, setLossFo
     </AnimatePresence>
   );
 }
+

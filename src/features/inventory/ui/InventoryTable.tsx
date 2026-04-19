@@ -36,10 +36,10 @@ export function InventoryTable({
       <table className="w-full text-left">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Vật tư / Sản phẩm</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-center">Số lượng</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
+            <th className="px-5 py-2 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Vật tư / Sản phẩm</th>
+            <th className="px-5 py-2 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
+            <th className="px-5 py-2 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-center">Số lượng</th>
+            <th className="px-5 py-2 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
@@ -52,7 +52,7 @@ export function InventoryTable({
               onClick={() => onView(item)} 
               className="hover:bg-slate-50 transition-all group cursor-pointer"
             >
-              <td className="px-10 py-6">
+              <td className="px-8 py-3.5">
                 <div className="flex items-center gap-4">
                   <div className={cn(
                     "w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs", 
@@ -66,18 +66,18 @@ export function InventoryTable({
                   </div>
                 </div>
               </td>
-              <td className="px-10 py-6">
+              <td className="px-8 py-3.5">
                 <span className="px-3 py-1 bg-slate-50 text-slate-500 text-[10px] font-black rounded-lg border border-slate-100 uppercase tracking-widest">
                   {item.supply_type}
                 </span>
               </td>
-              <td className="px-10 py-6 text-center">
+              <td className="px-8 py-3.5 text-center">
                 <span className={cn("text-lg font-black tracking-tighter", item.quantity < 10 ? "text-rose-500" : "text-emerald-600")}>
                   {item.quantity}
                 </span>
                 <span className="ml-1.5 text-[10px] font-black text-slate-400 uppercase">{item.unit}</span>
               </td>
-              <td className="px-10 py-6 text-right">
+              <td className="px-8 py-3.5 text-right">
                 <div className="flex justify-end gap-2 transition-all">
                   <button 
                     onClick={(e) => { e.stopPropagation(); onEditStock(item); }} 
@@ -106,3 +106,4 @@ export function InventoryTable({
     </div>
   );
 }
+

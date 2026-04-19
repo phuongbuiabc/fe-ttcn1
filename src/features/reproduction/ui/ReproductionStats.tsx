@@ -47,3 +47,4 @@ export const ReproductionStats: React.FC<ReproductionStatsProps> = ({ stats }) =
     </div>
   );
 };
+

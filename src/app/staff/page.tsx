@@ -75,7 +75,7 @@ export default function StaffPage() {
   );
 
   return (
-    <div className="space-y-8 pb-20 bg-[#fbfcfd] min-h-screen -m-8 p-8">
+    <div className="space-y-6 pb-20 bg-[#fbfcfd] min-h-screen -m-6 p-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -107,7 +107,7 @@ export default function StaffPage() {
       </div>
 
       {/* Member List */}
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-[1.75rem] border border-slate-100 shadow-sm overflow-hidden">
         <StaffTable 
           staffs={filteredMembers} 
           loading={loading}
@@ -144,3 +144,4 @@ export default function StaffPage() {
     </div>
   );
 }
+

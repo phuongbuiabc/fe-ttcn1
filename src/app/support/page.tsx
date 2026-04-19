@@ -67,9 +67,9 @@ export default function SupportPage() {
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
 
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-6 pb-20">
       {/* Hero Section */}
-      <div className="relative rounded-[3rem] overflow-hidden bg-emerald-900 p-8 md:p-20 text-center">
+      <div className="relative rounded-[1.75rem] overflow-hidden bg-emerald-900 p-8 md:p-20 text-center">
         <div className="absolute inset-0 opacity-20 pointer-events-none">
           <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-emerald-400 blur-[120px]" />
           <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-emerald-400 blur-[120px]" />
@@ -235,7 +235,7 @@ export default function SupportPage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-xl bg-white rounded-[3rem] shadow-2xl overflow-hidden"
+              className="relative w-full max-w-xl bg-white rounded-[1.75rem] shadow-2xl overflow-hidden"
             >
               <div className="p-10 space-y-8">
                 <div className="flex items-center justify-between">
@@ -287,3 +287,4 @@ export default function SupportPage() {
     </div>
   );
 }
+

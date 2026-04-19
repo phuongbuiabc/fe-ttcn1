@@ -27,10 +27,10 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
       <table className="w-full text-left">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Đối tác / Nhà cung cấp</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Thông tin liên hệ</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
+            <th className="px-6 py-1.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Đối tác / Nhà cung cấp</th>
+            <th className="px-6 py-1.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
+            <th className="px-6 py-1.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Thông tin liên hệ</th>
+            <th className="px-6 py-1.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
@@ -42,45 +42,45 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
               transition={{ delay: i * 0.05 }}
               className="hover:bg-slate-50/50 group transition-all"
             >
-              <td className="px-8 py-5">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
-                    <Truck size={20} />
+              <td className="px-6 py-1.5">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
+                    <Truck size={14} />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-800 leading-none">{item.name}</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase mt-1.5 tracking-tighter">{item.supplierCode}</p>
+                    <p className="text-[13px] font-bold text-slate-800 leading-none">{item.name}</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase mt-0.5 tracking-tighter">{item.supplierCode}</p>
                   </div>
                 </div>
               </td>
-              <td className="px-8 py-5">
-                <span className="px-3 py-1 bg-slate-100 text-slate-500 text-[10px] font-black rounded-lg uppercase tracking-wider">
+              <td className="px-6 py-1.5">
+                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-black rounded-lg uppercase tracking-wider">
                   {item.type}
                 </span>
               </td>
-              <td className="px-8 py-5">
+              <td className="px-6 py-1.5">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm font-bold text-slate-600">
+                  <div className="flex items-center gap-1.5 text-[13px] font-bold text-slate-600">
                     <Phone size={12} className="text-slate-300" /> {item.phone}
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] text-slate-400 font-medium">
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
                     <Mail size={12} className="text-slate-300" /> {item.email}
                   </div>
                 </div>
               </td>
-              <td className="px-10 py-6 text-right">
-                <div className="flex justify-end gap-2 transition-all">
+              <td className="px-6 py-1.5 text-right">
+                <div className="flex justify-end gap-1.5 transition-all">
                   <button 
                     onClick={(e) => { e.stopPropagation(); onEdit(item); }}
-                    className="p-2.5 text-slate-400 hover:text-emerald-600 transition-all"
+                    className="p-1.5 text-slate-400 hover:text-emerald-600 transition-all"
                   >
-                    <Edit size={18} />
+                    <Edit size={14} />
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); onDelete(item); }}
-                    className="p-2.5 text-slate-400 hover:text-rose-600 transition-all"
+                    className="p-1.5 text-slate-400 hover:text-rose-600 transition-all"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </td>
@@ -91,3 +91,4 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
     </div>
   );
 }
+

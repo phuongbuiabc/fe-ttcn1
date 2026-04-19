@@ -20,7 +20,7 @@ export function TransferPigModal({ isOpen, onClose, barns }: TransferPigModalPro
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white rounded-[3rem] w-full max-w-md overflow-hidden shadow-2xl"
+          className="bg-white rounded-[1.75rem] w-full max-w-md overflow-hidden shadow-2xl"
         >
           <div className="p-8 border-b border-slate-50 flex items-center justify-between">
             <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Điều chuyển đàn heo</h3>
@@ -62,3 +62,4 @@ export function TransferPigModal({ isOpen, onClose, barns }: TransferPigModalPro
     </AnimatePresence>
   );
 }
+

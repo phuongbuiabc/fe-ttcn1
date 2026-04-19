@@ -22,7 +22,7 @@ export function SupplyDetailModal({ isOpen, onClose, supply, onEdit }: SupplyDet
           initial={{ scale: 0.9, opacity: 0 }} 
           animate={{ scale: 1, opacity: 1 }} 
           exit={{ scale: 0.9, opacity: 0 }} 
-          className="bg-white rounded-[3rem] w-full max-w-xl shadow-2xl overflow-hidden p-10"
+          className="bg-white rounded-[1.75rem] w-full max-w-xl shadow-2xl overflow-hidden p-10"
         >
           <div className="flex justify-between items-center mb-10">
             <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center">
@@ -74,3 +74,4 @@ export function SupplyDetailModal({ isOpen, onClose, supply, onEdit }: SupplyDet
     </AnimatePresence>
   );
 }
+

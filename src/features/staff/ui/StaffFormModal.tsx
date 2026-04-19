@@ -37,7 +37,7 @@ export function StaffFormModal({
           initial={{ scale: 0.95, opacity: 0 }} 
           animate={{ scale: 1, opacity: 1 }} 
           exit={{ scale: 0.95, opacity: 0 }} 
-          className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden shadow-[#00a67d]/5"
+          className="relative w-full max-w-2xl bg-white rounded-[1.75rem] shadow-2xl overflow-hidden shadow-[#00a67d]/5"
         >
           <div className="p-8 border-b border-slate-50 flex items-center justify-between">
             <h3 className="text-2xl font-extrabold text-slate-800 uppercase tracking-tight">
@@ -147,3 +147,4 @@ export function StaffFormModal({
     </AnimatePresence>
   );
 }
+

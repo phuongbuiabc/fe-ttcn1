@@ -43,3 +43,4 @@ export function PigStats({ stats }: PigStatsProps) {
     </div>
   );
 }
+

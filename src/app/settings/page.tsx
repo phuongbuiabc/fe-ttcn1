@@ -284,7 +284,7 @@ function SettingsContent() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="p-8 space-y-10"
+                  className="p-8 space-y-6"
                 >
                   <div>
                     <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Thông tin Cá nhân</h3>
@@ -392,7 +392,7 @@ function SettingsContent() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="p-8 space-y-10"
+                  className="p-8 space-y-6"
                 >
                   <div>
                     <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Mật khẩu & Truy cập</h3>
@@ -469,3 +469,4 @@ export default function SettingsPage() {
     </Suspense>
   );
 }
+

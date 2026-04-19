@@ -37,7 +37,7 @@ export function SupplierFormModal({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden"
+          className="relative w-full max-w-2xl bg-white rounded-[1.75rem] shadow-2xl overflow-hidden"
         >
           <form onSubmit={onSave} className="p-8">
             <div className="flex items-center justify-between mb-8 text-emerald-600 font-headline">
@@ -149,3 +149,4 @@ export function SupplierFormModal({
     </AnimatePresence>
   );
 }
+

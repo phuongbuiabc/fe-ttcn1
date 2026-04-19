@@ -111,7 +111,7 @@ export default function CustomersPage() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <CustomerModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
@@ -209,17 +209,17 @@ export default function CustomersPage() {
       </div>
 
       {/* Customers List */}
-      <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-[1.75rem] border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50">
-                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Khách hàng</th>
-                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Liên hệ</th>
-                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Phân loại</th>
-                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tổng chi tiêu</th>
-                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Trạng thái</th>
-                <th className="px-10 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest"></th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Khách hàng</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Liên hệ</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Phân loại</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tổng chi tiêu</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Trạng thái</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -233,7 +233,7 @@ export default function CustomersPage() {
                     transition={{ delay: i * 0.05 }}
                     className="hover:bg-gray-50/50 transition-colors group cursor-pointer"
                   >
-                    <td className="px-10 py-6">
+                    <td className="px-8 py-3.5">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center font-bold text-sm ring-2 ring-emerald-100/50 group-hover:ring-emerald-200 transition-all">
                           {customer.avatar}
@@ -244,7 +244,7 @@ export default function CustomersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-10 py-6">
+                    <td className="px-8 py-3.5">
                       <div className="space-y-1.5">
                         <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
                           <Mail size={12} className="text-emerald-600" />
@@ -256,7 +256,7 @@ export default function CustomersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-10 py-6">
+                    <td className="px-8 py-3.5">
                       <span className={cn(
                         "px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider",
                         customer.type === "Đại lý" ? "bg-blue-50 text-blue-600" : "bg-purple-50 text-purple-600"
@@ -264,13 +264,13 @@ export default function CustomersPage() {
                         {customer.type}
                       </span>
                     </td>
-                    <td className="px-10 py-6">
+                    <td className="px-8 py-3.5">
                       <div>
                         <p className="text-sm font-bold text-gray-900">{customer.totalSpent}</p>
                         <p className="text-[10px] font-medium text-gray-400 mt-0.5">{customer.totalOrders} đơn hàng</p>
                       </div>
                     </td>
-                    <td className="px-10 py-6">
+                    <td className="px-8 py-3.5">
                       <span className={cn(
                         "flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider",
                         customer.status === "Hoạt động" ? "text-emerald-600" : "text-amber-600"
@@ -279,7 +279,7 @@ export default function CustomersPage() {
                         {customer.status}
                       </span>
                     </td>
-                    <td className="px-10 py-6 text-right">
+                    <td className="px-8 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link 
                           href={`/customers/${customer.id}`}
@@ -311,3 +311,4 @@ export default function CustomersPage() {
     </div>
   );
 }
+

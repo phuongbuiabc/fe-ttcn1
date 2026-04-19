@@ -23,7 +23,7 @@ export function AdjustmentModal({ isOpen, onClose, onSave, supply, adjForm, setA
           initial={{ scale: 0.9, opacity: 0 }} 
           animate={{ scale: 1, opacity: 1 }} 
           exit={{ scale: 0.9, opacity: 0 }} 
-          className="bg-white rounded-[3rem] w-full max-lg shadow-2xl p-10 border-t-8 border-blue-500 max-w-lg"
+          className="bg-white rounded-[1.75rem] w-full max-lg shadow-2xl p-10 border-t-8 border-blue-500 max-w-lg"
         >
           <div className="flex justify-between items-start mb-6 text-blue-600">
             <div>
@@ -86,3 +86,4 @@ export function AdjustmentModal({ isOpen, onClose, onSave, supply, adjForm, setA
     </AnimatePresence>
   );
 }
+

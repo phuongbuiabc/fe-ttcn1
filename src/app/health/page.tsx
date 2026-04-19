@@ -96,34 +96,32 @@ export default function HealthManagementPage() {
   };
 
   return (
-    <div className="space-y-10 pb-20 bg-[#fbfcfd] min-h-screen -m-8 p-8 ">
+    <div className="space-y-4 pb-20 bg-[#fbfcfd] min-h-screen -m-4 p-4 ">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">Sức khỏe & Tiêm phòng</h1>
+          <h1 className="text-lg font-extrabold text-slate-800 tracking-tight font-headline uppercase leading-none">Giám sát sức khỏe</h1>
+          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Hệ thống theo dõi cá thể tích cực</p>
         </div>
-        <div className="flex gap-4">
-          <button onClick={() => openAddVaccineModal(false)} className="px-6 py-3 bg-white text-emerald-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-100 shadow-sm active:scale-95 transition-all">Ghi nhận Vaccine</button>
-          <button onClick={openAddModal} className="px-8 py-3.5 bg-[#00a67d] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/10 flex items-center gap-2 active:scale-95 transition-all">
-            <PlusCircle size={18} /> Lập hồ sơ mới
-          </button>
-        </div>
+        <button onClick={openAddModal} className="px-4 py-2 bg-[#00a67d] text-white rounded-full text-[11px] font-bold shadow-lg shadow-emerald-900/10 flex items-center gap-2 active:scale-95 transition-all">
+          <Plus size={14} /> Ghi nhận tình trạng
+        </button>
       </div>
 
-      {/* KPI Section */}
-      <div className="grid grid-cols-3 gap-8">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: "Lợn bất thường", value: "12", color: "rose", bg: "bg-rose-50", text: "text-rose-600", icon: AlertTriangle },
           { label: "Đang điều trị", value: "45", color: "emerald", bg: "bg-emerald-50", text: "text-emerald-700", icon: Stethoscope },
           { label: "Bỏ ăn/Theo dõi", value: "08", color: "amber", bg: "bg-amber-50", text: "text-amber-600", icon: Utensils }
         ].map((kpi, i) => (
-          <div key={i} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
-            <div className={cn("absolute right-0 top-0 w-32 h-32 opacity-5 -mr-8 -mt-8 rounded-full", kpi.bg)} />
-            <div className="relative z-10 space-y-4">
-              <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner", kpi.bg, kpi.text)}><kpi.icon size={28} /></div>
+          <div key={i} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm relative overflow-hidden group">
+            <div className={cn("absolute right-0 top-0 w-20 h-20 opacity-5 -mr-5 -mt-5 rounded-full", kpi.bg)} />
+            <div className="relative z-10 space-y-3">
+              <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center shadow-inner", kpi.bg, kpi.text)}><kpi.icon size={20} /></div>
               <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{kpi.label}</p>
-                <p className={cn("text-5xl font-black tracking-tighter mt-1", kpi.text)}>{kpi.value}</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{kpi.label}</p>
+                <p className={cn("text-xl font-black tracking-tighter mt-1", kpi.text)}>{kpi.value}</p>
               </div>
             </div>
           </div>
@@ -131,42 +129,42 @@ export default function HealthManagementPage() {
       </div>
 
       {/* Monitoring List */}
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-          <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Cá thể đang điều trị tích cực</h2>
+      <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+          <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Cá thể đang điều trị tích cực</h2>
           <div className="flex gap-2">
-             <button className="p-2.5 bg-white text-slate-400 rounded-xl hover:bg-slate-50 active:scale-90 transition-all"><Search size={18} /></button>
-             <button className="p-2.5 bg-white text-slate-400 rounded-xl hover:bg-slate-50 active:scale-90 transition-all"><Plus size={18} /></button>
+             <button className="p-2 bg-white text-slate-400 rounded-lg hover:bg-slate-50 active:scale-90 transition-all"><Search size={14} /></button>
+             <button className="p-2 bg-white text-slate-400 rounded-lg hover:bg-slate-50 active:scale-90 transition-all"><Plus size={14} /></button>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50/50">
               <tr>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Mã số tai</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Chẩn đoán bệnh</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Liệu trình</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Dự kiến kết thúc</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
+                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Mã số tai</th>
+                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Chẩn đoán bệnh</th>
+                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Liệu trình</th>
+                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Dự kiến kết thúc</th>
+                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {treatments.map((item) => (
                 <tr key={item.id} className="bg-white hover:bg-slate-50 transition-all group cursor-pointer" onClick={() => { setSelectedTreatment(item); setIsDetailModalOpen(true); }}>
-                  <td className="px-10 py-6 font-black text-slate-900 tracking-tight leading-none">{item.id}</td>
-                  <td className="px-10 py-6 leading-none">
+                  <td className="px-8 py-3.5 font-black text-slate-900 tracking-tight leading-none">{item.id}</td>
+                  <td className="px-8 py-3.5 leading-none">
                     <span className={cn(
                       "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest", 
                       item.color === "rose" ? "bg-rose-50 text-rose-500" : "bg-amber-50 text-amber-600"
                     )}>{item.disease}</span>
                   </td>
-                  <td className="px-10 py-6">
+                  <td className="px-8 py-3.5">
                      <span className="px-3 py-1 bg-slate-50 text-slate-500 rounded-lg border border-slate-100 text-[10px] font-black uppercase tracking-tighter">
                         {item.duration}
                      </span>
                   </td>
-                  <td className="px-10 py-6 font-black text-emerald-600 tracking-tighter text-lg leading-none">{item.expected}</td>
-                  <td className="px-10 py-6 text-right">
+                  <td className="px-8 py-3.5 font-black text-emerald-600 tracking-tighter text-lg leading-none">{item.expected}</td>
+                  <td className="px-8 py-3.5 text-right">
                     <div className="flex justify-end gap-2 transition-all">
                       <button className="p-2.5 text-slate-400 hover:text-blue-600 transition-all"><Edit size={18} /></button>
                       <button className="p-2.5 text-slate-400 hover:text-rose-600 transition-all"><Trash2 size={18} /></button>
@@ -180,7 +178,7 @@ export default function HealthManagementPage() {
       </div>
 
       {/* History Grid */}
-      <div className="grid grid-cols-2 gap-8">
+      <div className="grid grid-cols-2 gap-4">
         {[
           { title: "Nhật ký tiêm phòng Lợn", icon: User, data: pVaccinations },
           { title: "Nhật ký tiêm phòng Đàn con", icon: Baby, data: lVaccinations }
@@ -188,28 +186,28 @@ export default function HealthManagementPage() {
           <div key={i} className="space-y-4">
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                   <div className="w-10 h-10 bg-white border border-slate-100 text-emerald-600 rounded-xl flex items-center justify-center shadow-sm"><sec.icon size={20} /></div>
-                   <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">{sec.title}</h3>
+                   <div className="w-8 h-8 bg-white border border-slate-100 text-emerald-600 rounded-lg flex items-center justify-center shadow-sm"><sec.icon size={16} /></div>
+                   <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">{sec.title}</h3>
                 </div>
-                <button onClick={() => openAddVaccineModal(i === 1)} className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Thêm mới</button>
+                <button onClick={() => openAddVaccineModal(i === 1)} className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Thêm mới</button>
              </div>
-             <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden min-h-[240px]">
+             <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden min-h-[200px]">
                 <table className="w-full text-left border-collapse">
                    <thead className="bg-slate-50/50">
                       <tr>
-                         <th className="px-8 py-4 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Mã định danh</th>
-                         <th className="px-8 py-4 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Loại Vaccine</th>
-                         <th className="px-8 py-4 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Ngày thực hiện</th>
+                         <th className="px-6 py-2 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Mã định danh</th>
+                         <th className="px-6 py-2 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Loại Vaccine</th>
+                         <th className="px-6 py-2 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Ngày thực hiện</th>
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-50">
                       {sec.data.map((v, idx) => (
                         <tr key={idx} className="hover:bg-slate-50 transition-all cursor-pointer">
-                           <td className="px-8 py-4 font-black text-slate-900 text-xs leading-none">{v.id}</td>
-                           <td className="px-8 py-4 leading-none">
-                              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[10px] font-black uppercase tracking-tighter border border-emerald-100/50">{v.vaccine}</span>
+                           <td className="px-6 py-2 font-black text-slate-900 text-xs leading-none">{v.id}</td>
+                           <td className="px-6 py-2 leading-none">
+                              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[9px] font-black uppercase tracking-tighter border border-emerald-100/50">{v.vaccine}</span>
                            </td>
-                           <td className="px-8 py-4 font-bold text-slate-400 text-[10px] text-right leading-none uppercase">{v.date}</td>
+                           <td className="px-6 py-2 font-bold text-slate-400 text-[9px] text-right leading-none uppercase">{v.date}</td>
                         </tr>
                       ))}
                    </tbody>
@@ -228,44 +226,44 @@ export default function HealthManagementPage() {
       <AnimatePresence>
         {isDetailModalOpen && selectedTreatment && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-2xl bg-white rounded-[3.5rem] shadow-2xl overflow-hidden p-12">
-               <div className="flex justify-between items-start mb-10">
-                  <div className="flex items-center gap-5">
-                    <div className="w-20 h-20 bg-emerald-50 text-[#00a67d] rounded-[2rem] flex items-center justify-center shadow-inner"><Activity size={40} /></div>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden p-8">
+               <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-emerald-50 text-[#00a67d] rounded-xl flex items-center justify-center shadow-inner"><Activity size={28} /></div>
                     <div>
-                      <h2 className="text-3xl font-black text-slate-800 tracking-tight uppercase">{selectedTreatment.id}</h2>
-                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Hồ sơ bệnh án chi tiết</p>
+                      <h2 className="text-xl font-black text-slate-800 tracking-tight uppercase">{selectedTreatment.id}</h2>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Hồ sơ bệnh án chi tiết</p>
                     </div>
                   </div>
-                  <button onClick={() => setIsDetailModalOpen(false)} className="p-4 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 transition-all"><X /></button>
+                  <button onClick={() => setIsDetailModalOpen(false)} className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all"><X size={18} /></button>
                </div>
 
-               <div className="grid grid-cols-2 gap-10 mb-10 pb-10 border-b border-slate-50">
+               <div className="grid grid-cols-2 gap-6 mb-6 pb-6 border-b border-slate-50">
                   <div className="space-y-4">
-                     <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">Quản lý đàn lợn</h1>
-                     <div className="space-y-3">
-                        <div className="flex items-center gap-3 font-bold text-slate-700 text-sm"><User size={16} className="text-emerald-500" /> {selectedTreatment.type} - {selectedTreatment.breed}</div>
-                        <div className="flex items-center gap-3 font-bold text-slate-700 text-sm"><PlusCircle size={16} className="text-rose-500" /> {selectedTreatment.disease}</div>
+                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Thông tin cơ bản</p>
+                     <div className="space-y-2">
+                        <div className="flex items-center gap-3 font-bold text-slate-700 text-xs"><User size={14} className="text-emerald-500" /> {selectedTreatment.type} - {selectedTreatment.breed}</div>
+                        <div className="flex items-center gap-3 font-bold text-slate-700 text-xs"><PlusCircle size={14} className="text-rose-500" /> {selectedTreatment.disease}</div>
                      </div>
                   </div>
                   <div className="space-y-4">
                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tiến độ điều trị</p>
-                     <div className="space-y-3">
-                        <div className="flex items-center gap-3 font-bold text-slate-700 text-sm"><Calendar size={16} className="text-[#00a67d]" /> Bắt đầu: {selectedTreatment.date}</div>
-                        <div className="flex items-center gap-3 font-black text-emerald-600 text-sm"><Clock size={16} /> Dự kiến: {selectedTreatment.expected}</div>
+                     <div className="space-y-2">
+                        <div className="flex items-center gap-3 font-bold text-slate-700 text-xs"><Calendar size={14} className="text-[#00a67d]" /> Bắt đầu: {selectedTreatment.date}</div>
+                        <div className="flex items-center gap-3 font-black text-emerald-600 text-xs"><Clock size={14} /> Dự kiến: {selectedTreatment.expected}</div>
                      </div>
                   </div>
                </div>
 
-               <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 flex items-center justify-between">
+               <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-400 shadow-sm"><CheckCircle size={24} /></div>
-                    <p className="text-sm font-bold text-slate-600">Xác nhận hoàn thành liệu trình sớm?</p>
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 shadow-sm"><CheckCircle size={20} /></div>
+                    <p className="text-xs font-bold text-slate-600">Xác nhận hoàn thành liệu trình sớm?</p>
                   </div>
-                  <button className="px-6 py-2.5 bg-white text-emerald-600 border border-emerald-100 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-emerald-50 transition-all">Kết thúc</button>
+                  <button className="px-4 py-2 bg-white text-emerald-600 border border-emerald-100 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-emerald-50 transition-all">Kết thúc</button>
                </div>
                
-               <button onClick={() => setIsDetailModalOpen(false)} className="w-full mt-10 py-5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all">Quay lại danh sách</button>
+               <button onClick={() => setIsDetailModalOpen(false)} className="w-full mt-6 py-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all">Quay lại danh sách</button>
             </motion.div>
           </div>
         )}
@@ -273,3 +271,4 @@ export default function HealthManagementPage() {
     </div>
   );
 }
+

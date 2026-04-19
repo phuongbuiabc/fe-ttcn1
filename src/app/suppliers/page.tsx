@@ -126,7 +126,7 @@ export default function SuppliersPage() {
   const types = ["Tất cả", "Thức ăn", "Thuốc thú y", "Dụng cụ", "Con giống"];
 
   return (
-    <div className="space-y-10 pb-20 bg-[#fbfcfd] min-h-screen -m-8 p-8 ">
+    <div className="space-y-6 pb-20 bg-[#fbfcfd] min-h-screen -m-6 p-6 ">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
@@ -165,7 +165,7 @@ export default function SuppliersPage() {
       </div>
 
       {/* List Content */}
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-[1.75rem] border border-slate-100 shadow-sm overflow-hidden">
         <SupplierTable 
           suppliers={filteredSuppliers} 
           loading={loading}
@@ -199,3 +199,4 @@ export default function SuppliersPage() {
     </div>
   );
 }
+

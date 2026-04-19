@@ -30,7 +30,7 @@ export function SupplyFormModal({
           initial={{ scale: 0.9, opacity: 0 }} 
           animate={{ scale: 1, opacity: 1 }} 
           exit={{ scale: 0.9, opacity: 0 }} 
-          className="bg-white rounded-[3rem] w-full max-w-2xl shadow-2xl overflow-hidden p-10"
+          className="bg-white rounded-[1.75rem] w-full max-w-2xl shadow-2xl overflow-hidden p-10"
         >
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter font-headline">
@@ -119,3 +119,4 @@ export function SupplyFormModal({
     </AnimatePresence>
   );
 }
+

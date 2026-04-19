@@ -73,11 +73,11 @@ export default function PigManagementPage() {
   );
 
   return (
-    <div className="space-y-10 pb-20 bg-[#fbfcfd] min-h-screen -m-8 p-8 ">
+    <div className="space-y-4 pb-20 bg-[#fbfcfd] min-h-screen -m-4 p-4 ">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">Quản lý đàn lợn</h1>
+          <h1 className="text-xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">Quản lý đàn lợn</h1>
         </div>
         <div className="flex gap-4">
           <button onClick={refresh} className="px-5 py-2.5 bg-white text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-100 shadow-sm hover:bg-slate-50 active:scale-95 transition-all">
@@ -106,7 +106,7 @@ export default function PigManagementPage() {
       </div>
 
       {/* Main Table Area */}
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
+      <div className="bg-white rounded-[1.75rem] border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
         {activeTab === "individual" ? (
           <PigTable 
             pigs={filteredPigs} loading={loading}
@@ -175,3 +175,4 @@ export default function PigManagementPage() {
     </div>
   );
 }
+

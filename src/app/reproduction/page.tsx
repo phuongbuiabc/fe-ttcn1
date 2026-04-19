@@ -52,7 +52,7 @@ export default function ReproductionManagementPage() {
   const selectedSow = sows.find(s => s.id === selectedSowId) || sows[0];
 
   return (
-    <div className="space-y-10 pb-20 bg-[#fbfcfd] min-h-screen -m-8 p-8 ">
+    <div className="space-y-6 pb-20 bg-[#fbfcfd] min-h-screen -m-6 p-6 ">
       {/* Smart Alerts */}
       <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-rose-50 border border-rose-100 p-6 rounded-[2rem] flex items-center gap-6 shadow-sm">
         <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-rose-500 shadow-sm shadow-rose-200/50"><AlertTriangle size={28} /></div>
@@ -91,7 +91,7 @@ export default function ReproductionManagementPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
+          <div className="bg-white rounded-[1.75rem] border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
             <SowTable 
               sows={filteredSows} 
               loading={loading}
@@ -105,7 +105,7 @@ export default function ReproductionManagementPage() {
         {/* Sidebar Detail */}
         <aside className="lg:w-96 space-y-8">
           {selectedSow && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-[#003d2e] text-white p-10 rounded-[3rem] shadow-2xl space-y-8 relative overflow-hidden">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-[#003d2e] text-white p-10 rounded-[1.75rem] shadow-2xl space-y-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl" />
               <div className="flex justify-between items-start relative z-10">
                 <div>
@@ -174,3 +174,4 @@ export default function ReproductionManagementPage() {
     </div>
   );
 }
+

@@ -19,7 +19,7 @@ export function MatingFormModal({ isOpen, onClose }: MatingFormModalProps) {
           initial={{ scale: 0.9, opacity: 0 }} 
           animate={{ scale: 1, opacity: 1 }} 
           exit={{ scale: 0.9, opacity: 0 }} 
-          className="bg-white rounded-[3rem] w-full max-w-xl overflow-hidden shadow-2xl flex flex-col"
+          className="bg-white rounded-[1.75rem] w-full max-w-xl overflow-hidden shadow-2xl flex flex-col"
         >
           <div className="p-8 border-b border-slate-50 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -57,3 +57,4 @@ export function MatingFormModal({ isOpen, onClose }: MatingFormModalProps) {
     </AnimatePresence>
   );
 }
+

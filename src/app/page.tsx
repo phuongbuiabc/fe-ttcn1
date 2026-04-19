@@ -208,9 +208,9 @@ const recentActivities = [
 
 export default function Dashboard() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Hero Statistics Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
         {stats.map((stat, i) => (
           <motion.div 
             key={stat.title}
@@ -510,3 +510,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

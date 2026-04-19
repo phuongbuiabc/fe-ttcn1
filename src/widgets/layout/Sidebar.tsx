@@ -80,26 +80,26 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   };
 
   return (
-    <aside className="w-64 h-screen bg-[#0f172a] flex flex-col border-r border-white/5 z-50">
-      <div className="p-8 pb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#006c49] to-[#10b981] rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/40">
-            <Sprout className="text-white" size={20} />
+    <aside className="w-56 h-screen bg-[#0f172a] flex flex-col border-r border-white/5 z-50">
+      <div className="p-4 pb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-8 h-8 bg-gradient-to-br from-[#006c49] to-[#10b981] rounded-lg flex items-center justify-center shadow-lg shadow-emerald-900/40">
+            <Sprout className="text-white" size={16} />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tighter text-white font-headline">MDFARM</h1>
+          <h1 className="text-lg font-extrabold tracking-tighter text-white font-headline">MDFARM</h1>
         </div>
         <button 
           onClick={onClose}
           className="lg:hidden p-2 text-slate-400 hover:text-white transition-colors"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
       </div>
-      <div className="px-8 mb-6 lg:block hidden">
-        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-0.5">QUẢN LÝ LỢN GIỐNG v2.0</p>
+      <div className="px-4 mb-4 lg:block hidden">
+        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-0.5">QUẢN LÝ LỢN GIỐNG v2.0</p>
       </div>
 
-      <nav className="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
+      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto no-scrollbar">
         {navItems.map((item) => {
           const hasChildren = !!item.children;
           const isActive = pathname === item.href || (hasChildren && pathname.startsWith(item.href));
@@ -222,3 +222,4 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
     </aside>
   );
 }
+

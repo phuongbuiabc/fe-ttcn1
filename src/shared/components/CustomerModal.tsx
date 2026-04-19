@@ -30,7 +30,7 @@ export function CustomerModal({ isOpen, onClose, customer }: CustomerModalProps)
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden"
+          className="relative w-full max-w-2xl bg-white rounded-[1.75rem] shadow-2xl overflow-hidden"
         >
           <div className="p-10">
             <div className="flex items-center justify-between mb-10">
@@ -140,3 +140,4 @@ export function CustomerModal({ isOpen, onClose, customer }: CustomerModalProps)
     </AnimatePresence>
   );
 }
+
