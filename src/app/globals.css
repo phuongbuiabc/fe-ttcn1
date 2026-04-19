@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-body: var(--font-inter);
-  --font-headline: var(--font-manrope);
+  --font-body: var(--font-roboto);
+  --font-headline: var(--font-roboto);
 }
 
 @layer base {

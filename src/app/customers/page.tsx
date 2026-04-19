@@ -163,7 +163,7 @@ export default function CustomersPage() {
       {/* Header */}
       <div className="flex items-end justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 font-manrope tracking-tight">Danh sách Khách hàng</h2>
+          <h2 className="text-3xl font-bold text-gray-900  tracking-tight">Danh sách Khách hàng</h2>
           <p className="text-gray-500 mt-2 font-medium">Quản lý thông tin và lịch sử giao dịch của khách hàng.</p>
         </div>
         <div className="flex gap-3">

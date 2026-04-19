@@ -1,9 +1,8 @@
-// components/AuthProvider.tsx
 'use client'
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService as authApi } from '@/features/auth/api/auth.service';
+import { authService as authApi } from '@/entities/auth/api/auth.service';
 
 interface AuthContextType {
   user: any;

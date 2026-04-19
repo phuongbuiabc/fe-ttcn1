@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Sidebar } from "@/shared/components/Sidebar";
-import { TopBar } from "@/shared/components/TopBar";
+import { Sidebar } from "./Sidebar";
+import { TopBar } from "./TopBar";
+import { Footer } from "./Footer";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/shared/components/AuthProvider";
 import { Loader2 } from "lucide-react";
@@ -68,9 +69,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <TopBar onMenuClick={() => setIsSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-10">
-          <div className="max-w-7xl mx-auto">
-            {children}
+        <main className="flex-1 overflow-y-auto p-4 md:pt-10 md:px-10 md:pb-0">
+          <div className="max-w-7xl mx-auto min-h-full flex flex-col justify-between">
+            <div className="w-full">
+              {children}
+            </div>
+            <Footer />
           </div>
         </main>
       </div>

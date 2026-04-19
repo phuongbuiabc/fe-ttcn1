@@ -1,19 +1,12 @@
-import { Inter, Manrope } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/shared/components/Sidebar";
-import { TopBar } from "@/shared/components/TopBar";
-import { Footer } from "@/shared/components/Footer";
-import { DashboardLayout } from "@/shared/components/DashboardLayout";
+import { DashboardLayout } from "@/widgets/layout/DashboardLayout";
 import { AuthProvider } from "@/shared/components/AuthProvider";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
+const roboto = Roboto({
+  weight: ["100", "300", "400", "500", "700", "900"],
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-roboto",
 });
 
 export const metadata = {
@@ -27,12 +20,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${inter.variable} ${manrope.variable}`}>
-      <body className={`${inter.variable} ${manrope.variable} font-body bg-[#f8f9fa] text-on-background selection:bg-emerald-100 selection:text-emerald-900`}>
+    <html lang="vi" className={`${roboto.variable}`}>
+      <body className={`${roboto.variable} font-body bg-[#f8f9fa] text-on-background selection:bg-emerald-100 selection:text-emerald-900`}>
         <AuthProvider>
           <DashboardLayout>
             {children}
-            <Footer />
           </DashboardLayout>
         </AuthProvider>
       </body>

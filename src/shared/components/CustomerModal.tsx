@@ -35,7 +35,7 @@ export function CustomerModal({ isOpen, onClose, customer }: CustomerModalProps)
           <div className="p-10">
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 font-manrope">
+                <h3 className="text-2xl font-bold text-gray-900 ">
                   {isEditing ? "Chỉnh sửa Khách hàng" : "Thêm Khách hàng mới"}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">

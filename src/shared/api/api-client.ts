@@ -38,13 +38,20 @@ export class ApiClient {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || `Error ${response.status}`);
+        return {
+          success: false,
+          message: data.message || data.error || `Error ${response.status}`,
+          status: response.status
+        } as any;
       }
 
       return data as T;
     } catch (error) {
       console.error(`API Request Error [${fullUrl}]:`, error);
-      throw error;
+      return {
+        success: false,
+        message: "Kết nối máy chủ thất bại. Vui lòng thử lại sau.",
+      } as any;
     }
   }
 

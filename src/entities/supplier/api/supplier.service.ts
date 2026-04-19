@@ -74,7 +74,8 @@ export const supplierService = {
     mockSuppliers = mockSuppliers.filter(s => s.id !== id);
     return {
       success: true,
-      message: "Xóa thành công"
+      data: null,
+      message: "Xóa nhà cung cấp thành công"
     };
   }
 };

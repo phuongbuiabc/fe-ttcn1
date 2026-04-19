@@ -95,8 +95,14 @@ export default function ExportPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("Tất cả");
   const [records, setRecords] = useState<ExportRecord[]>(exportRecords);
+  
+  // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<ExportRecord | null>(null);
+  
+  // Delete Confirmation
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<ExportRecord | null>(null);
 
   // Form State
   const [formData, setFormData] = useState<Partial<ExportRecord>>({
@@ -141,9 +147,15 @@ export default function ExportPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn xóa đơn bán này không?")) {
-      setRecords(records.filter(r => r.id !== id));
+  const handleDeleteClick = (record: ExportRecord) => {
+    setRecordToDelete(record);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (recordToDelete) {
+      setRecords(records.filter(r => r.id !== recordToDelete.id));
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -304,7 +316,7 @@ export default function ExportPage() {
                         <Edit size={18} />
                       </button>
                       <button 
-                        onClick={() => handleDelete(record.id)}
+                        onClick={() => handleDeleteClick(record)}
                         className="p-2 text-slate-400 hover:text-rose-600 transition-colors"
                       >
                         <Trash2 size={18} />
@@ -318,7 +330,7 @@ export default function ExportPage() {
         </div>
 
         <div className="px-6 py-4 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-400 font-medium">Hiển thị 3 trong số 18 đơn bán</p>
+          <p className="text-xs text-slate-400 font-medium">Hiển thị {filteredRecords.length} trong số {records.length} đơn bán</p>
           <div className="flex gap-2">
             <button className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 disabled:opacity-30" disabled>
               <ChevronLeft size={18} />
@@ -330,6 +342,7 @@ export default function ExportPage() {
           </div>
         </div>
       </div>
+      
       {/* Add/Edit Modal */}
       <AnimatePresence>
         {isModalOpen && (
@@ -447,6 +460,37 @@ export default function ExportPage() {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {isDeleteModalOpen && recordToDelete && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl p-10 text-center">
+              <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <Trash2 size={40} />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 mb-2 italic uppercase">Xóa đơn bán?</h3>
+              <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                Bạn có chắc chắn muốn xóa đơn bán <span className="font-bold text-slate-900">"{recordToDelete.id}"</span> cho khách hàng <span className="font-bold text-slate-900">"{recordToDelete.customer}"</span>? 
+              </p>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="flex-1 py-4 bg-slate-100 text-slate-700 rounded-2xl text-sm font-bold"
+                >
+                  Hủy bỏ
+                </button>
+                <button 
+                  onClick={confirmDelete}
+                  className="flex-1 py-4 bg-rose-500 text-white rounded-2xl text-sm font-bold shadow-lg shadow-rose-900/20"
+                >
+                  Xác nhận xóa
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
