@@ -7,6 +7,8 @@ import { Footer } from "./Footer";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/shared/components/AuthProvider";
 import { Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { cn } from "@/shared/lib/utils";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -51,7 +53,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden bg-[#f8f9fa]">
       {/* Sidebar Overlay for mobile */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isSidebarOpen && (
           <motion.div 
             initial={{ opacity: 0 }}
@@ -86,4 +88,3 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-
