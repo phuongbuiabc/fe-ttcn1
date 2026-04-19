@@ -15,16 +15,12 @@
   }
 
   body {
-    @apply font-body bg-[#f8f9fa];
+    background-color: #f8f9fa;
+    font-family: var(--font-roboto), system-ui, sans-serif;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-headline;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-roboto), system-ui, sans-serif;
   }
 }
 
