@@ -43,27 +43,27 @@ export const SowTable: React.FC<SowTableProps> = ({ sows, loading, onEdit, onDel
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-6 py-1.5 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Mã Số Nái</th>
-            <th className="px-6 py-1.5 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Giống / Đặc điểm</th>
-            <th className="px-6 py-1.5 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Chuồng</th>
-            <th className="px-6 py-1.5 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Trạng thái</th>
-            <th className="px-6 py-1.5 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none text-center">Tiến độ</th>
-            <th className="px-6 py-1.5 text-right text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Thao tác</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Mã Số Nái</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Giống / Đặc điểm</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Chuồng</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Trạng thái</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none text-center">Tiến độ</th>
+            <th className="px-6 py-3 text-right text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
           {sows.map((sow) => (
             <tr key={sow.id} className="hover:bg-slate-50 transition-all group cursor-pointer" onClick={() => onView(sow)}>
-              <td className="px-6 py-1.5">
+              <td className="px-6 py-3">
                 <span className="text-emerald-600 font-black tracking-tighter uppercase leading-none text-[11px]">{sow.id}</span>
               </td>
               <td className="px-6 py-1.5 font-black text-slate-900 leading-none text-[11px]">{sow.breed}</td>
-              <td className="px-6 py-1.5">
+              <td className="px-6 py-3">
                 <span className="px-2 py-0.5 bg-slate-50 text-slate-400 text-[9px] font-black rounded border border-slate-100 uppercase tracking-tighter">
                   {sow.pen}
                 </span>
               </td>
-              <td className="px-6 py-1.5">
+              <td className="px-6 py-3">
                 <span className={cn(
                   "px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest",
                   sow.status === "PREGNANT" ? "bg-emerald-50 text-emerald-600" : 
@@ -74,7 +74,7 @@ export const SowTable: React.FC<SowTableProps> = ({ sows, loading, onEdit, onDel
                    sow.status === "FARROWING" ? "ĐANG ĐẺ" : "CHỜ PHỐI"}
                 </span>
               </td>
-              <td className="px-6 py-1.5">
+              <td className="px-6 py-3">
                 <div className="flex items-center justify-center gap-2">
                   <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden max-w-[40px]">
                     <div 

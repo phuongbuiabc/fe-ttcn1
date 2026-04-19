@@ -36,10 +36,10 @@ export function InventoryTable({
       <table className="w-full text-left">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-5 py-2 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Vật tư / Sản phẩm</th>
-            <th className="px-5 py-2 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
-            <th className="px-5 py-2 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-center">Số lượng</th>
-            <th className="px-5 py-2 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
+            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Vật tư / Sản phẩm</th>
+            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
+            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-center">Số lượng</th>
+            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
@@ -52,7 +52,7 @@ export function InventoryTable({
               onClick={() => onView(item)} 
               className="hover:bg-slate-50 transition-all group cursor-pointer"
             >
-              <td className="px-8 py-3.5">
+              <td className="px-6 py-3">
                 <div className="flex items-center gap-4">
                   <div className={cn(
                     "w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs", 
@@ -66,7 +66,7 @@ export function InventoryTable({
                   </div>
                 </div>
               </td>
-              <td className="px-8 py-3.5">
+              <td className="px-6 py-3">
                 <span className="px-3 py-1 bg-slate-50 text-slate-500 text-[10px] font-black rounded-lg border border-slate-100 uppercase tracking-widest">
                   {item.supply_type}
                 </span>

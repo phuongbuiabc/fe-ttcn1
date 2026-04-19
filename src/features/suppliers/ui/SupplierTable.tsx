@@ -27,10 +27,10 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
       <table className="w-full text-left">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-6 py-1.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Đối tác / Nhà cung cấp</th>
-            <th className="px-6 py-1.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
-            <th className="px-6 py-1.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Thông tin liên hệ</th>
-            <th className="px-6 py-1.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
+            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Đối tác / Nhà cung cấp</th>
+            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
+            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Thông tin liên hệ</th>
+            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
@@ -42,7 +42,7 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
               transition={{ delay: i * 0.05 }}
               className="hover:bg-slate-50/50 group transition-all"
             >
-              <td className="px-6 py-1.5">
+              <td className="px-6 py-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
                     <Truck size={14} />

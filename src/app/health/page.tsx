@@ -141,33 +141,33 @@ export default function HealthManagementPage() {
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50/50">
               <tr>
-                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Mã số tai</th>
-                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Chẩn đoán bệnh</th>
-                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Liệu trình</th>
-                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Dự kiến kết thúc</th>
-                <th className="px-8 py-3.5 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
+                <th className="px-6 py-1.5 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Mã số tai</th>
+                <th className="px-6 py-1.5 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Chẩn đoán bệnh</th>
+                <th className="px-6 py-1.5 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Liệu trình</th>
+                <th className="px-6 py-1.5 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Dự kiến kết thúc</th>
+                <th className="px-6 py-1.5 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {treatments.map((item) => (
                 <tr key={item.id} className="bg-white hover:bg-slate-50 transition-all group cursor-pointer" onClick={() => { setSelectedTreatment(item); setIsDetailModalOpen(true); }}>
-                  <td className="px-8 py-3.5 font-black text-slate-900 tracking-tight leading-none">{item.id}</td>
-                  <td className="px-8 py-3.5 leading-none">
+                  <td className="px-6 py-1.5 font-black text-slate-900 tracking-tight leading-none text-[13px]">{item.id}</td>
+                  <td className="px-6 py-1.5 leading-none">
                     <span className={cn(
-                      "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest", 
+                      "px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest", 
                       item.color === "rose" ? "bg-rose-50 text-rose-500" : "bg-amber-50 text-amber-600"
                     )}>{item.disease}</span>
                   </td>
-                  <td className="px-8 py-3.5">
-                     <span className="px-3 py-1 bg-slate-50 text-slate-500 rounded-lg border border-slate-100 text-[10px] font-black uppercase tracking-tighter">
+                  <td className="px-6 py-1.5">
+                     <span className="px-2 py-0.5 bg-slate-50 text-slate-500 rounded border border-slate-100 text-[9px] font-black uppercase tracking-tighter">
                         {item.duration}
                      </span>
                   </td>
-                  <td className="px-8 py-3.5 font-black text-emerald-600 tracking-tighter text-lg leading-none">{item.expected}</td>
-                  <td className="px-8 py-3.5 text-right">
-                    <div className="flex justify-end gap-2 transition-all">
-                      <button className="p-2.5 text-slate-400 hover:text-blue-600 transition-all"><Edit size={18} /></button>
-                      <button className="p-2.5 text-slate-400 hover:text-rose-600 transition-all"><Trash2 size={18} /></button>
+                  <td className="px-6 py-1.5 font-black text-emerald-600 tracking-tighter text-base leading-none">{item.expected}</td>
+                  <td className="px-6 py-1.5 text-right">
+                    <div className="flex justify-end gap-1.5 transition-all">
+                      <button className="p-1.5 text-slate-400 hover:text-blue-600 transition-all"><Edit size={14} /></button>
+                      <button className="p-1.5 text-slate-400 hover:text-rose-600 transition-all"><Trash2 size={14} /></button>
                     </div>
                   </td>
                 </tr>
@@ -226,44 +226,44 @@ export default function HealthManagementPage() {
       <AnimatePresence>
         {isDetailModalOpen && selectedTreatment && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden p-8">
-               <div className="flex justify-between items-start mb-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-emerald-50 text-[#00a67d] rounded-xl flex items-center justify-center shadow-inner"><Activity size={28} /></div>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden p-6">
+               <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-emerald-50 text-[#00a67d] rounded-lg flex items-center justify-center shadow-inner"><Activity size={20} /></div>
                     <div>
-                      <h2 className="text-xl font-black text-slate-800 tracking-tight uppercase">{selectedTreatment.id}</h2>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Hồ sơ bệnh án chi tiết</p>
+                      <h2 className="text-lg font-black text-slate-800 tracking-tight uppercase leading-none">{selectedTreatment.id}</h2>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Hồ sơ bệnh án chi tiết</p>
                     </div>
                   </div>
-                  <button onClick={() => setIsDetailModalOpen(false)} className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all"><X size={18} /></button>
+                  <button onClick={() => setIsDetailModalOpen(false)} className="p-1.5 bg-slate-50 text-slate-400 rounded-lg hover:bg-slate-100 transition-all"><X size={14} /></button>
                </div>
 
-               <div className="grid grid-cols-2 gap-6 mb-6 pb-6 border-b border-slate-50">
-                  <div className="space-y-4">
-                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Thông tin cơ bản</p>
-                     <div className="space-y-2">
-                        <div className="flex items-center gap-3 font-bold text-slate-700 text-xs"><User size={14} className="text-emerald-500" /> {selectedTreatment.type} - {selectedTreatment.breed}</div>
-                        <div className="flex items-center gap-3 font-bold text-slate-700 text-xs"><PlusCircle size={14} className="text-rose-500" /> {selectedTreatment.disease}</div>
+               <div className="grid grid-cols-2 gap-4 mb-4 pb-4 border-b border-slate-50">
+                  <div className="space-y-3">
+                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Thông tin cơ bản</p>
+                     <div className="space-y-1.5">
+                        <div className="flex items-center gap-2 font-bold text-slate-700 text-[11px]"><User size={12} className="text-emerald-500" /> {selectedTreatment.type} - {selectedTreatment.breed}</div>
+                        <div className="flex items-center gap-2 font-bold text-slate-700 text-[11px]"><PlusCircle size={12} className="text-rose-500" /> {selectedTreatment.disease}</div>
                      </div>
                   </div>
-                  <div className="space-y-4">
-                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tiến độ điều trị</p>
-                     <div className="space-y-2">
-                        <div className="flex items-center gap-3 font-bold text-slate-700 text-xs"><Calendar size={14} className="text-[#00a67d]" /> Bắt đầu: {selectedTreatment.date}</div>
-                        <div className="flex items-center gap-3 font-black text-emerald-600 text-xs"><Clock size={14} /> Dự kiến: {selectedTreatment.expected}</div>
+                  <div className="space-y-3">
+                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Tiến độ điều trị</p>
+                     <div className="space-y-1.5">
+                        <div className="flex items-center gap-2 font-bold text-slate-700 text-[11px]"><Calendar size={12} className="text-[#00a67d]" /> Bắt đầu: {selectedTreatment.date}</div>
+                        <div className="flex items-center gap-2 font-black text-emerald-600 text-[11px]"><Clock size={12} /> Dự kiến: {selectedTreatment.expected}</div>
                      </div>
                   </div>
                </div>
 
-               <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 shadow-sm"><CheckCircle size={20} /></div>
-                    <p className="text-xs font-bold text-slate-600">Xác nhận hoàn thành liệu trình sớm?</p>
+               <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-slate-400 shadow-sm"><CheckCircle size={16} /></div>
+                    <p className="text-[11px] font-bold text-slate-600">Xác nhận hoàn thành liệu trình sớm?</p>
                   </div>
-                  <button className="px-4 py-2 bg-white text-emerald-600 border border-emerald-100 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-emerald-50 transition-all">Kết thúc</button>
+                  <button className="px-3 py-1.5 bg-white text-emerald-600 border border-emerald-100 rounded text-[9px] font-black uppercase tracking-widest shadow-sm hover:bg-emerald-50 transition-all">Kết thúc</button>
                </div>
                
-               <button onClick={() => setIsDetailModalOpen(false)} className="w-full mt-6 py-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all">Quay lại danh sách</button>
+               <button onClick={() => setIsDetailModalOpen(false)} className="w-full mt-4 py-3 bg-slate-900 text-white rounded-lg text-[9px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all">Quay lại danh sách</button>
             </motion.div>
           </div>
         )}

@@ -80,14 +80,14 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   };
 
   return (
-    <aside className="w-56 h-screen bg-[#0f172a] flex flex-col border-r border-white/5 z-50">
+    <aside className="w-56 h-screen bg-[#0f172a] flex flex-col border-r border-white/5 z-50 shadow-2xl">
       <div className="p-4 pb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#006c49] to-[#10b981] rounded-lg flex items-center justify-center shadow-lg shadow-emerald-900/40">
+        <Link href="/" className="flex items-center gap-3 group/logo">
+          <div className="w-8 h-8 bg-gradient-to-br from-[#006c49] to-[#10b981] rounded flex items-center justify-center shadow-lg shadow-emerald-900/40 group-hover/logo:scale-105 transition-transform">
             <Sprout className="text-white" size={16} />
           </div>
-          <h1 className="text-lg font-extrabold tracking-tighter text-white font-headline">MDFARM</h1>
-        </div>
+          <h1 className="text-lg font-black tracking-tighter text-white font-headline">MDFARM</h1>
+        </Link>
         <button 
           onClick={onClose}
           className="lg:hidden p-2 text-slate-400 hover:text-white transition-colors"
@@ -95,11 +95,8 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           <X size={18} />
         </button>
       </div>
-      <div className="px-4 mb-4 lg:block hidden">
-        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-0.5">QUẢN LÝ LỢN GIỐNG v2.0</p>
-      </div>
 
-      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto no-scrollbar">
+      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto no-scrollbar pt-3">
         {navItems.map((item) => {
           const hasChildren = !!item.children;
           const isActive = pathname === item.href || (hasChildren && pathname.startsWith(item.href));
@@ -107,29 +104,23 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           if (hasChildren) {
             const isExpanded = expandedItems.includes(item.name);
             return (
-              <div key={item.name} className="space-y-1">
+              <div key={item.name} className="space-y-0.5">
                 <button
                   onClick={() => toggleExpand(item.name)}
                   className={cn(
-                    "w-full group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 relative overflow-hidden",
+                    "w-full group flex items-center justify-between px-4 py-2 rounded-lg transition-all duration-200 relative overflow-hidden",
                     isActive && !isExpanded
-                      ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/30" 
+                      ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-900/40" 
                       : "text-slate-400 hover:bg-white/5 hover:text-white"
                   )}
                 >
-                  {isActive && !isExpanded && (
-                    <motion.div 
-                      layoutId="sidebar-active-bg"
-                      className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 z-0"
-                    />
-                  )}
                   <div className="flex items-center gap-3 relative z-10">
-                    <item.icon size={20} className={cn("transition-colors duration-300", isActive && !isExpanded ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
+                    <item.icon size={18} className={cn("transition-colors", isActive && !isExpanded ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
                     <span className="text-sm tracking-tight">{item.name}</span>
                   </div>
                   <motion.div
                     animate={{ rotate: isExpanded ? 90 : 0 }}
-                    transition={{ duration: 0.2 }}
+                    transition={{ duration: 0.15 }}
                     className="relative z-10"
                   >
                     <ChevronRight size={14} className={cn(isActive && !isExpanded ? "text-white" : "text-slate-600")} />
@@ -142,8 +133,8 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2, ease: "easeInOut" }}
-                      className="overflow-hidden pl-4 space-y-1"
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden pl-4 space-y-0.5"
                     >
                       {item.children?.map((child) => {
                         const isChildActive = pathname === child.href;
@@ -152,20 +143,14 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              "flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 group/child relative",
+                              "flex items-center gap-3 px-4 py-1.5 rounded-lg transition-all group/child relative",
                               isChildActive 
-                                ? "text-white font-bold bg-white/10" 
+                                ? "text-white font-bold bg-white/5 border border-white/5" 
                                 : "text-slate-500 hover:text-emerald-400 hover:bg-white/5"
                             )}
                           >
-                            <child.icon size={18} className={cn("transition-colors duration-300", isChildActive ? "text-emerald-400" : "text-slate-600 group-hover/child:text-emerald-400")} />
+                            <child.icon size={16} className={cn("transition-colors", isChildActive ? "text-emerald-400" : "text-slate-600 group-hover/child:text-emerald-400")} />
                             <span className="text-xs tracking-tight">{child.name}</span>
-                            {isChildActive && (
-                              <motion.div 
-                                layoutId="sidebar-child-dot"
-                                className="absolute right-4 w-1 h-1 bg-emerald-400 rounded-full"
-                              />
-                            )}
                           </Link>
                         );
                       })}
@@ -181,25 +166,17 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 relative overflow-hidden",
+                "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 relative overflow-hidden",
                 isActive 
-                  ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/30" 
+                  ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-900/40" 
                   : "text-slate-400 hover:bg-white/5 hover:text-white"
               )}
             >
+              <item.icon size={18} className={cn("transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
+              <span className="text-sm tracking-tight">{item.name}</span>
               {isActive && (
-                <motion.div 
-                  layoutId="sidebar-active-bg"
-                  className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 z-0"
-                />
-              )}
-              <div className="flex items-center gap-3 relative z-10">
-                <item.icon size={20} className={cn("transition-colors duration-300", isActive ? "text-white" : "text-slate-500 group-hover:text-emerald-400")} />
-                <span className="text-sm tracking-tight">{item.name}</span>
-              </div>
-              {isActive && (
-                <motion.div layoutId="active-indicator" className="relative z-10">
-                  <ChevronRight size={14} className="text-white" />
+                <motion.div layoutId="active-indicator" className="ml-auto">
+                  <div className="w-1 h-1 bg-white rounded-full shadow-[0_0_8px_white]" />
                 </motion.div>
               )}
             </Link>
@@ -207,14 +184,14 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
         })}
       </nav>
 
-      <div className="p-4 mt-auto border-t border-white/5">
+      <div className="p-4 mt-auto border-t border-white/5 space-y-0.5">
         {bottomItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-emerald-400 transition-colors rounded-xl hover:bg-white/5"
+            className="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-emerald-400 transition-colors rounded-lg hover:bg-white/5"
           >
-            <item.icon size={20} className="text-slate-600" />
+            <item.icon size={18} className="text-slate-600" />
             <span className="text-sm font-medium">{item.name}</span>
           </Link>
         ))}

@@ -24,19 +24,19 @@ export const ReproductionStats: React.FC<ReproductionStatsProps> = ({ stats }) =
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
       {cards.map((card, idx) => (
-        <div key={idx} className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+        <div key={idx} className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
           <div className={cn(
-            "absolute top-0 right-0 w-16 h-16 opacity-5 -mr-4 -mt-4 transition-transform group-hover:scale-110",
+            "absolute top-0 right-0 w-8 h-8 opacity-5 -mr-2 -mt-2 transition-transform group-hover:scale-110",
             card.color === "emerald" ? "text-emerald-600" : "text-rose-600"
           )}>
-            <card.icon size={64} />
+            <card.icon size={32} />
           </div>
-          <p className="text-[10px] uppercase font-bold text-slate-400 mb-2 tracking-wider">{card.label}</p>
+          <p className="text-[9px] uppercase font-bold text-slate-400 mb-1 tracking-wider">{card.label}</p>
           <div className="flex items-baseline gap-2">
             <h3 className={cn(
-              "text-2xl font-black font-headline",
+              "text-lg font-black font-headline",
               card.color === "rose" ? "text-rose-600" : "text-emerald-900"
             )}>
               {card.value}

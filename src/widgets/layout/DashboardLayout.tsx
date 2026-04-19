@@ -69,8 +69,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <TopBar onMenuClick={() => setIsSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-4 md:pt-4 md:px-4 md:pb-0">
-          <div className="max-w-7xl mx-auto min-h-full flex flex-col justify-between">
+        <main className="flex-1 overflow-y-auto p-4 md:pt-4 md:px-6 md:pb-0">
+          <div className="max-w-[1600px] mx-auto min-h-full flex flex-col justify-between">
             <div className="w-full">
               {children}
             </div>

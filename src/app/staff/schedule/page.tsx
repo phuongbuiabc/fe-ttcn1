@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Search, 
-  Filter, 
-  Plus, 
-  AlertTriangle, 
+import {
+  Search,
+  Filter,
+  Plus,
+  AlertTriangle,
   MoreVertical,
   ChevronRight,
   Zap,
@@ -67,7 +67,7 @@ export default function SchedulePage() {
   const [activeShift, setActiveShift] = useState("Tất cả");
   const [schedules, setSchedules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<any | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -83,11 +83,11 @@ export default function SchedulePage() {
   const getStaffDetail = (id: string) => mockEmployees.find(e => e.employee_id === id);
 
   const filteredSchedules = schedules.filter(item => {
-    const matchesSearch = 
-      item.employee_id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch =
+      item.employee_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.task.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const shiftMap: Record<string, string> = { "Ca Sáng": "MORNING", "Ca Chiều": "AFTERNOON", "Ca Đêm": "NIGHT" };
     return matchesSearch && (activeShift === "Tất cả" || item.shift === shiftMap[activeShift]);
   });
@@ -97,11 +97,6 @@ export default function SchedulePage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            <span>ĐIỀU PHỐI VẬN HÀNH</span>
-            <span>/</span>
-            <span className="text-slate-500">LỊCH TRỰC NHÂN SỰ</span>
-          </div>
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight font-headline">Kế hoạch Phân ca</h1>
         </div>
         <button className="px-8 py-3 bg-[#00a67d] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/10 flex items-center gap-2 active:scale-95 transition-all">
@@ -138,7 +133,7 @@ export default function SchedulePage() {
             {loading ? (
               <tr><td colSpan={5} className="py-20 text-center text-slate-400 font-black uppercase tracking-widest">Đang tải lịch trực...</td></tr>
             ) : filteredSchedules.map((item, i) => (
-              <motion.tr 
+              <motion.tr
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
                 key={item.id} onClick={() => { setSelectedSchedule(item); setIsDetailModalOpen(true); }}
                 className="hover:bg-slate-50/50 cursor-pointer group transition-all"
