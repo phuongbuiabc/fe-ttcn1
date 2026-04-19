@@ -25,12 +25,12 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left">
-        <thead>
-          <tr className="bg-slate-50/50">
-            <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Nhà cung cấp</th>
-            <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Phân loại</th>
-            <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Liên hệ</th>
-            <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-right">Thao tác</th>
+        <thead className="bg-slate-50/50">
+          <tr>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Đối tác / Nhà cung cấp</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Thông tin liên hệ</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">

@@ -127,10 +127,10 @@ export default function SchedulePage() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50">
-              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Ngày phối hợp</th>
-              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nhân sự phụ trách</th>
-              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Ca trực</th>
-              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nhiệm vụ</th>
+              <th className="px-8 py-6 text-[10px] font-black text-slate-900 uppercase tracking-[0.2em]">Ngày phối hợp</th>
+              <th className="px-8 py-6 text-[10px] font-black text-slate-900 uppercase tracking-[0.2em]">Nhân sự phụ trách</th>
+              <th className="px-8 py-6 text-[10px] font-black text-slate-900 uppercase tracking-[0.2em]">Ca trực</th>
+              <th className="px-8 py-6 text-[10px] font-black text-slate-900 uppercase tracking-[0.2em]">Nhiệm vụ</th>
               <th className="px-8 py-6"></th>
             </tr>
           </thead>

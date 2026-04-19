@@ -25,10 +25,10 @@ export function StaffTable({ staffs, loading, onEdit, onDelete, onView }: StaffT
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-10 py-6 text-[10px] uppercase font-black text-slate-400 tracking-widest leading-none">Cán bộ / Nhân viên</th>
-            <th className="px-10 py-6 text-[10px] uppercase font-black text-slate-400 tracking-widest leading-none">Chức vụ / Vị trí</th>
-            <th className="px-10 py-6 text-[10px] uppercase font-black text-slate-400 tracking-widest leading-none">Thông tin Liên hệ</th>
-            <th className="px-10 py-6 text-[10px] uppercase font-black text-slate-400 tracking-widest leading-none text-right">Thao tác</th>
+            <th className="px-10 py-6 text-[10px] uppercase font-black text-slate-900 tracking-widest leading-none">Cán bộ / Nhân viên</th>
+            <th className="px-10 py-6 text-[10px] uppercase font-black text-slate-900 tracking-widest leading-none">Chức vụ / Vị trí</th>
+            <th className="px-10 py-6 text-[10px] uppercase font-black text-slate-900 tracking-widest leading-none">Thông tin Liên hệ</th>
+            <th className="px-10 py-6 text-[10px] uppercase font-black text-slate-900 tracking-widest leading-none text-right">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">

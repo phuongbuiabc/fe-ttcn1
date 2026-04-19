@@ -43,12 +43,12 @@ export const SowTable: React.FC<SowTableProps> = ({ sows, loading, onEdit, onDel
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-400 leading-none">Mã Số Nái</th>
-            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-400 leading-none">Giống / Đặc điểm</th>
-            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-400 leading-none">Chuồng</th>
-            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-400 leading-none">Trạng thái</th>
-            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-400 leading-none text-center">Tiến độ</th>
-            <th className="px-10 py-6 text-right text-[10px] uppercase tracking-widest font-black text-slate-400 leading-none">Thao tác</th>
+            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-900 leading-none">Mã Số Nái</th>
+            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-900 leading-none">Giống / Đặc điểm</th>
+            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-900 leading-none">Chuồng</th>
+            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-900 leading-none">Trạng thái</th>
+            <th className="px-10 py-6 text-[10px] uppercase tracking-widest font-black text-slate-900 leading-none text-center">Tiến độ</th>
+            <th className="px-10 py-6 text-right text-[10px] uppercase tracking-widest font-black text-slate-900 leading-none">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">

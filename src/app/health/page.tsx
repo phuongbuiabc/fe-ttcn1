@@ -143,11 +143,11 @@ export default function HealthManagementPage() {
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50/50">
               <tr>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Mã số tai</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Chẩn đoán bệnh</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Liệu trình</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Dự kiến kết thúc</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-right">Thao tác</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Mã số tai</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Chẩn đoán bệnh</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Liệu trình</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Dự kiến kết thúc</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -167,9 +167,9 @@ export default function HealthManagementPage() {
                   </td>
                   <td className="px-10 py-6 font-black text-emerald-600 tracking-tighter text-lg leading-none">{item.expected}</td>
                   <td className="px-10 py-6 text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2.5 text-slate-300 hover:text-blue-600 transition-all"><Edit size={18} /></button>
-                      <button className="p-2.5 text-slate-300 hover:text-rose-600 transition-all"><Trash2 size={18} /></button>
+                    <div className="flex justify-end gap-2 transition-all">
+                      <button className="p-2.5 text-slate-400 hover:text-blue-600 transition-all"><Edit size={18} /></button>
+                      <button className="p-2.5 text-slate-400 hover:text-rose-600 transition-all"><Trash2 size={18} /></button>
                     </div>
                   </td>
                 </tr>
@@ -197,9 +197,9 @@ export default function HealthManagementPage() {
                 <table className="w-full text-left border-collapse">
                    <thead className="bg-slate-50/50">
                       <tr>
-                         <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Mã định danh</th>
-                         <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Loại Vaccine</th>
-                         <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none text-right">Ngày thực hiện</th>
+                         <th className="px-8 py-4 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Mã định danh</th>
+                         <th className="px-8 py-4 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none">Loại Vaccine</th>
+                         <th className="px-8 py-4 text-[9px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Ngày thực hiện</th>
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-50">

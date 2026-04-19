@@ -36,10 +36,10 @@ export function InventoryTable({
       <table className="w-full text-left">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Vật tư / Sản phẩm</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Phân loại hàng</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">Số lượng</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-right">Thao tác</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Vật tư / Sản phẩm</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-center">Số lượng</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">

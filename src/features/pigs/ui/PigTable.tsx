@@ -28,11 +28,11 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Mã Số Giao Dịch</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Giống / Đặc điểm</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Trạng thái</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">Trọng lượng</th>
-            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-right">Thao tác</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Mã Số Tai / ID</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Giống / Đặc điểm</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Trạng thái</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-center">Trọng lượng</th>
+            <th className="px-10 py-6 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
