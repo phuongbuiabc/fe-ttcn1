@@ -8,12 +8,12 @@ import {
   Trash2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { staffService } from "@/entities/staff/api/staff.service";
+import { staffService } from "@/modules/staff/api/staff.service";
 
 // Feature Components
-import { StaffFormModal } from "@/features/staff/ui/StaffFormModal";
-import { StaffDetailModal } from "@/features/staff/ui/StaffDetailModal";
-import { StaffTable } from "@/features/staff/ui/StaffTable";
+import { StaffFormModal } from "@/modules/staff/ui/StaffFormModal";
+import { StaffDetailModal } from "@/modules/staff/ui/StaffDetailModal";
+import { StaffTable } from "@/modules/staff/ui/StaffTable";
 
 // --- Mock Data ---
 const mockEmployees: any[] = [

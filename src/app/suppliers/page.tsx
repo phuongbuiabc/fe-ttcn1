@@ -15,10 +15,10 @@ import {
 import { cn } from "@/shared/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { Supplier } from "@/modules/supplier/model/supplier.model";
-import { supplierService } from "@/entities/supplier/api/supplier.service";
+import { supplierService } from "@/modules/supplier/api/supplier.service";
 
-import { SupplierFormModal } from "@/features/suppliers/ui/SupplierFormModal";
-import { SupplierTable } from "@/features/suppliers/ui/SupplierTable";
+import { SupplierFormModal } from "@/modules/supplier/ui/SupplierFormModal";
+import { SupplierTable } from "@/modules/supplier/ui/SupplierTable";
 
 export default function SuppliersPage() {
 // ... existing state ...
