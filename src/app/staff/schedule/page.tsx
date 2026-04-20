@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
-import { scheduleService } from "@/entities/staff/api/schedule.service";
+import { scheduleService } from "@/modules/staff/api/schedule.service";
 
 // --- Mock Data ---
 const mockEmployees: any[] = [

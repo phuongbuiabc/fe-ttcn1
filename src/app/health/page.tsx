@@ -31,8 +31,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/lib/utils";
 
 // Feature Components
-import { TreatmentFormModal } from "@/features/health/ui/TreatmentFormModal";
-import { VaccinationFormModal } from "@/features/health/ui/VaccinationFormModal";
+import { TreatmentFormModal } from "@/modules/health/ui/TreatmentFormModal";
+import { VaccinationFormModal } from "@/modules/health/ui/VaccinationFormModal";
 
 // --- Types ---
 interface Treatment {

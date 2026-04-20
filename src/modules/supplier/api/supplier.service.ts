@@ -66,4 +66,14 @@ export const supplierService = {
 			message: "Cập nhật thành công"
 		};
 	},
+	// Xóa nhà cung cấp
+	deleteSupplier: async (id: string): Promise<ApiResponse<null>> => {
+		// KHI CÓ BACKEND: return apiClient.delete<ApiResponse<null>>(`/api/v1/suppliers/${id}`);
+		mockSuppliers = mockSuppliers.filter(s => s.id !== id);
+		return {
+			success: true,
+			data: null,
+			message: "Xóa thành công"
+		};
+	}
 }

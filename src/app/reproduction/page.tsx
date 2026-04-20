@@ -20,14 +20,15 @@ import {
 } from "recharts";
 
 // Custom Features
-import { useReproduction } from "@/features/reproduction/hooks/use-reproduction";
-import { SowTable } from "@/features/reproduction/ui/SowTable";
-import { ReproductionStats } from "@/features/reproduction/ui/ReproductionStats";
+
+import { useReproduction } from "@/modules/reproduction/hooks/useReproduction";
+import { SowTable } from "@/modules/reproduction/ui/SowTable";
+import { ReproductionStats } from "@/modules/reproduction/ui/ReproductionStats";
 
 // Feature Modals
-import { MatingFormModal } from "@/features/reproduction/ui/MatingFormModal";
-import { PregnancyFormModal } from "@/features/reproduction/ui/PregnancyFormModal";
-import { FarrowingFormModal } from "@/features/reproduction/ui/FarrowingFormModal";
+import { MatingFormModal } from "@/modules/reproduction/ui/MatingFormModal";
+import { PregnancyFormModal } from "@/modules/reproduction/ui/PregnancyFormModal";
+// import { FarrowingFormModal } from "@/modules/reproduction/ui/FarrowingFormModal";
 
 const performanceData = [
   { name: "Tháng 6", value: 45 }, { name: "Tháng 7", value: 60 }, { name: "Tháng 8", value: 75 },

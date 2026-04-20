@@ -12,8 +12,8 @@ import { motion } from "motion/react";
 import { cn } from "@/shared/lib/utils";
 
 // Feature Components
-import { TransferPigModal } from "@/features/pens/ui/TransferPigModal";
-import { BarnTable } from "@/features/pens/ui/BarnTable";
+import { TransferPigModal } from "@/modules/pens/ui/TransferPigModal";
+import { BarnTable } from "@/modules/pens/ui/BarnTable";
 
 // --- Types ---
 interface Barn {

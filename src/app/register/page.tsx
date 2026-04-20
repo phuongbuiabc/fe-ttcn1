@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/shared/lib/utils";
-import { authService as authApi } from "@/entities/auth/api/auth.service";
+import { authService as authApi } from "@/modules/auth/api/auth.service";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/shared/components/AuthProvider";
 import { useEffect } from "react";
