@@ -13,14 +13,14 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/lib/utils";
-import { Supply, SupplyLoss } from "@/shared/types";
-import { inventoryService } from "@/entities/inventory/api/inventory.service";
+import { Supply, SupplyLoss } from "@/modules/inventory/model/inventory.model";
+import { inventoryService } from "@/modules/inventory/api/inventory.service";
 
-import { SupplyFormModal } from "@/features/inventory/ui/SupplyFormModal";
-import { SupplyDetailModal } from "@/features/inventory/ui/SupplyDetailModal";
-import { LossModal } from "@/features/inventory/ui/LossModal";
-import { AdjustmentModal } from "@/features/inventory/ui/AdjustmentModal";
-import { InventoryTable } from "@/features/inventory/ui/InventoryTable";
+import { SupplyFormModal } from "@/modules/inventory/ui/SupplyFormModal";
+import { SupplyDetailModal } from "@/modules/inventory/ui/SupplyDetailModal";
+import { LossModal } from "@/modules/inventory/ui/LossModal";
+import { AdjustmentModal } from "@/modules/inventory/ui/AdjustmentModal";
+import { InventoryTable } from "@/modules/inventory/ui/InventoryTable";
 
 export default function InventoryPage() {
   const [supplies, setSuppliers] = useState<Supply[]>([]);

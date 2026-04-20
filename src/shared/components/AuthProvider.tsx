@@ -2,10 +2,11 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService as authApi } from '@/entities/auth/api/auth.service';
+import { authService as authApi } from '@/modules/auth/api/auth.service';
+import { User } from '@/modules/auth/model/auth.model';
 
 interface AuthContextType {
-  user: any;
+  user: User | null;
   loading: boolean;
   login: (credentials: any) => Promise<void>;
   logout: () => void;
@@ -14,7 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 

@@ -15,39 +15,33 @@ import {
 import { cn } from "@/shared/lib/utils";
 
 // Custom Features
-import { usePigs } from "@/features/pigs/hooks/use-pigs";
-import { PigTable } from "@/features/pigs/ui/PigTable";
-import { PigStats } from "@/features/pigs/ui/PigStats";
-import { PigFormModal } from "@/features/pigs/ui/PigFormModal";
-import { LitterFormModal } from "@/features/pigs/ui/LitterFormModal";
-import { ActionConfirmModal } from "@/features/pigs/ui/ActionConfirmModal";
+import { usePigList } from "@/modules/pig/hooks/usePigList";
+import { PigTable } from "@/modules/pig/ui/PigTable";
+import { PigStats } from "@/modules/pig/ui/PigStats";
+import { PigFormModal } from "@/modules/pig/ui/PigFormModal";
+import { LitterFormModal } from "@/modules/pig/ui/LitterFormModal";
+import { ActionConfirmModal } from "@/modules/pig/ui/ActionConfirmModal";
 import { Pig, Litter } from "@/shared/types";
 
-export default function PigManagementPage() {
-  const { pigs, stats, loading, refresh, removePig } = usePigs();
+export default function PigPage() {
+  const { pigs, stats, loading, refresh, removePig } = usePigList();
   const [activeTab, setActiveTab] = useState("individual");
   const [searchTerm, setSearchTerm] = useState("");
-  
   // Modals Status
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLitterModalOpen, setIsLitterModalOpen] = useState(false);
   const [confirmModal, setConfirmModal] = useState<any>({ isOpen: false, type: "delete-pig" });
-
   const [editingPig, setEditingPig] = useState<any>(null);
   const [editingLitter, setEditingLitter] = useState<any>(null);
-  
   const [litters, setLitters] = useState<any[]>([]);
   const [sales] = useState<any[]>([]);
   const [disposals] = useState<any[]>([]);
-
   const [formData, setFormData] = useState<any>({
     id: "", pigCode: "", type: "Lợn nái", breed: "Duroc", pen: "", date: "", weight: 0, growth: "+0kg", status: "Bình thường", statusColor: "emerald"
   });
-
   const [litterFormData, setLitterFormData] = useState<any>({
     id: "", motherId: "", birthDate: "", count: 0, status: "Khỏe mạnh", pen: ""
   });
-
   const openAddModal = () => {
     if (activeTab === "individual") {
       setEditingPig(null);
@@ -59,19 +53,16 @@ export default function PigManagementPage() {
       setIsLitterModalOpen(true);
     }
   };
-
   const handleActionConfirm = async () => {
     const { type, targetId } = confirmModal;
     if (type === "delete-pig" && targetId) await removePig(targetId);
     else if (type === "delete-litter" && targetId) setLitters(litters.filter(l => l.id !== targetId));
     setConfirmModal({ ...confirmModal, isOpen: false });
   };
-
   const filteredPigs = pigs.filter(p => 
     p.pigCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.breed.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   return (
     <div className="space-y-4 pb-20 bg-[#fbfcfd] min-h-screen -m-4 p-4 ">
       {/* Header */}

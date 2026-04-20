@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
-import { Supplier } from "@/shared/types";
+import { Supplier } from "@/modules/supplier/model/supplier.model";
 import { supplierService } from "@/entities/supplier/api/supplier.service";
 
 import { SupplierFormModal } from "@/features/suppliers/ui/SupplierFormModal";
