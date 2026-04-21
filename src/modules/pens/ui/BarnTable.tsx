@@ -1,4 +1,3 @@
-// TODO: Move code from features/pens/ui/BarnTable.tsx here
 'use client'
 
 import React from 'react';

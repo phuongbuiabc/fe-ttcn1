@@ -1,4 +1,3 @@
-// TODO: Move code from features/health/ui/TreatmentFormModal.tsx here
 "use client";
 
 import React from "react";

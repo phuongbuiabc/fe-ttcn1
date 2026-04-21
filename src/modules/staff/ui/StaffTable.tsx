@@ -1,4 +1,3 @@
-// TODO: Move code from features/staff/ui/StaffTable.tsx here
 'use client'
 
 import React from 'react';

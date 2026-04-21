@@ -67,14 +67,14 @@ export function AdjustmentModal({ isOpen, onClose, onSave, supply, adjForm, setA
 						</div>
 						<div className="flex gap-4 pt-4">
 							<button 
-								type="button" 
-								onClick={onClose} 
+								type="button"
+								onClick={onClose}
 								className="flex-1 py-4 bg-slate-50 text-slate-700 rounded-2xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
 							>
 								Huỷ bỏ
 							</button>
 							<button 
-								type="submit" 
+								type="submit"
 								className="flex-1 py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-900/10 active:scale-95 transition-all"
 							>
 								Cập nhật kho

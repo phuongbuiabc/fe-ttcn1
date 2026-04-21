@@ -1,4 +1,3 @@
-// components/features/pigs/PigStats.tsx
 'use client'
 
 import React from 'react';

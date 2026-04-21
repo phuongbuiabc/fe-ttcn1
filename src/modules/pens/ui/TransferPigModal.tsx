@@ -1,4 +1,3 @@
-// TODO: Move code from features/pens/ui/TransferPigModal.tsx here
 "use client";
 
 import React from "react";

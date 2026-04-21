@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react';
-import { Pig } from '../model/pig.model';
+import { Pig } from '@/shared/types';
 import { Eye, Edit, Trash2, Scale, History, MoreVertical, PawPrint } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
@@ -58,16 +58,34 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
                   "px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest",
                   pig.healthStatus === 'HEALTHY' ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
                 )}>
-                  {pig.healthStatus}
+                  {pig.healthStatus === 'HEALTHY' ? "KHỎE MẠNH" : "THEO DÕI"}
                 </span>
               </td>
-              <td className="px-6 py-3 text-center font-bold text-slate-800">
-                {pig.weight}
+              <td className="px-6 py-1.5 text-center">
+                <span className="text-base font-black text-slate-800 tracking-tighter">{pig.weight}</span>
+                <span className="ml-1 text-[9px] font-black text-slate-400 uppercase">KG</span>
               </td>
-              <td className="px-6 py-3 text-right">
-                <button onClick={e => { e.stopPropagation(); onEdit(pig); }} className="mr-2 text-blue-500 hover:underline"><Edit size={16} /></button>
-                <button onClick={e => { e.stopPropagation(); onDelete(pig.id); }} className="mr-2 text-red-500 hover:underline"><Trash2 size={16} /></button>
-                <button onClick={e => { e.stopPropagation(); onView(pig); }} className="text-green-500 hover:underline"><Eye size={16} /></button>
+              <td className="px-6 py-1.5 text-right">
+                <div className="flex justify-end gap-1.5 transition-all">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onView(pig); }}
+                    className="p-1.5 text-slate-400 hover:text-emerald-600 transition-all"
+                  >
+                    <Eye size={14} />
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onEdit(pig); }}
+                    className="p-1.5 text-slate-400 hover:text-blue-600 transition-all"
+                  >
+                    <Edit size={14} />
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onDelete(pig.id); }}
+                    className="p-1.5 text-slate-400 hover:text-rose-600 transition-all"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
