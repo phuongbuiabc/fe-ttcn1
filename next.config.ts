@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
   webpack: (config, {dev}) => {
     // Basic optimization for dev performance
     if (dev) {
-      config.devtool = 'eval-source-map'; // Faster source maps
+      // config.devtool = 'eval-source-map'; // Faster source maps
     }
 
     // HMR is disabled in AI Studio via DISABLE_HMR env var.
