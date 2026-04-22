@@ -1,16 +1,25 @@
 import { apiClient } from '@/shared/api/api-client';
+import {
+  CreatePigRequest,
+  UpdatePigRequest,
+  PigResponse,
+  PigDetailResponse,
+} from '../model/pig.model';
 import { ApiResponse } from '@/shared/types';
-import { Pig } from '../model/pig.model';
 
 export const pigService = {
-  getAll: (status?: string) =>
-    apiClient.get<ApiResponse<Pig[]>>(`/api/v1/pigs${status ? `?status=${status}` : ''}`),
+  create: (data: CreatePigRequest) =>
+    apiClient.post<ApiResponse<PigResponse>>('/api/v1/pigs', data),
+
+  update: (id: string, data: UpdatePigRequest) =>
+    apiClient.put<ApiResponse<PigResponse>>(`/api/v1/pigs/${id}`, data),
+
+  getAll: () =>
+    apiClient.get<ApiResponse<PigResponse[]>>('/api/v1/pigs'),
+
   getById: (id: string) =>
-    apiClient.get<ApiResponse<Pig>>(`/api/v1/pigs/${id}`),
-  create: (data: Partial<Pig>) =>
-    apiClient.post<ApiResponse<Pig>>('/api/v1/pigs', data),
-  update: (id: string, data: Partial<Pig>) =>
-    apiClient.put<ApiResponse<Pig>>(`/api/v1/pigs/${id}`, data),
+    apiClient.get<ApiResponse<PigDetailResponse>>(`/api/v1/pigs/${id}`),
+
   delete: (id: string) =>
-    apiClient.delete<ApiResponse<void>>(`/api/v1/pigs/${id}`),
+    apiClient.delete<ApiResponse<any>>(`/api/v1/pigs/${id}`),
 };

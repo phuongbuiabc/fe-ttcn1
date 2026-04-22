@@ -74,7 +74,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   });
 
   const toggleExpand = (name: string) => {
-    setExpandedItems(prev => 
+    setExpandedItems(prev =>
       prev.includes(name) ? prev.filter(i => i !== name) : [...prev, name]
     );
   };
@@ -199,4 +199,3 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
     </aside>
   );
 }
-

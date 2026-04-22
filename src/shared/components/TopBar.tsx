@@ -1,12 +1,24 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { Bell, Settings, Menu, LogOut, User, Shield, HelpCircle, Check, Clock } from "lucide-react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import {
+  Bell,
+  Settings,
+  Menu,
+  LogOut,
+  User,
+  Shield,
+  HelpCircle,
+  Check,
+  Clock,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/lib/utils";
 import { useAuth } from "@/shared/components/AuthProvider";
+import { usePathname, useRouter } from "next/navigation";
+import { useModuleTabs } from "@/shared/hooks/useModuleTabs";
 
 const notifications = [
   {
@@ -15,7 +27,7 @@ const notifications = [
     description: "Chuồng A-01 vượt ngưỡng 30°C",
     time: "2 phút trước",
     type: "alert",
-    read: false
+    read: false,
   },
   {
     id: 2,
@@ -23,7 +35,7 @@ const notifications = [
     description: "Đàn P-2024-05 cần tiêm Vaccine FMD",
     time: "1 giờ trước",
     type: "info",
-    read: false
+    read: false,
   },
   {
     id: 3,
@@ -31,49 +43,85 @@ const notifications = [
     description: "Báo cáo doanh thu tháng 3 đã sẵn sàng",
     time: "5 giờ trước",
     type: "success",
-    read: true
-  }
+    read: true,
+  },
 ];
 
-export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
+interface TopBarProps {
+  onMenuClick?: () => void;
+}
+
+export function TopBar({ onMenuClick }: TopBarProps) {
+  const pathname = usePathname();
+
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
   const notificationRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const { user, logout } = useAuth();
+
+  const currentModule = useModuleTabs();
+  const tabs = currentModule?.tabs || [];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
         setIsNotificationsOpen(false);
       }
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
         setIsUserMenuOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
     <header className="h-14 bg-white/80 backdrop-blur-md border-b border-slate-100/80 flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm">
-      <div className="flex items-center gap-6 flex-1">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={onMenuClick}
-            className="lg:hidden p-2 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all active:scale-95"
-          >
-            <Menu size={16} />
-          </button>
-          
-          <div className="hidden lg:flex items-center gap-2">
-            <div className="w-1 h-4 bg-emerald-500 rounded-full"></div>
-            <h2 className="text-[13px] font-black text-slate-800 tracking-tighter uppercase">Hệ thống quản lý trang trại Mão Điền</h2>
+      <div className="flex items-center gap-3 flex-1">
+
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 text-slate-500 hover:text-emerald-600"
+        >
+          <Menu size={16} />
+        </button>
+
+        {/* TABS */}
+        {tabs.length > 0 && (
+          <div className="flex items-center gap-1 ml-4">
+            {tabs.map((tab) => {
+              const active = pathname === tab.href;
+
+              return (
+                <button
+                  key={tab.href}
+                  onClick={() => router.push(tab.href)}
+                  className={cn(
+                    "px-3 py-1 rounded-lg text-[11px] font-bold transition",
+                    active
+                      ? "bg-emerald-600 text-white"
+                      : "text-slate-500 hover:bg-slate-100"
+                  )}
+                >
+                  {tab.name}
+                </button>
+              );
+            })}
           </div>
-        </div>
-
+        )}
       </div>
-
+      
       <div className="flex items-center gap-1.5 md:gap-2">
         <div className="relative" ref={notificationRef}>
           <button 
@@ -138,12 +186,12 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
             >
               <div className="text-right hidden sm:block">
                 <p className="text-[11px] font-black text-slate-800 leading-none group-hover:text-emerald-600 transition-colors">
-                  {user.name || `${user.familyName || ''} ${user.givenName || ''}`.trim() || user.username}
+                  {`${user.familyName || ''} ${user.givenName || ''}`.trim() || user.email}
                 </p>
                 <div className="flex items-center justify-end gap-1 mt-0.5">
                    <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
                    <p className="text-[8px] text-slate-400 uppercase tracking-widest font-black">
-                     {user.role || (user.roles?.[0]?.name) || "Thành viên"}
+                     {user.role || "Thành viên"}
                    </p>
                 </div>
               </div>
@@ -154,7 +202,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                 {user.avatarUrl ? (
                   <Image 
                     src={user.avatarUrl}
-                    alt={user.name || user.username || "Avatar"}
+                    alt={`${user.familyName || ''} ${user.givenName || ''}`.trim() || user.email || "Avatar"}
                     fill
                     className="object-cover"
                     referrerPolicy="no-referrer"
@@ -185,7 +233,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
               >
                 <div className="p-4 bg-slate-50/50 border-b border-slate-100">
                   <p className="text-xs font-black text-slate-900">
-                    {user.name || `${user.familyName || ''} ${user.givenName || ''}`.trim() || user.username || "Người dùng"}
+                    {`${user.familyName || ''} ${user.givenName || ''}`.trim() || user.email || "Người dùng"}
                   </p>
                   <p className="text-[10px] text-slate-500 mt-0.5">{user.email}</p>
                 </div>
@@ -226,5 +274,4 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
       </div>
     </header>
   );
-}
-
+};

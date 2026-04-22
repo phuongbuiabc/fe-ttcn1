@@ -1,41 +1,65 @@
-import { Area } from '../api/area.service';
+import React, { useState } from 'react';
+import { areaService } from '../api/area.service';
+import { CreateAreaRequest } from '../model/area.model';
 
-export interface AreaFormProps {
-  formData: Partial<Area>;
-  setFormData: (data: Partial<Area>) => void;
+interface AreaFormProps {
+  onSuccess?: () => void;
 }
 
-export function AreaForm({ formData, setFormData }: AreaFormProps) {
+export const AreaForm: React.FC<AreaFormProps> = ({ onSuccess }) => {
+  const [form, setForm] = useState<CreateAreaRequest>({name: '', description: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      await areaService.create(form);
+      setForm({ name: '', description: '' });
+      if (onSuccess) onSuccess();
+    } catch (err: any) {
+      setError(err?.message || 'Có lỗi xảy ra');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-bold mb-1">Mã khu chuồng <span className="text-red-500">*</span></label>
+        <label className="block text-xs font-bold mb-1">Tên khu vực</label>
         <input
           type="text"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
           required
-          value={formData.areaCode || ''}
-          onChange={e => setFormData({ ...formData, areaCode: e.target.value })}
-          className="w-full px-4 py-2 border rounded"
-        />
-      </div>
-      <div>
-        <label className="block text-xs font-bold mb-1">Tên khu chuồng <span className="text-red-500">*</span></label>
-        <input
-          type="text"
-          required
-          value={formData.name || ''}
-          onChange={e => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-3 py-2 border rounded"
         />
       </div>
       <div>
         <label className="block text-xs font-bold mb-1">Mô tả</label>
         <textarea
-          value={formData.description || ''}
-          onChange={e => setFormData({ ...formData, description: e.target.value })}
-          className="w-full px-4 py-2 border rounded"
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          className="w-full px-3 py-2 border rounded"
         />
       </div>
-    </div>
+      {error && <div className="text-red-500 text-xs">{error}</div>}
+      <button
+        type="submit"
+        className="px-4 py-2 bg-emerald-600 text-white rounded font-bold"
+        disabled={loading}
+      >
+        {loading ? 'Đang lưu...' : 'Thêm khu vực'}
+      </button>
+    </form>
   );
-}
+};
