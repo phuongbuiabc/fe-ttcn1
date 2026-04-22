@@ -1,6 +1,6 @@
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import { DashboardLayout } from "@/widgets/layout/DashboardLayout";
+import { DashboardLayout } from "@/shared/components/DashboardLayout";
 import { AuthProvider } from "@/shared/components/AuthProvider";
 
 const roboto = Roboto({

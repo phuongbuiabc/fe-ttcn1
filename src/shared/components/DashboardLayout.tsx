@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
-import { Footer } from "./Footer";
+import { Footer } from "../../shared/components/Footer";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/shared/components/AuthProvider";
 import { Loader2 } from "lucide-react";
