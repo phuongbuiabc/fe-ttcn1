@@ -36,15 +36,27 @@ const initialBarns: Barn[] = [
   { id: "P-04", name: "Chuồng A4", section: "KHU CÁCH LY", type: "Cách ly", capacity: 40, currentPigs: 12, area: 80, density: 0.15, status: "BẢO TRÌ" }
 ];
 
+// --- API Hook ---
+import { useAreaList } from "@/modules/area/hooks/useAreaList";
+
 export default function BarnManagementPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [items] = useState<Barn[]>(initialBarns);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [sectionFilter, setSectionFilter] = useState<string>("Tất cả");
+  const [typeFilter, setTypeFilter] = useState<string>("Tất cả");
 
-  const filteredItems = items.filter(item => 
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.section.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Lấy danh sách khu vực từ API
+  const { areas, loading: areaLoading } = useAreaList();
+      const sectionOptions = ["Tất cả", ...areas.map(a => a.name)];
+  const typeOptions = ["Tất cả", ...Array.from(new Set(items.map(i => i.type)))];
+
+  const filteredItems = items.filter(item => {
+    const matchSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.section.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchSection = sectionFilter === "Tất cả" || item.section === sectionFilter;
+    const matchType = typeFilter === "Tất cả" || item.type === typeFilter;
+    return matchSearch && matchSection && matchType;
+  });
 
   const handleEdit = (barn: Barn) => {
     console.log("Edit barn:", barn);
@@ -95,17 +107,36 @@ export default function BarnManagementPage() {
 
       {/* Control Bar */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <div className="flex gap-1.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-          {["Tất cả", "Lợn con", "Vỗ béo", "Sinh sản"].map((s) => (
-            <button key={s} className={cn("px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap", s === "Tất cả" ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100" : "text-slate-400 hover:text-slate-600")}>{s}</button>
-          ))}
+        <div className="flex gap-2 w-full md:w-auto items-center flex-wrap">
+          {/* Filter Khu vực */}
+          <label className="text-xs font-bold mr-1">Khu vực:</label>
+          <select
+            className="px-2 py-1 rounded border text-xs font-bold"
+            value={sectionFilter}
+            onChange={e => setSectionFilter(e.target.value)}
+            disabled={areaLoading}
+          >
+            {sectionOptions.map(option => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+          {/* Filter Loại chuồng */}
+          <label className="text-xs font-bold ml-4 mr-1">Loại chuồng:</label>
+          <select
+            className="px-2 py-1 rounded border text-xs font-bold"
+            value={typeFilter}
+            onChange={e => setTypeFilter(e.target.value)}
+          >
+            {typeOptions.map(option => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
         </div>
-        
-        <div className="relative flex-1 md:max-w-xs w-full">
+        <div className="relative flex-1 md:max-w-xs w-full mt-2 md:mt-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-          <input 
-            type="text" 
-            placeholder="Tìm chuồng..." 
+          <input
+            type="text"
+            placeholder="Tìm chuồng..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500/10"
@@ -123,10 +154,10 @@ export default function BarnManagementPage() {
         />
       </div>
 
-      <TransferPigModal 
-        isOpen={isTransferModalOpen} 
-        onClose={() => setIsTransferModalOpen(false)} 
-        barns={items} 
+      <TransferPigModal
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+        barns={items}
       />
     </div>
   );
