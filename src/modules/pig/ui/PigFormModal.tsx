@@ -1,19 +1,16 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { X } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-
-import { CreatePigRequest } from '@/modules/pig/model/pig.model';
-import { PigType, PigStatus } from '@/modules/pig/model/pig.enum';
+import React from "react";
+import { X } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
 interface PigFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: CreatePigRequest) => void;
+  onSave: (e: React.FormEvent) => void;
   editingPig: any | null;
-  formData: CreatePigRequest;
-  setFormData: (data: CreatePigRequest) => void;
+  formData: any;
+  setFormData: (data: any) => void;
 }
 
 export function PigFormModal({
@@ -26,193 +23,102 @@ export function PigFormModal({
 }: PigFormModalProps) {
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-  };
-
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white rounded-[2rem] w-full max-w-2xl overflow-hidden shadow-xl"
+        <motion.div 
+          initial={{ scale: 0.9, opacity: 0 }} 
+          animate={{ scale: 1, opacity: 1 }} 
+          exit={{ scale: 0.9, opacity: 0 }} 
+          className="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col"
         >
-          {/* HEADER */}
-          <div className="p-6 border-b flex justify-between items-center">
-            <h3 className="text-xl font-black uppercase">
-              {editingPig ? 'Cập nhật lợn' : 'Thêm lợn'}
+          <div className="p-8 border-b border-slate-50 flex items-center justify-between">
+            <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tight">
+              {editingPig ? "Cập nhật thông tin Heo" : "Thêm cá thể mới"}
             </h3>
-            <button onClick={onClose}>
-              <X />
+            <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-xl transition-all">
+              <X size={24} className="text-slate-400" />
             </button>
           </div>
-
-          {/* FORM */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
-
-            <div className="grid grid-cols-2 gap-4">
-
-              {/* earTag */}
-              <div>
-                <label className="text-xs font-bold">Số tai</label>
-                <input
-                  value={formData.earTag || ''}
-                  onChange={(e) =>
-                    setFormData({ ...formData, earTag: e.target.value })
-                  }
-                  className="input"
+          <form onSubmit={onSave} className="p-10 space-y-6">
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Số tai / ID</label>
+                <input 
+                  type="text" required 
+                  value={formData.id} 
+                  onChange={(e) => setFormData({...formData, id: e.target.value})} 
+                  className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500/20" 
                 />
               </div>
-
-              {/* type */}
-              <div>
-                <label className="text-xs font-bold">Loại</label>
-                <select
-                  value={formData.type}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      type: e.target.value as PigType,
-                    })
-                  }
-                  className="input"
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Loại lợn</label>
+                <select 
+                  className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold outline-none" 
+                  value={formData.type} 
+                  onChange={(e) => setFormData({...formData, type: e.target.value})}
                 >
-                  <option value="NAI">Lợn nái</option>
-                  <option value="NOC">Lợn nọc</option>
-                  <option value="THIT">Lợn thịt</option>
+                  <option>Lợn nái</option>
+                  <option>Lợn nọc</option>
+                  <option>Lợn con</option>
+                  <option>Lợn vỗ béo</option>
                 </select>
               </div>
-
-              {/* species */}
-              <div>
-                <label className="text-xs font-bold">Giống</label>
-                <input
-                  value={formData.species || ''}
-                  onChange={(e) =>
-                    setFormData({ ...formData, species: e.target.value })
-                  }
-                  className="input"
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Giống</label>
+                <input 
+                  type="text" required 
+                  value={formData.breed} 
+                  onChange={(e) => setFormData({...formData, breed: e.target.value})} 
+                  className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold" 
                 />
               </div>
-
-              {/* origin */}
-              <div>
-                <label className="text-xs font-bold">Nguồn gốc</label>
-                <input
-                  value={formData.origin || ''}
-                  onChange={(e) =>
-                    setFormData({ ...formData, origin: e.target.value })
-                  }
-                  className="input"
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Chuồng</label>
+                <input 
+                  type="text" required 
+                  value={formData.pen} 
+                  onChange={(e) => setFormData({...formData, pen: e.target.value})} 
+                  className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold" 
                 />
               </div>
-
-              {/* birthWeight */}
-              <div>
-                <label className="text-xs font-bold">Cân nặng lúc sinh (kg)</label>
-                <input
-                  type="number"
-                  value={formData.birthWeight || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      birthWeight: Number(e.target.value),
-                    })
-                  }
-                  className="input"
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Cân nặng (kg)</label>
+                <input 
+                  type="number" required 
+                  value={formData.weight} 
+                  onChange={(e) => setFormData({...formData, weight: parseFloat(e.target.value) || 0})} 
+                  className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold" 
                 />
               </div>
-
-              {/* birthDate */}
-              <div>
-                <label className="text-xs font-bold">Ngày sinh</label>
-                <input
-                  type="date"
-                  value={formData.birthDate || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      birthDate: e.target.value,
-                    })
-                  }
-                  className="input"
-                />
-              </div>
-
-              {/* nippleCount */}
-              <div>
-                <label className="text-xs font-bold">Số vú</label>
-                <input
-                  type="number"
-                  value={formData.nippleCount || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      nippleCount: Number(e.target.value),
-                    })
-                  }
-                  className="input"
-                />
-              </div>
-
-              {/* herdEntryDate */}
-              <div>
-                <label className="text-xs font-bold">Ngày nhập đàn</label>
-                <input
-                  type="date"
-                  value={formData.herdEntryDate || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      herdEntryDate: e.target.value,
-                    })
-                  }
-                  className="input"
-                />
-              </div>
-
-              {/* status */}
-              <div className="col-span-2">
-                <label className="text-xs font-bold">Trạng thái</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      status: e.target.value as PigStatus,
-                    })
-                  }
-                  className="input"
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Trạng thái</label>
+                <select 
+                  className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold outline-none" 
+                  value={formData.status} 
+                  onChange={(e) => setFormData({...formData, status: e.target.value})}
                 >
-                  <option value="ACTIVE">Đang nuôi</option>
-                  <option value="SOLD">Đã bán</option>
-                  <option value="DEAD">Đã chết</option>
+                  <option>Bình thường</option>
+                  <option>Cảnh báo Sức khỏe</option>
+                  <option>Cần theo dõi</option>
                 </select>
               </div>
-
             </div>
-
-            {/* ACTION */}
-            <div className="flex gap-3 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 py-3 bg-slate-100 rounded-xl"
+            <div className="pt-6 flex gap-4">
+              <button 
+                type="button" 
+                onClick={onClose} 
+                className="flex-1 py-4 bg-slate-100 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest"
               >
-                Hủy
+                Hủy bỏ
               </button>
-
-              <button
-                type="submit"
-                className="flex-1 py-3 bg-emerald-600 text-white rounded-xl"
+              <button 
+                type="submit" 
+                className="flex-[2] py-4 bg-[#00a67d] text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-emerald-900/20 active:scale-95 transition-all"
               >
-                Lưu
+                Lưu thông tin cá thể
               </button>
             </div>
-
           </form>
         </motion.div>
       </div>

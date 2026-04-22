@@ -1,7 +1,22 @@
 import { apiClient } from '@/shared/api/api-client';
-import { Area, CreateAreaRequest } from '@/modules/area/model/area.model';
+import { ApiResponse } from '@/shared/types';
+
+export interface Area {
+  id: string;
+  areaCode: string;
+  name: string;
+  description?: string;
+}
+
+export interface CreateAreaRequest {
+  areaCode: string;
+  name: string;
+  description?: string;
+}
 
 export const areaService = {
-  getAll: () => apiClient.get<{ data: Area[] }>('/api/v1/areas'),
-  create: (data: CreateAreaRequest) => apiClient.post('/api/v1/areas', data),
+  create: (data: CreateAreaRequest) =>
+    apiClient.post<ApiResponse<Area>>('/api/v1/areas', data),
+  getAll: () =>
+    apiClient.get<ApiResponse<Area[]>>('/api/v1/areas'),
 };
