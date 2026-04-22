@@ -1,10 +1,12 @@
-// services/api-client.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://maodien.bitoj.io.vn';
+import { tokenStorage } from '@/modules/auth/utils/token';
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'https://maodien.bitoj.io.vn';
 
 export class ApiClient {
   private static instance: ApiClient;
-
-  private constructor() { }
+  private isRefreshing = false;
+  private refreshPromise: Promise<string> | null = null;
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -13,70 +15,117 @@ export class ApiClient {
     return ApiClient.instance;
   }
 
+  private getBaseUrl() {
+    return typeof window !== 'undefined' ? '/api/proxy' : API_URL;
+  }
+
   private getHeaders(): HeadersInit {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = tokenStorage.getAccessToken();
     return {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   }
 
-  public async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const baseUrl = typeof window !== 'undefined' ? '/api/proxy' : API_URL;
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const fullUrl = `${baseUrl}${cleanEndpoint}`.replace(/([^:]\/)\/+/g, "$1");
+  private async refreshToken(): Promise<string> {
+    const refreshToken = tokenStorage.getRefreshToken();
+    if (!refreshToken) throw new Error('No refresh token');
 
-    try {
-      const response = await fetch(fullUrl, {
-        ...options,
-        headers: {
-          ...this.getHeaders(),
-          ...options.headers,
-        },
-      });
+    const res = await fetch(`/api/proxy/api/v1/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
 
-      const data = await response.json().catch(() => ({}));
+    const data = await res.json();
 
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || data.error || `Error ${response.status}`,
-          status: response.status
-        } as any;
+    if (!res.ok || !data?.data?.accessToken) {
+      throw new Error('Refresh token failed');
+    }
+
+    tokenStorage.setTokens(
+      data.data.accessToken,
+      data.data.refreshToken
+    );
+
+    return data.data.accessToken;
+  }
+
+  public async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const baseUrl = this.getBaseUrl();
+    const url = `${baseUrl}${endpoint}`;
+
+    let response = await fetch(url, {
+      ...options,
+      headers: {
+        ...this.getHeaders(),
+        ...options.headers,
+      },
+    });
+
+    if (response.status === 401) {
+      try {
+        if (!this.isRefreshing) {
+          this.isRefreshing = true;
+          this.refreshPromise = this.refreshToken();
+        }
+
+        const newToken = await this.refreshPromise;
+        this.isRefreshing = false;
+
+        // retry request
+        response = await fetch(url, {
+          ...options,
+          headers: {
+            ...options.headers,
+            Authorization: `Bearer ${newToken}`,
+          },
+        });
+      } catch (err) {
+        this.isRefreshing = false;
+        tokenStorage.clear();
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+        throw err;
       }
+    }
 
-      return data as T;
-    } catch (error) {
-      console.error(`API Request Error [${fullUrl}]:`, error);
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
       return {
         success: false,
-        message: "Kết nối máy chủ thất bại. Vui lòng thử lại sau.",
+        message: data.message || `Error ${response.status}`,
       } as any;
     }
+
+    return data as T;
   }
 
-  public async get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    return this.request<T>(endpoint, { ...options, method: 'GET' });
+  public get<T>(endpoint: string) {
+    return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  public async post<T>(endpoint: string, data?: any, options: RequestInit = {}): Promise<T> {
+  public post<T>(endpoint: string, body?: any) {
     return this.request<T>(endpoint, {
-      ...options,
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined
+      body: JSON.stringify(body),
     });
   }
 
-  public async put<T>(endpoint: string, data?: any, options: RequestInit = {}): Promise<T> {
+  public put<T>(endpoint: string, body?: any) {
     return this.request<T>(endpoint, {
-      ...options,
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined
+      body: JSON.stringify(body),
     });
   }
 
-  public async delete<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+  public delete<T>(endpoint: string) {
+    return this.request<T>(endpoint, { method: 'DELETE' });
   }
 }
 
