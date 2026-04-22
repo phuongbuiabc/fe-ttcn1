@@ -7,14 +7,9 @@ export interface User {
   avatarUrl?: string;
 }
 
-export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-  user: User;
-}
-
-export interface ApiResponse<T> {
+export interface AuthResponse {
   success: boolean;
-  data: T;
+  token?: string;
+  user?: User;
   message?: string;
 }
