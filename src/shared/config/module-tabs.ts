@@ -18,6 +18,12 @@ const pigTabs: ModuleTab[] = [
   { name: "Đề xuất loại", href: "/pigs/culling-proposals", title: "Danh mục đề xuất" },
 ];
 
+const healthTabs: ModuleTab[] = [
+  { name: "Tăng trưởng", href: "/health/growth-tracking", title: "Theo dõi tăng trưởng" },
+  { name: "Bệnh", href: "/health/diseases", title: "Danh mục bệnh" },
+  { name: "Điều trị", href: "/health/treatments", title: "Theo dõi điều trị" },
+];
+
 const tradingTabs: ModuleTab[] = [
   { name: "Nhập hàng", href: "/trading/import" },
   { name: "Bán hàng", href: "/trading/export" },
@@ -48,7 +54,7 @@ export const modules: ModuleConfig[] = [
   {
     name: "Sức khỏe",
     basePath: "/health",
-    tabs: [],
+    tabs: healthTabs,
   },
   {
     name: "Chuồng nuôi",

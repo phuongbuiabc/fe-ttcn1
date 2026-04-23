@@ -1,11 +1,10 @@
-import { tokenStorage } from '@/modules/auth/utils/token';
+import { tokenStorage } from '@/modules/auth/utils/tokenStorage';
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'https://maodien.bitoj.io.vn';
 
 export class ApiClient {
   private static instance: ApiClient;
-  private isRefreshing = false;
   private refreshPromise: Promise<string> | null = null;
 
   public static getInstance(): ApiClient {
@@ -21,42 +20,53 @@ export class ApiClient {
 
   private getHeaders(): HeadersInit {
     const token = tokenStorage.getAccessToken();
+
     return {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   }
 
+  // =====================
+  // REFRESH TOKEN
+  // =====================
   private async refreshToken(): Promise<string> {
     const refreshToken = tokenStorage.getRefreshToken();
-    if (!refreshToken) throw new Error('No refresh token');
 
-    const res = await fetch(`/api/proxy/api/v1/auth/refresh`, {
+    if (!refreshToken) {
+      tokenStorage.clear();
+      window.location.href = '/login';
+      throw new Error('Missing refresh token');
+    }
+
+    const res = await fetch(`/api/proxy/api/v1/auth/refresh-token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
     });
 
-    const data = await res.json();
+    const json = await res.json().catch(() => ({}));
+    const data = json?.data;
 
-    if (!res.ok || !data?.data?.accessToken) {
+    if (!res.ok || !data?.accessToken) {
+      tokenStorage.clear();
+      window.location.href = '/login';
       throw new Error('Refresh token failed');
     }
 
-    tokenStorage.setTokens(
-      data.data.accessToken,
-      data.data.refreshToken
-    );
+    tokenStorage.setTokens(data.accessToken, data.refreshToken);
 
-    return data.data.accessToken;
+    return data.accessToken;
   }
 
+  // =====================
+  // REQUEST CORE
+  // =====================
   public async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const baseUrl = this.getBaseUrl();
-    const url = `${baseUrl}${endpoint}`;
+    const url = `${this.getBaseUrl()}${endpoint}`;
 
     let response = await fetch(url, {
       ...options,
@@ -66,30 +76,30 @@ export class ApiClient {
       },
     });
 
+    // =====================
+    // HANDLE 401
+    // =====================
     if (response.status === 401) {
       try {
-        if (!this.isRefreshing) {
-          this.isRefreshing = true;
-          this.refreshPromise = this.refreshToken();
+        if (!this.refreshPromise) {
+          this.refreshPromise = this.refreshToken().finally(() => {
+            this.refreshPromise = null;
+          });
         }
 
         const newToken = await this.refreshPromise;
-        this.isRefreshing = false;
 
-        // retry request
         response = await fetch(url, {
           ...options,
           headers: {
             ...options.headers,
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${newToken}`,
           },
         });
       } catch (err) {
-        this.isRefreshing = false;
         tokenStorage.clear();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
-        }
+        window.location.href = '/login';
         throw err;
       }
     }
@@ -106,25 +116,25 @@ export class ApiClient {
     return data as T;
   }
 
-  public get<T>(endpoint: string) {
+  get<T>(endpoint: string) {
     return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  public post<T>(endpoint: string, body?: any) {
+  post<T>(endpoint: string, body?: any) {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(body),
     });
   }
 
-  public put<T>(endpoint: string, body?: any) {
+  put<T>(endpoint: string, body?: any) {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(body),
     });
   }
 
-  public delete<T>(endpoint: string) {
+  delete<T>(endpoint: string) {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
 }

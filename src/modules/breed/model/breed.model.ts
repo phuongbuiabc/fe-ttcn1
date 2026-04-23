@@ -1,6 +1,5 @@
 export interface BreedResponse {
   id: string;
-  breedCode: string;
   name: string;
   characteristics?: string;
   createdAt: string;
@@ -8,7 +7,6 @@ export interface BreedResponse {
 }
 
 export interface CreateBreedRequest {
-  breedCode: string;
   name: string;
   characteristics?: string;
 }

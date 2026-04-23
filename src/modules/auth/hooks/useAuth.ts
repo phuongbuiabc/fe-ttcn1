@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { authService } from '@/modules/auth/api/auth.service';
-import { tokenStorage } from '@/modules/auth/utils/token';
+import { tokenStorage } from '@/modules/auth/utils/tokenStorage';
 import { User } from '../model/auth.model';
 
 export function useAuthLogic() {

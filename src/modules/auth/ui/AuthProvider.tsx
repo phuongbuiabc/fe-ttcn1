@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthLogic } from '@/modules/auth/hooks/useAuth';
-import { tokenStorage } from '@/modules/auth/utils/token';
+import { tokenStorage } from '@/modules/auth/utils/tokenStorage';
 
 const AuthContext = createContext<any>(null);
 

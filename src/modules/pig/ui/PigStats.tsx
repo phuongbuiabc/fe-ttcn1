@@ -11,7 +11,6 @@ interface PigStatsProps {
 
 export function PigStats({ pigs }: PigStatsProps) {
 
-  // 🔥 tính toán từ data thật
   const stats = useMemo(() => {
     const total = pigs.length;
 
