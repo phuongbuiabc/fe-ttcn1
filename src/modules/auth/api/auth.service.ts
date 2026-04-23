@@ -19,7 +19,7 @@ export const authService = {
 
   refreshToken: (refreshToken: string) =>
     apiClient.post<ApiResponse<LoginResponse>>(
-      '/api/v1/auth/refresh',
+      '/api/v1/auth/refresh-token',
       { refreshToken }
     ),
 };

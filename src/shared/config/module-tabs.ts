@@ -1,64 +1,58 @@
 export type ModuleTab = {
   name: string;
   href: string;
+  title?: string;
 };
 
 export type ModuleConfig = {
   name: string;
+  basePath: string;
   tabs: ModuleTab[];
 };
 
-export const moduleTabs: Record<string, ModuleConfig> = {
-  "/pigs": {
+// ===== DEFINE TABS =====
+const pigTabs: ModuleTab[] = [
+  { name: "Lợn", href: "/pigs", title: "Danh mục lợn" },
+  { name: "Đàn con", href: "/pigs/pig-herds", title: "Danh mục đàn con" },
+  { name: "Giống", href: "/pigs/breeds", title: "Danh mục giống" },
+  { name: "Đề xuất loại", href: "/pigs/culling-proposals", title: "Danh mục đề xuất" },
+];
+
+const tradingTabs: ModuleTab[] = [
+  { name: "Nhập hàng", href: "/trading/import" },
+  { name: "Bán hàng", href: "/trading/export" },
+];
+
+const staffTabs: ModuleTab[] = [
+  { name: "Nhân viên", href: "/staff" },
+  { name: "Lịch làm việc", href: "/staff/schedule" },
+];
+
+// ===== MODULE CONFIG =====
+export const modules: ModuleConfig[] = [
+  {
     name: "Quản lý lợn",
-    tabs: [
-      { name: "Lợn", href: "/pigs" },
-      { name: "Đàn con", href: "/litter" },
-      { name: "Giống", href: "/breed" },
-    ],
+    basePath: "/pigs",
+    tabs: pigTabs,
   },
-
-  "/breed": {
-    name: "Giống",
-    tabs: [{ name: "Giống", href: "/breed" }],
-  },
-
-  "/litter": {
-    name: "Đàn con",
-    tabs: [{ name: "Đàn con", href: "/litter" }],
-  },
-
-  "/reproduction": {
-    name: "Sinh sản",
-    tabs: [
-      { name: "Phối giống", href: "/reproduction/mating" },
-      { name: "Đẻ", href: "/reproduction/birth" },
-    ],
-  },
-
-  "/health": {
-    name: "Sức khỏe",
-    tabs: [],
-  },
-
-  "/pens": {
-    name: "Chuồng nuôi",
-    tabs: [],
-  },
-
-  "/trading": {
+  {
     name: "Mua bán",
-    tabs: [
-      { name: "Nhập hàng", href: "/trading/import" },
-      { name: "Bán hàng", href: "/trading/export" },
-    ],
+    basePath: "/trading",
+    tabs: tradingTabs,
   },
-
-  "/staff": {
+  {
     name: "Nhân sự",
-    tabs: [
-      { name: "Nhân viên", href: "/staff" },
-      { name: "Lịch làm việc", href: "/staff/schedule" },
-    ],
+    basePath: "/staff",
+    tabs: staffTabs,
   },
-};
+  {
+    name: "Sức khỏe",
+    basePath: "/health",
+    tabs: [],
+  },
+  {
+    name: "Chuồng nuôi",
+    basePath: "/pens",
+    tabs: [],
+  },
+];

@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react';
-import { breedService } from '../api/breed.service';
+import { useState, useCallback, useMemo } from 'react';
+import { breedService } from '@/modules/breed/api/breed.service';
 import {
   BreedResponse,
   CreateBreedRequest,
   UpdateBreedRequest,
-} from '../model/breed.model';
+} from '@/modules/breed/model/breed.model';
 
 export function useBreed() {
   const [breeds, setBreeds] = useState<BreedResponse[]>([]);
@@ -14,8 +14,6 @@ export function useBreed() {
     setLoading(true);
     try {
       const res = await breedService.getAll();
-
-      console.log("BREED API:", res);
 
       if (res.success) {
         setBreeds(res.data);
@@ -49,8 +47,16 @@ export function useBreed() {
     return res;
   };
 
+  const options = useMemo(() => {
+    return breeds.map((b) => ({
+      label: b.name,
+      value: b.id,
+    }));
+  }, [breeds]);
+
   return {
     breeds,
+    options,
     loading,
     fetchBreeds,
     createBreed,
