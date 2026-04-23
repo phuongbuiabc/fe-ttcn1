@@ -20,22 +20,16 @@ export class ApiClient {
 
   private getHeaders(): HeadersInit {
     const token = tokenStorage.getAccessToken();
-
     return {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   }
 
-  // =====================
-  // REFRESH TOKEN
-  // =====================
   private async refreshToken(): Promise<string> {
     const refreshToken = tokenStorage.getRefreshToken();
 
     if (!refreshToken) {
-      tokenStorage.clear();
-      window.location.href = '/login';
       throw new Error('Missing refresh token');
     }
 
@@ -45,28 +39,30 @@ export class ApiClient {
       body: JSON.stringify({ refreshToken }),
     });
 
-    const json = await res.json().catch(() => ({}));
-    const data = json?.data;
+    const data = await res.json().catch(() => ({}));
 
-    if (!res.ok || !data?.accessToken) {
-      tokenStorage.clear();
-      window.location.href = '/login';
+    console.log('REFRESH RESPONSE:', data);
+
+    if (!res.ok || !data?.data?.accessToken) {
       throw new Error('Refresh token failed');
     }
 
-    tokenStorage.setTokens(data.accessToken, data.refreshToken);
+    // ✅ GIỮ refreshToken cũ nếu BE không trả
+    const newAccessToken = data.data.accessToken;
+    const newRefreshToken =
+      data.data.refreshToken || refreshToken;
 
-    return data.accessToken;
+    tokenStorage.setTokens(newAccessToken, newRefreshToken);
+
+    return newAccessToken;
   }
 
-  // =====================
-  // REQUEST CORE
-  // =====================
   public async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.getBaseUrl()}${endpoint}`;
+    const baseUrl = this.getBaseUrl();
+    const url = `${baseUrl}${endpoint}`;
 
     let response = await fetch(url, {
       ...options,
@@ -76,9 +72,6 @@ export class ApiClient {
       },
     });
 
-    // =====================
-    // HANDLE 401
-    // =====================
     if (response.status === 401) {
       try {
         if (!this.refreshPromise) {
@@ -89,17 +82,24 @@ export class ApiClient {
 
         const newToken = await this.refreshPromise;
 
+        // retry request
         response = await fetch(url, {
           ...options,
           headers: {
+            ...this.getHeaders(),
             ...options.headers,
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${newToken}`,
           },
         });
       } catch (err) {
+        console.error('REFRESH FAILED:', err);
+
         tokenStorage.clear();
-        window.location.href = '/login';
+
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+
         throw err;
       }
     }
@@ -116,25 +116,25 @@ export class ApiClient {
     return data as T;
   }
 
-  get<T>(endpoint: string) {
+  public get<T>(endpoint: string) {
     return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  post<T>(endpoint: string, body?: any) {
+  public post<T>(endpoint: string, body?: any) {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(body),
     });
   }
 
-  put<T>(endpoint: string, body?: any) {
+  public put<T>(endpoint: string, body?: any) {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(body),
     });
   }
 
-  delete<T>(endpoint: string) {
+  public delete<T>(endpoint: string) {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
 }

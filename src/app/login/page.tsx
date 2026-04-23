@@ -46,7 +46,6 @@ export default function LoginPage() {
       console.log("Login successful");
     } catch (err: any) {
       console.error("Login catch error:", err);
-      // Give more specific feedback for network issues
       if (err.message?.includes("Failed to fetch") || err.name === "TypeError") {
         setError("Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối mạng hoặc CORS.");
       } else {

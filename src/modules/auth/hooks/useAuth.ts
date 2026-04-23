@@ -30,6 +30,11 @@ export function useAuthLogic() {
       throw new Error(res.message);
     }
 
+    // ✅ đảm bảo có refreshToken
+    if (!res.data.refreshToken) {
+      throw new Error('No refresh token returned from server');
+    }
+
     tokenStorage.setTokens(
       res.data.accessToken,
       res.data.refreshToken
