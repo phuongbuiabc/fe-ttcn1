@@ -2,14 +2,14 @@
 
 import React, { createContext, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthLogic } from '@/modules/auth/hooks/useAuth';
+import { useAuth } from '@/modules/auth/hooks/useAuth';
 import { tokenStorage } from '@/modules/auth/utils/tokenStorage';
 import { authService } from '@/modules/auth/api/auth.service';
 
 const AuthContext = createContext<any>(null);
 
 export function AuthProvider({ children }: any) {
-  const auth = useAuthLogic();
+  const auth = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -17,23 +17,24 @@ export function AuthProvider({ children }: any) {
       const accessToken = tokenStorage.getAccessToken();
       const refreshToken = tokenStorage.getRefreshToken();
 
-      // ❌ không có refreshToken => khỏi cố
-      if (!refreshToken) return;
+      if (!refreshToken) {
+        tokenStorage.clear();
+        router.push('/login');
+        return;
+      }
 
       try {
-        // ✅ Có accessToken → thử lấy user (ApiClient sẽ auto refresh nếu 401)
         if (accessToken) {
           await auth.fetchUser();
           return;
         }
 
-        // ✅ Không có accessToken → dùng refreshToken để login lại
         const res = await authService.refreshToken(refreshToken);
 
         if (res.success) {
           tokenStorage.setTokens(
             res.data.accessToken,
-            refreshToken // ⚠️ BE bạn không trả refreshToken mới
+            refreshToken
           );
 
           await auth.fetchUser();
@@ -41,6 +42,7 @@ export function AuthProvider({ children }: any) {
       } catch (err) {
         console.log('Auto login failed');
         tokenStorage.clear();
+        router.push('/login');
       }
     };
 
@@ -64,6 +66,6 @@ export function AuthProvider({ children }: any) {
   );
 }
 
-export const useAuth = () => {
+export const useAuthContext = () => {
   return useContext(AuthContext);
 };

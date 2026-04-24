@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 import { diseaseService } from '../api/disease.service';
 
 import {
@@ -11,8 +11,7 @@ export function useDisease() {
   const [diseases, setDiseases] = useState<DiseaseResponse[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // 📥 fetch list
-  const fetchDiseases = async () => {
+  const fetchDiseases = useCallback(async () => {
     setLoading(true);
     try {
       const res = await diseaseService.getAll();
@@ -22,9 +21,8 @@ export function useDisease() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // ➕ create
   const createDisease = async (data: CreateDiseaseRequest) => {
     const res = await diseaseService.create(data);
     if (res.success) {
@@ -33,7 +31,6 @@ export function useDisease() {
     return res;
   };
 
-  // ✏️ update
   const updateDisease = async (id: string, data: UpdateDiseaseRequest) => {
     const res = await diseaseService.update(id, data);
     if (res.success) {
@@ -42,7 +39,6 @@ export function useDisease() {
     return res;
   };
 
-  // ❌ delete
   const deleteDisease = async (id: string) => {
     const res = await diseaseService.delete(id);
     if (res.success) {
@@ -50,10 +46,6 @@ export function useDisease() {
     }
     return res;
   };
-
-  useEffect(() => {
-    fetchDiseases();
-  }, []);
 
   return {
     diseases,

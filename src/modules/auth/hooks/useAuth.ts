@@ -3,7 +3,7 @@ import { authService } from '@/modules/auth/api/auth.service';
 import { tokenStorage } from '@/modules/auth/utils/tokenStorage';
 import { User } from '../model/auth.model';
 
-export function useAuthLogic() {
+export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +37,7 @@ export function useAuthLogic() {
 
     tokenStorage.setTokens(
       res.data.accessToken,
-      oldRefreshToken!
+      res.data.refreshToken
     );
 
     setUser(res.data.user);

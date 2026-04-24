@@ -9,6 +9,7 @@ import { DiseaseFormCreate } from '@/modules/disease/ui/DiseaseFormCreate';
 import { DiseaseFormUpdate } from '@/modules/disease/ui/DiseaseFormUpdate';
 import { usePathname } from 'next/navigation';
 import { getPageTitle } from '@/shared/utils/getPageTitle';
+import { useAuth } from '@/modules/auth/hooks/useAuth';
 
 import {
   DiseaseResponse,
@@ -17,6 +18,8 @@ import {
 } from '@/modules/disease/model/disease.model';
 
 export default function DiseasePage() {
+  const { user } = useAuth();
+
   const {
     diseases,
     loading,
@@ -42,8 +45,10 @@ export default function DiseasePage() {
   const [updateForm, setUpdateForm] = useState<UpdateDiseaseRequest>({});
 
   useEffect(() => {
-    fetchDiseases();
-  }, [fetchDiseases]);
+    if (user) {
+      fetchDiseases();
+    }
+  }, [user]);
 
   const handleCreate = async (data: CreateDiseaseRequest) => {
     await createDisease(data);
