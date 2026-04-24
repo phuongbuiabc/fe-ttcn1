@@ -7,6 +7,8 @@ import { useDisease } from '@/modules/disease/hooks/useDisease';
 import { DiseaseTable } from '@/modules/disease/ui/DiseaseTable';
 import { DiseaseFormCreate } from '@/modules/disease/ui/DiseaseFormCreate';
 import { DiseaseFormUpdate } from '@/modules/disease/ui/DiseaseFormUpdate';
+import { usePathname } from 'next/navigation';
+import { getPageTitle } from '@/shared/utils/getPageTitle';
 
 import {
   DiseaseResponse,
@@ -28,6 +30,8 @@ export default function DiseasePage() {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
 
   const [selected, setSelected] = useState<DiseaseResponse | null>(null);
+  const pathname = usePathname();
+  const title = getPageTitle(pathname);
 
   const [createForm, setCreateForm] = useState<CreateDiseaseRequest>({
     name: '',
@@ -67,7 +71,7 @@ export default function DiseasePage() {
 
       {/* HEADER */}
       <div className="flex justify-between items-center">
-        <h1 className="font-bold uppercase">Danh mục bệnh</h1>
+        <h1 className="font-bold uppercase">{title}</h1>
 
         <div className="flex gap-2">
           <button

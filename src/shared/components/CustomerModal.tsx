@@ -3,7 +3,7 @@
 import React from "react";
 import { X, User, Mail, Phone, MapPin, Briefcase, Save } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 interface CustomerModalProps {
   isOpen: boolean;

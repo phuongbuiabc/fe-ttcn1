@@ -11,7 +11,7 @@ import {
   PawPrint,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import {
   BarChart,
   Bar,

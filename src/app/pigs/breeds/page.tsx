@@ -7,6 +7,8 @@ import { useBreed } from '@/modules/breed/hooks/useBreed';
 import { BreedTable } from '@/modules/breed/ui/BreedTable';
 import { CreateBreedRequest } from '@/modules/breed/model/breed.model';
 import { BreedFormModal } from '@/modules/breed/ui/BreedFormCreate';
+import { usePathname } from 'next/navigation';
+import { getPageTitle } from '@/shared/utils/getPageTitle';
 
 export default function BreedPage() {
   const {
@@ -17,6 +19,9 @@ export default function BreedPage() {
   } = useBreed();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const pathname = usePathname();
+  const title = getPageTitle(pathname);
 
   const [formData, setFormData] = useState<CreateBreedRequest>({
     name: '',
@@ -39,7 +44,7 @@ export default function BreedPage() {
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-extrabold uppercase">
-          Danh mục giống
+          {title}
         </h1>
 
         <div className="flex gap-2">

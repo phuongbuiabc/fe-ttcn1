@@ -9,7 +9,7 @@ import {
   Calendar,
   Eye
 } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { SowRecord } from "@/shared/types";
 
 interface SowTableProps {

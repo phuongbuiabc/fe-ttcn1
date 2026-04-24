@@ -3,7 +3,7 @@
 import React from 'react';
 import { Trash2, Edit, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/utils/utils';
 import { Supply } from '@/shared/types';
 
 interface InventoryTableProps {

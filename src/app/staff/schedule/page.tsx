@@ -24,7 +24,7 @@ import {
   Phone,
   LayoutDashboard
 } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { scheduleService } from "@/modules/staff/api/schedule.service";
 

@@ -19,7 +19,7 @@ import {
   MoreVertical,
   History
 } from "lucide-react";
-import { cn } from "../../../shared/lib/utils";
+import { cn } from "../../../shared/utils/utils";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { 

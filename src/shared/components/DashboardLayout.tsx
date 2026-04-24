@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/shared/components/AuthProvider";
 import { Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

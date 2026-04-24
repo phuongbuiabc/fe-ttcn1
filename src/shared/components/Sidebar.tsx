@@ -28,7 +28,7 @@ import {
   ArrowDownLeft,
   ArrowUpRight
 } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 const navItems = [

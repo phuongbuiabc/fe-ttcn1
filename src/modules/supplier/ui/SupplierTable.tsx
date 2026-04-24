@@ -4,7 +4,7 @@ import React from 'react';
 import { Edit, Trash2, Truck, Phone, Mail, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Supplier } from '@/shared/types';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/utils/utils';
 
 interface SupplierTableProps {
   suppliers: Supplier[];

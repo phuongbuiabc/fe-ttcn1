@@ -26,10 +26,12 @@ export class ApiClient {
     };
   }
 
+  // ===== REFRESH TOKEN =====
   private async refreshToken(): Promise<string> {
     const refreshToken = tokenStorage.getRefreshToken();
 
     if (!refreshToken) {
+      console.error('Missing refresh token');
       throw new Error('Missing refresh token');
     }
 
@@ -41,25 +43,21 @@ export class ApiClient {
 
     const data = await res.json().catch(() => ({}));
 
-    console.log('REFRESH RESPONSE:', data);
-
     if (!res.ok || !data?.data?.accessToken) {
       throw new Error('Refresh token failed');
     }
 
-    // ✅ GIỮ refreshToken cũ nếu BE không trả
     const newAccessToken = data.data.accessToken;
-    const newRefreshToken =
-      data.data.refreshToken || refreshToken;
 
-    tokenStorage.setTokens(newAccessToken, newRefreshToken);
+    tokenStorage.setTokens(newAccessToken, refreshToken);
 
     return newAccessToken;
   }
 
+  // ===== MAIN REQUEST =====
   public async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit & { _retry?: boolean } = {}
   ): Promise<T> {
     const baseUrl = this.getBaseUrl();
     const url = `${baseUrl}${endpoint}`;
@@ -67,12 +65,13 @@ export class ApiClient {
     let response = await fetch(url, {
       ...options,
       headers: {
-        ...this.getHeaders(),
         ...options.headers,
+        ...this.getHeaders(),
       },
     });
 
-    if (response.status === 401) {
+    // ===== HANDLE 401 =====
+    if (response.status === 401 && !options._retry) {
       try {
         if (!this.refreshPromise) {
           this.refreshPromise = this.refreshToken().finally(() => {
@@ -82,12 +81,12 @@ export class ApiClient {
 
         const newToken = await this.refreshPromise;
 
-        // retry request
+        // ===== RETRY REQUEST =====
         response = await fetch(url, {
           ...options,
           headers: {
-            ...this.getHeaders(),
             ...options.headers,
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${newToken}`,
           },
         });
@@ -116,6 +115,7 @@ export class ApiClient {
     return data as T;
   }
 
+  // ===== METHODS =====
   public get<T>(endpoint: string) {
     return this.request<T>(endpoint, { method: 'GET' });
   }

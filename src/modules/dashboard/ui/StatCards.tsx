@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { TrendingUp, Venus, Mars, Baby, Stethoscope, Package, AlertCircle } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/utils/utils';
 
 const stats = [
   { 

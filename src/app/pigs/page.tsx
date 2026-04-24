@@ -16,6 +16,8 @@ import {
   CreatePigRequest,
 } from '@/modules/pig/model/pig.model';
 import { ActionType } from '@/modules/pig/constants/action-confirm';
+import { usePathname } from 'next/navigation';
+import { getPageTitle } from '@/shared/utils/getPageTitle';
 
 interface ConfirmModalState {
   isOpen: boolean;
@@ -43,6 +45,9 @@ export default function PigPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const pathname = usePathname();
+  const title = getPageTitle(pathname);
 
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>({
     isOpen: false,
@@ -104,7 +109,7 @@ export default function PigPage() {
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-extrabold uppercase">
-          Quản lý đàn lợn
+          {title}
         </h1>
 
         <div className="flex gap-2">

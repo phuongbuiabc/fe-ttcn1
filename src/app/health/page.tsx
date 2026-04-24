@@ -28,7 +28,7 @@ import {
   Activity
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 // Feature Components
 import { TreatmentFormModal } from "@/modules/health/ui/TreatmentFormModal";

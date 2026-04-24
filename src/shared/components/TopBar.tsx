@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { useAuth } from "@/shared/components/AuthProvider";
 import { usePathname, useRouter } from "next/navigation";
 import { useModuleTabs } from "@/shared/hooks/useModuleTabs";

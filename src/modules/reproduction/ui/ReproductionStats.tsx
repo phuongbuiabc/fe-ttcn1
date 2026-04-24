@@ -7,7 +7,7 @@ import {
   Activity,
   BarChart3
 } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { ReproductionStats as StatsType } from "@/shared/types";
 
 interface ReproductionStatsProps {

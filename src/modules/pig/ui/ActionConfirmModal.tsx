@@ -3,7 +3,7 @@
 import React from 'react';
 import { AlertTriangle, ShoppingCart, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/utils/utils';
 
 import {
   ACTION_CONFIRM_CONFIG,

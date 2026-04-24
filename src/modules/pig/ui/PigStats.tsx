@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { PigResponse } from '../model/pig.model';
 import { PawPrint, CheckCircle, DollarSign, Skull } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/utils/utils';
 
 interface PigStatsProps {
   pigs: PigResponse[];

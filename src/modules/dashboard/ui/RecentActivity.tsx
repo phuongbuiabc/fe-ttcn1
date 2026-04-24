@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { PlusCircle, MoveDown, Package, Stethoscope } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/utils/utils';
 
 const recentActivities = [
   { event: "Đã thêm lô mới", desc: "250 lợn con - B-129", time: "2h", icon: PlusCircle, iconColor: "text-emerald-600", bgColor: "bg-emerald-50" },

@@ -12,7 +12,7 @@ import {
   Trash2, 
   Download,
 } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { Supplier } from "@/modules/supplier/model/supplier.model";
 import { supplierService } from "@/modules/supplier/api/supplier.service";

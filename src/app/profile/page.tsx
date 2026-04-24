@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 export default function ProfilePage() {
   const stats = [

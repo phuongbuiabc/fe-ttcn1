@@ -25,19 +25,19 @@ export function useAuthLogic() {
 
   const login = async (credentials: any) => {
     const res = await authService.login(credentials);
+    const oldRefreshToken = tokenStorage.getRefreshToken();
 
     if (!res.success) {
       throw new Error(res.message);
     }
 
-    // ✅ đảm bảo có refreshToken
     if (!res.data.refreshToken) {
       throw new Error('No refresh token returned from server');
     }
 
     tokenStorage.setTokens(
       res.data.accessToken,
-      res.data.refreshToken
+      oldRefreshToken!
     );
 
     setUser(res.data.user);

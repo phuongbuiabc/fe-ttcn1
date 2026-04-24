@@ -3,7 +3,7 @@
 import React from 'react';
 import { Eye, Edit, Trash2, Home } from 'lucide-react';
 import { motion } from 'motion/react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/utils/utils';
 
 interface Barn {
   id: string;

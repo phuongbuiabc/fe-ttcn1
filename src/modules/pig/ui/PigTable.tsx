@@ -3,7 +3,7 @@
 import React from 'react';
 import { PigResponse } from '@/modules/pig/model/pig.model';
 import { Eye, Edit, Trash2 } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/utils/utils';
 
 interface PigTableProps {
   pigs: PigResponse[];

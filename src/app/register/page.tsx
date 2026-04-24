@@ -16,7 +16,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { motion } from "motion/react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { authService as authApi } from "@/modules/auth/api/auth.service";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/shared/components/AuthProvider";

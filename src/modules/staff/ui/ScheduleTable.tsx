@@ -6,7 +6,7 @@ import {
   Eye
 } from "lucide-react";
 import { motion } from "motion/react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 interface ScheduleTableProps {
   schedules: any[];
