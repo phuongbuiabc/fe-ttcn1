@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/shared/lib/utils";
-import { 
-  BarChart, 
-  Bar, 
+import {
+  BarChart,
+  Bar,
   ResponsiveContainer,
   Cell
 } from "recharts";

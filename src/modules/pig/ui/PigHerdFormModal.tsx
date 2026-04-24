@@ -47,24 +47,24 @@ export function LitterFormModal({
                 <input 
                   type="text" required 
                   value={litterFormData.id} 
-                  onChange={(e) => setLitterFormData({...litterFormData, id: e.target.value})} 
+                  onChange={(e) => setLitterFormData({...litterFormData, id: e.target.value})}
                   className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 outline-none" 
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Mã lợn mẹ</label>
-                <input 
-                  type="text" required 
-                  value={litterFormData.motherId} 
-                  onChange={(e) => setLitterFormData({...litterFormData, motherId: e.target.value})} 
+                <input
+                  type="text" required
+                  value={litterFormData.motherId}
+                  onChange={(e) => setLitterFormData({...litterFormData, motherId: e.target.value})}
                   className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold opacity-70" 
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Số lượng con</label>
                 <input 
-                  type="number" required 
-                  value={litterFormData.count} 
+                  type="number" required
+                  value={litterFormData.count}
                   onChange={(e) => setLitterFormData({...litterFormData, count: parseInt(e.target.value) || 0})} 
                   className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold" 
                 />
@@ -72,17 +72,17 @@ export function LitterFormModal({
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Chuồng nuôi</label>
                 <input 
-                  type="text" required 
-                  value={litterFormData.pen} 
+                  type="text" required
+                  value={litterFormData.pen}
                   onChange={(e) => setLitterFormData({...litterFormData, pen: e.target.value})} 
                   className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold" 
                 />
               </div>
               <div className="col-span-2 space-y-1">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Trạng thái đàn</label>
-                <select 
+                <select
                   className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold outline-none" 
-                  value={litterFormData.status} 
+                  value={litterFormData.status}
                   onChange={(e) => setLitterFormData({...litterFormData, status: e.target.value})}
                 >
                   <option>Khỏe mạnh</option>

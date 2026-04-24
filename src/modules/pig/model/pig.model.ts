@@ -1,4 +1,5 @@
-import { PigType, PigStatus } from './pig.enum';
+import { Pig } from '@/shared/types';
+import { PigType, PigStatus } from '@/shared/enums/pig.enum';
 
 export interface CreatePigRequest {
   earTag?: string;

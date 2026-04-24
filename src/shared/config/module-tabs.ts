@@ -18,10 +18,22 @@ const pigTabs: ModuleTab[] = [
   { name: "Đề xuất loại", href: "/pigs/culling-proposals", title: "Danh mục đề xuất" },
 ];
 
+const reproductionTabs: ModuleTab[] = [
+  { name: "Phối giống", href: "/reproductions", title: "Quản lý sinh sản" },
+  { name: "Thai kỳ", href: "/reproductions/reproduction-cycles", title: "Quản lý thai kỳ" },
+  { name: "Phối giống", href: "/reproductions/mattings", title: "Quản lý phối giống" },
+];
+
 const healthTabs: ModuleTab[] = [
   { name: "Tăng trưởng", href: "/health/growth-tracking", title: "Theo dõi tăng trưởng" },
   { name: "Bệnh", href: "/health/diseases", title: "Danh mục bệnh" },
   { name: "Điều trị", href: "/health/treatments", title: "Theo dõi điều trị" },
+];
+
+const penTabs: ModuleTab[] = [
+  { name: "Danh sách chuồng", href: "/pens", title: "Danh mục chuồng" },
+  { name: "Khu vực", href: "/pens/areas", title: "Danh mục khu vực" },
+  { name: "Lịch sử chuồng", href: "/pens/history", title: "Lịch sử chuồng" },
 ];
 
 const tradingTabs: ModuleTab[] = [
@@ -42,6 +54,11 @@ export const modules: ModuleConfig[] = [
     tabs: pigTabs,
   },
   {
+    name: "Sinh sản",
+    basePath: "/reproductions",
+    tabs: reproductionTabs,
+  },
+  {
     name: "Mua bán",
     basePath: "/trading",
     tabs: tradingTabs,
@@ -59,6 +76,6 @@ export const modules: ModuleConfig[] = [
   {
     name: "Chuồng nuôi",
     basePath: "/pens",
-    tabs: [],
+    tabs: penTabs,
   },
 ];

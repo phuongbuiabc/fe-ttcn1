@@ -34,7 +34,7 @@ import { motion, AnimatePresence } from "motion/react";
 const navItems = [
   { name: "Bảng điều khiển", icon: LayoutDashboard, href: "/" },
   { name: "Quản lý Đàn lợn", icon: PawPrint, href: "/pigs" },
-  { name: "Sinh sản", icon: Baby, href: "/reproduction" },
+  { name: "Sinh sản", icon: Baby, href: "/reproductions" },
   { name: "Sức khỏe", icon: Stethoscope, href: "/health" },
   { name: "Chuồng nuôi", icon: Warehouse, href: "/pens" },
   { name: "Vật tư", icon: Database, href: "/inventory" },
@@ -168,7 +168,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
               className={cn(
                 "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 relative overflow-hidden",
                 isActive 
-                  ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-900/40" 
+                  ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-900/40"
                   : "text-slate-400 hover:bg-white/5 hover:text-white"
               )}
             >

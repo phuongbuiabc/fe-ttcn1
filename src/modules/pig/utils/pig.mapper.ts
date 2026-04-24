@@ -1,16 +1,16 @@
-import { PigType, PigStatus } from '../model/pig.enum';
+import { PigType, PigStatus } from '@/shared/enums/pig.enum';
 
-export const pigTypeLabel: Record<PigType, string> = {
-  NAI: 'Lợn nái',
-  NOC: 'Lợn nọc',
-  THIT: 'Lợn thịt',
-};
+export const PIG_TYPE_OPTIONS = [
+  { value: PigType.NAI, label: 'Nái' },
+  { value: PigType.NOC, label: 'Nọc' },
+  { value: PigType.THIT, label: 'Thịt' },
+];
 
-export const pigStatusLabel: Record<PigStatus, string> = {
-  ACTIVE: 'Đang nuôi',
-  SOLD: 'Đã bán',
-  DEAD: 'Đã chết',
-};
+export const PIG_STATUS_OPTIONS = [
+  { value: PigStatus.ACTIVE, label: 'Khỏe mạnh' },
+  { value: PigStatus.SOLD, label: 'Đã bán' },
+  { value: PigStatus.DEAD, label: 'Tiêu hủy' },
+];
 
 export const pigStatusColor: Record<PigStatus, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-600',

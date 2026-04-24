@@ -5,11 +5,12 @@ import { PlusCircle, RefreshCw, Search } from 'lucide-react';
 import { useEffect } from 'react';
 
 import { usePig } from '@/modules/pig/hooks/usePig';
+import { useBreed } from '@/modules/breed/hooks/useBreed';
 import { PigTable } from '@/modules/pig/ui/PigTable';
 import { PigStats } from '@/modules/pig/ui/PigStats';
 import { PigFormModal } from '@/modules/pig/ui/PigFormModal';
 import { ActionConfirmModal } from '@/modules/pig/ui/ActionConfirmModal';
-
+import {PigType, PigStatus} from "@/shared/enums/pig.enum";
 import {
   PigResponse,
   CreatePigRequest,
@@ -23,7 +24,6 @@ interface ConfirmModalState {
   targetName?: string;
 }
 
-
 export default function PigPage() {
   const {
     pigs,
@@ -33,6 +33,12 @@ export default function PigPage() {
     updatePig,
     deletePig,
   } = usePig();
+
+  const {
+    options: breedOptions,
+    loading: isLoadingBreeds,
+    fetchBreeds,
+  } = useBreed();
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -45,8 +51,8 @@ export default function PigPage() {
   const [editingPig, setEditingPig] = useState<PigResponse | null>(null);
 
   const [formData, setFormData] = useState<CreatePigRequest>({
-    type: 'NAI',
-    status: 'ACTIVE',
+    type: PigType.NAI,
+    status: PigStatus.ACTIVE,
   });
 
   const filteredPigs = useMemo(() => {
@@ -61,15 +67,16 @@ export default function PigPage() {
   const openAddModal = () => {
     setEditingPig(null);
     setFormData({
-      type: 'NAI',
-      status: 'ACTIVE',
+      type: PigType.NAI,
+      status: PigStatus.ACTIVE,
     });
     setIsModalOpen(true);
   };
 
   useEffect(() => {
     fetchPigs();
-  }, [fetchPigs]);
+    fetchBreeds();
+  }, [fetchPigs, fetchBreeds]);
 
 
   const handleSave = async (data: CreatePigRequest) => {
@@ -177,6 +184,8 @@ export default function PigPage() {
         editingPig={editingPig}
         formData={formData}
         setFormData={setFormData}
+        breedOptions={breedOptions}
+        isLoadingBreeds={isLoadingBreeds}
       />
 
       {/* CONFIRM MODAL */}
