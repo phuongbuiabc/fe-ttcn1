@@ -20,6 +20,7 @@ import { useAuth } from "@/shared/components/AuthProvider";
 import { usePathname, useRouter } from "next/navigation";
 import { useModuleTabs } from "@/shared/hooks/useModuleTabs";
 
+
 const notifications = [
   {
     id: 1,
@@ -66,6 +67,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
   const currentModule = useModuleTabs();
   const tabs = currentModule?.tabs || [];
 
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -99,7 +101,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
 
         {/* TABS */}
         {tabs.length > 0 && (
-          <div className="flex items-center gap-1 ml-4">
+          <div className="flex items-center gap-1 ml-2">
             {tabs.map((tab) => {
               const active = pathname === tab.href;
 
@@ -108,9 +110,9 @@ export function TopBar({ onMenuClick }: TopBarProps) {
                   key={tab.href}
                   onClick={() => router.push(tab.href)}
                   className={cn(
-                    "px-3 py-1 rounded-lg text-[11px] font-bold transition",
+                    "px-3 py-1 rounded-lg text-[11px] font-bold transition whitespace-nowrap",
                     active
-                      ? "bg-emerald-600 text-white"
+                      ? "bg-emerald-600 text-white shadow-sm"
                       : "text-slate-500 hover:bg-slate-100"
                   )}
                 >
@@ -120,7 +122,10 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             })}
           </div>
         )}
+
       </div>
+
+
       
       <div className="flex items-center gap-1.5 md:gap-2">
         <div className="relative" ref={notificationRef}>

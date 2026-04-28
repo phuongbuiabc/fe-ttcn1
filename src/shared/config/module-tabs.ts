@@ -46,6 +46,12 @@ const staffTabs: ModuleTab[] = [
   { name: "Lịch làm việc", href: "/staff/schedule" },
 ];
 
+const inventoryTabs: ModuleTab[] = [
+  { name: "Kho hàng", href: "/inventory" },
+  { name: "Hao hụt", href: "/inventory/losses" },
+];
+
+
 // ===== MODULE CONFIG =====
 export const modules: ModuleConfig[] = [
   {
@@ -77,5 +83,10 @@ export const modules: ModuleConfig[] = [
     name: "Chuồng nuôi",
     basePath: "/pens",
     tabs: penTabs,
+  },
+  {
+    name: "Kho hàng",
+    basePath: "/inventory",
+    tabs: inventoryTabs,
   },
 ];

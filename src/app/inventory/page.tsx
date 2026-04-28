@@ -13,7 +13,9 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/utils/utils";
+import { usePathname } from "next/navigation";
 import { Supply, SupplyLoss } from "@/modules/inventory/model/inventory.model";
+
 import { inventoryService } from "@/modules/inventory/api/inventory.service";
 
 import { SupplyFormModal } from "@/modules/inventory/ui/SupplyFormModal";
@@ -23,12 +25,18 @@ import { AdjustmentModal } from "@/modules/inventory/ui/AdjustmentModal";
 import { InventoryTable } from "@/modules/inventory/ui/InventoryTable";
 
 export default function InventoryPage() {
+  const pathname = usePathname();
+  
   const [supplies, setSuppliers] = useState<Supply[]>([]);
   const [lossHistory, setLossHistory] = useState<SupplyLoss[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"inventory" | "losses">("inventory");
+  
+  const activeTab = pathname.endsWith("/losses") ? "losses" : "inventory";
   const [searchTerm, setSearchTerm] = useState("");
+
+  
   const [activeType, setActiveType] = useState("Tất cả");
+
 
   // Modals Status
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -124,22 +132,24 @@ export default function InventoryPage() {
         </button>
       </div>
 
-      {/* Tabs & Controls */}
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <div className="flex bg-slate-100 p-1 rounded-xl w-full lg:w-auto">
-          <button onClick={() => setActiveTab("inventory")} className={cn("flex-1 lg:flex-none px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all", activeTab === "inventory" ? "bg-white text-[#00a67d] shadow-sm" : "text-slate-400 hover:text-slate-600")}>Kho hàng</button>
-          <button onClick={() => setActiveTab("losses")} className={cn("flex-1 lg:flex-none px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all", activeTab === "losses" ? "bg-white text-rose-500 shadow-sm" : "text-slate-400 hover:text-slate-600")}>Hao hụt</button>
-        </div>
-        
+      {/* Search Controls */}
+      <div className="flex flex-col lg:flex-row justify-start items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
         <div className="flex items-center gap-4 w-full lg:w-auto">
           <div className="relative flex-1 lg:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 shadow-inner" size={16} />
-            <input type="text" placeholder="Tìm tên vật tư, mã kho..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-6 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#00a67d]/10" />
+            <input 
+              type="text" 
+              placeholder="Tìm tên vật tư, mã kho..." 
+              value={searchTerm} 
+              onChange={e => setSearchTerm(e.target.value)} 
+              className="w-full pl-10 pr-6 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#00a67d]/10" 
+            />
           </div>
         </div>
       </div>
 
       {/* Main Content */}
+
       <div className="space-y-6">
         {activeTab === "inventory" ? (
           <div className="bg-white rounded-[1.75rem] border border-slate-100 shadow-sm overflow-hidden">
