@@ -26,10 +26,10 @@ export function LitterFormModal({
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-        <motion.div 
-          initial={{ scale: 0.9, opacity: 0 }} 
-          animate={{ scale: 1, opacity: 1 }} 
-          exit={{ scale: 0.9, opacity: 0 }} 
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
           className="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col"
         >
           <div className="p-8 border-b border-slate-50 flex items-center justify-between">
@@ -94,13 +94,13 @@ export function LitterFormModal({
             <div className="pt-6 flex gap-4">
               <button 
                 type="button" 
-                onClick={onClose} 
+                onClick={onClose}
                 className="flex-1 py-4 bg-slate-100 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest"
               >
                 Hủy bỏ
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="flex-[2] py-4 bg-[#00a67d] text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-emerald-900/20 active:scale-95 transition-all"
               >
                 Lưu thông tin đàn

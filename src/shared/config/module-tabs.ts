@@ -13,7 +13,7 @@ export type ModuleConfig = {
 // ===== DEFINE TABS =====
 const pigTabs: ModuleTab[] = [
   { name: "Lợn", href: "/pigs", title: "Danh mục lợn" },
-  { name: "Đàn con", href: "/pigs/pig-herds", title: "Danh mục đàn con" },
+  { name: "Đàn con", href: "/pigs/piglet-herds", title: "Danh mục đàn con" },
   { name: "Giống", href: "/pigs/breeds", title: "Danh mục giống" },
   { name: "Đề xuất loại", href: "/pigs/culling-proposals", title: "Danh mục đề xuất" },
 ];
@@ -31,7 +31,7 @@ const healthTabs: ModuleTab[] = [
 ];
 
 const penTabs: ModuleTab[] = [
-  { name: "Danh sách chuồng", href: "/pens", title: "Danh mục chuồng" },
+  { name: "Chuồng", href: "/pens", title: "Danh mục chuồng" },
   { name: "Khu vực", href: "/pens/areas", title: "Danh mục khu vực" },
   { name: "Lịch sử chuồng", href: "/pens/history", title: "Lịch sử chuồng" },
 ];

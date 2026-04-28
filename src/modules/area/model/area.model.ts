@@ -1,6 +1,5 @@
-export interface Area {
+export interface AreaResponse {
   id: string;
-  areaCode: string;
   name: string;
   description?: string;
   createdAt?: string;

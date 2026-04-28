@@ -1,0 +1,12 @@
+export enum PenStatus {
+  IN_USE = 'IN_USE',
+  EMPTY = 'EMPTY',
+  MAINTENANCE = 'MAINTENANCE',
+}
+
+export enum PenType {
+  BREEDING = 'BREEDING',
+  FARROWING = 'FARROWING',
+  GROWING = 'GROWING',
+  FINISHING = 'FINISHING'
+}

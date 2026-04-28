@@ -10,32 +10,37 @@ import {
 export function usePig() {
   const [pigs, setPigs] = useState<PigResponse[]>([]);
   const [pigDetail, setPigDetail] = useState<PigDetailResponse | null>(null);
-  const [loading, setLoading] = useState(false);
 
+  const [loadingList, setLoadingList] = useState(false);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+
+  // ===== FETCH LIST =====
   const fetchPigs = useCallback(async () => {
-    setLoading(true);
+    setLoadingList(true);
     try {
       const res = await pigService.getAll();
       if (res.success) {
-        setPigs(res.data);
+        setPigs(res.data || []);
       }
     } finally {
-      setLoading(false);
+      setLoadingList(false);
     }
   }, []);
 
+  // ===== FETCH DETAIL=====
   const fetchPigDetail = useCallback(async (id: string) => {
-    setLoading(true);
+    setLoadingDetail(true);
     try {
-      const res = await pigService.getById(id);
+      const res = await pigService.getPigDetail(id);
       if (res.success) {
         setPigDetail(res.data);
       }
     } finally {
-      setLoading(false);
+      setLoadingDetail(false);
     }
   }, []);
 
+  // ===== CREATE =====
   const createPig = async (data: CreatePigRequest) => {
     const res = await pigService.create(data);
     if (res.success) {
@@ -44,6 +49,7 @@ export function usePig() {
     return res;
   };
 
+  // ===== UPDATE =====
   const updatePig = async (id: string, data: UpdatePigRequest) => {
     const res = await pigService.update(id, data);
     if (res.success) {
@@ -52,10 +58,11 @@ export function usePig() {
     return res;
   };
 
+  // ===== DELETE =====
   const deletePig = async (id: string) => {
     const res = await pigService.delete(id);
     if (res.success) {
-      setPigs(prev => prev.filter(p => p.id !== id));
+      setPigs((prev) => prev.filter((p) => p.id !== id));
     }
     return res;
   };
@@ -63,9 +70,13 @@ export function usePig() {
   return {
     pigs,
     pigDetail,
-    loading,
+
+    loadingList,
+    loadingDetail,
+
     fetchPigs,
     fetchPigDetail,
+
     createPig,
     updatePig,
     deletePig,

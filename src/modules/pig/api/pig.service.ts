@@ -18,7 +18,12 @@ export const pigService = {
     apiClient.get<ApiResponse<PigResponse[]>>('/api/v1/pigs'),
 
   getById: (id: string) =>
-    apiClient.get<ApiResponse<PigDetailResponse>>(`/api/v1/pigs/${id}`),
+    apiClient.get<ApiResponse<PigResponse>>(`/api/v1/pigs/${id}`),
+
+  getPigDetail: (id: string) =>
+    apiClient.get<ApiResponse<PigDetailResponse>>(
+      `/api/v1/pigs/${id}/detail`
+    ),
 
   delete: (id: string) =>
     apiClient.delete<ApiResponse<any>>(`/api/v1/pigs/${id}`),

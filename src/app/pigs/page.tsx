@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PlusCircle, RefreshCw, Search } from 'lucide-react';
-import { useEffect } from 'react';
 
 import { usePig } from '@/modules/pig/hooks/usePig';
 import { useBreed } from '@/modules/breed/hooks/useBreed';
@@ -10,11 +9,14 @@ import { PigTable } from '@/modules/pig/ui/PigTable';
 import { PigStats } from '@/modules/pig/ui/PigStats';
 import { PigFormModal } from '@/modules/pig/ui/PigFormModal';
 import { ActionConfirmModal } from '@/modules/pig/ui/ActionConfirmModal';
-import {PigType, PigStatus} from "@/shared/enums/pig.enum";
+import { PigDetail } from '@/modules/pig/ui/PigDetail';
+
+import { PigType, PigStatus } from '@/shared/enums/pig.enum';
 import {
   PigResponse,
   CreatePigRequest,
 } from '@/modules/pig/model/pig.model';
+
 import { ActionType } from '@/modules/pig/constants/action-confirm';
 import { usePathname } from 'next/navigation';
 import { getPageTitle } from '@/shared/utils/getPageTitle';
@@ -29,8 +31,11 @@ interface ConfirmModalState {
 export default function PigPage() {
   const {
     pigs,
-    loading,
+    pigDetail,
+    loadingList,
+    loadingDetail,
     fetchPigs,
+    fetchPigDetail,
     createPig,
     updatePig,
     deletePig,
@@ -42,23 +47,30 @@ export default function PigPage() {
     fetchBreeds,
   } = useBreed();
 
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const pathname = usePathname();
   const title = getPageTitle(pathname);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [editingPig, setEditingPig] = useState<PigResponse | null>(null);
+  const [selectedPigId, setSelectedPigId] = useState<string | null>(null);
+  const [isDetailMode, setIsDetailMode] = useState(false);
 
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>({
     isOpen: false,
   });
 
-  const [editingPig, setEditingPig] = useState<PigResponse | null>(null);
-
   const [formData, setFormData] = useState<CreatePigRequest>({
     type: PigType.NAI,
     status: PigStatus.ACTIVE,
   });
+
+  // ✅ FIX: chỉ load 1 lần (không phụ thuộc function)
+  useEffect(() => {
+    fetchPigs();
+    fetchBreeds();
+  }, []);
 
   const filteredPigs = useMemo(() => {
     return pigs.filter((p) =>
@@ -71,18 +83,15 @@ export default function PigPage() {
 
   const openAddModal = () => {
     setEditingPig(null);
+    setIsDetailMode(false);
+
     setFormData({
       type: PigType.NAI,
       status: PigStatus.ACTIVE,
     });
+
     setIsModalOpen(true);
   };
-
-  useEffect(() => {
-    fetchPigs();
-    fetchBreeds();
-  }, [fetchPigs, fetchBreeds]);
-
 
   const handleSave = async (data: CreatePigRequest) => {
     if (editingPig) {
@@ -92,14 +101,12 @@ export default function PigPage() {
     }
 
     setIsModalOpen(false);
-    fetchPigs();
   };
 
   const handleDelete = async () => {
     if (!confirmModal.targetId) return;
 
     await deletePig(confirmModal.targetId);
-
     setConfirmModal({ isOpen: false });
   };
 
@@ -108,16 +115,14 @@ export default function PigPage() {
 
       {/* HEADER */}
       <div className="flex justify-between items-center">
-        <h1 className="text-lg font-extrabold uppercase">
-          {title}
-        </h1>
+        <h1 className="text-lg font-extrabold uppercase">{title}</h1>
 
         <div className="flex gap-2">
           <button
             onClick={fetchPigs}
             className="px-4 py-2 bg-white rounded-xl text-xs flex items-center gap-2"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={loadingList ? 'animate-spin' : ''} />
             Làm mới
           </button>
 
@@ -147,41 +152,63 @@ export default function PigPage() {
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="bg-white rounded-xl overflow-hidden">
-        <PigTable
-          pigs={filteredPigs}
-          loading={loading}
-          onView={() => {}}
-          onEdit={(pig) => {
-            setEditingPig(pig);
+      {/* MAIN */}
+      <div className={`grid gap-4 ${isDetailMode ? 'grid-cols-1 lg:grid-cols-10' : 'grid-cols-1'}`}>
 
-            setFormData({
-              earTag: pig.earTag,
-              birthWeight: pig.birthWeight,
-              birthDate: pig.birthDate,
-              type: pig.type,
-              origin: pig.origin,
-              species: pig.species,
-              nippleCount: pig.nippleCount,
-              herdEntryDate: pig.herdEntryDate,
-              status: pig.status,
-            });
+        {/* TABLE */}
+        <div className={isDetailMode ? 'bg-white rounded-xl overflow-hidden lg:col-span-6' : 'bg-white rounded-xl overflow-hidden'}>
+          <PigTable
+            pigs={filteredPigs}
+            loading={loadingList}
+            onView={async (pig) => {
+              if (pig.id === selectedPigId && isDetailMode) return;
 
-            setIsModalOpen(true);
-          }}
-          onDelete={(id) =>
-            setConfirmModal({
-              isOpen: true,
-              type: 'delete-pig',
-              targetId: id,
-              targetName: id,
-            })
-          }
-        />
+              setSelectedPigId(pig.id);
+              setIsDetailMode(true);
+              await fetchPigDetail(pig.id);
+            }}
+            onEdit={(pig) => {
+              setEditingPig(pig);
+              setIsDetailMode(false);
+
+              setFormData({
+                earTag: pig.earTag,
+                birthWeight: pig.birthWeight,
+                birthDate: pig.birthDate,
+                type: pig.type,
+                origin: pig.origin,
+                species: pig.species,
+                nippleCount: pig.nippleCount,
+                herdEntryDate: pig.herdEntryDate,
+                status: pig.status,
+              });
+
+              setIsModalOpen(true);
+            }}
+            onDelete={(id) =>
+              setConfirmModal({
+                isOpen: true,
+                type: 'delete-pig',
+                targetId: id,
+                targetName: id,
+              })
+            }
+          />
+        </div>
+
+        {/* DETAIL */}
+        {isDetailMode && (
+            <div className="bg-white rounded-xl p-4 overflow-y-auto max-h-[80vh] lg:col-span-4">
+            <PigDetail
+              data={pigDetail}
+              loading={loadingDetail}
+              onClose={() => setIsDetailMode(false)}
+            />
+          </div>
+        )}
       </div>
 
-      {/* FORM MODAL */}
+      {/* MODAL */}
       <PigFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -193,7 +220,7 @@ export default function PigPage() {
         isLoadingBreeds={isLoadingBreeds}
       />
 
-      {/* CONFIRM MODAL */}
+      {/* CONFIRM */}
       {confirmModal.type && (
         <ActionConfirmModal
           isOpen={confirmModal.isOpen}
