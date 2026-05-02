@@ -4,11 +4,7 @@ import { WorkSchedule, CreateScheduleRequest } from '../model/staff.model';
 
 export const scheduleService = {
 	getSchedules: (params?: any) => 
-		apiClient.get<ApiResponse<WorkSchedule[]>>('/api/v1/work-schedules', { 
-			// Query params handling would go here if needed, 
-			// but standard fetch needs it in the URL.
-			// For now we'll just handle the URL directly if params are provided.
-		}),
+		apiClient.get<ApiResponse<WorkSchedule[]>>('/api/v1/work-schedules', { params }),
     
 	getScheduleById: (id: string) => 
 		apiClient.get<ApiResponse<WorkSchedule>>(`/api/v1/work-schedules/${id}`),

@@ -3,12 +3,16 @@ import { pigService } from '../api/pig.service';
 import {
   PigResponse,
   PigDetailResponse,
+  SowResponse,
+  PigCurrentResponse,
   CreatePigRequest,
   UpdatePigRequest,
 } from '../model/pig.model';
 
 export function usePig() {
   const [pigs, setPigs] = useState<PigResponse[]>([]);
+  const [sows, setSows] = useState<SowResponse[]>([]);
+  const [pigCurrent, setPigCurrent] = useState<PigCurrentResponse[]>([]);
   const [pigDetail, setPigDetail] = useState<PigDetailResponse | null>(null);
 
   const [loadingList, setLoadingList] = useState(false);
@@ -34,11 +38,39 @@ export function usePig() {
       const res = await pigService.getPigDetail(id);
       if (res.success) {
         setPigDetail(res.data);
+        return res.data;
       }
+      return null;
     } finally {
       setLoadingDetail(false);
     }
   }, []);
+
+  const fetchSows = useCallback(async () => {
+    setLoadingList(true);
+    try {
+      const res = await pigService.getSow();
+      if (res.success) {
+        setSows(res.data || []);
+      }
+    } finally {
+      setLoadingList(false);
+    }
+  }, []);
+
+  const fetchPigCurrent = useCallback(async () => {
+    setLoadingList(true);
+    try {
+      const res = await pigService.getPigCurrent();
+      if (res.success) {
+        setPigCurrent(res.data || []);
+      }
+    } finally {
+      setLoadingList(false);
+    }
+  }, []);
+
+
 
   // ===== CREATE =====
   const createPig = async (data: CreatePigRequest) => {
@@ -69,13 +101,16 @@ export function usePig() {
 
   return {
     pigs,
+    sows,
     pigDetail,
-
+    pigCurrent,
     loadingList,
     loadingDetail,
 
     fetchPigs,
+    fetchSows,
     fetchPigDetail,
+    fetchPigCurrent,
 
     createPig,
     updatePig,

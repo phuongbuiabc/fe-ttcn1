@@ -6,7 +6,7 @@ import { PlusCircle, RefreshCw } from 'lucide-react';
 import { useBreed } from '@/modules/breed/hooks/useBreed';
 import { BreedTable } from '@/modules/breed/ui/BreedTable';
 import { CreateBreedRequest } from '@/modules/breed/model/breed.model';
-import { BreedFormModal } from '@/modules/breed/ui/BreedFormCreate';
+import { BreedFormModal } from '@/modules/breed/ui/BreedForm';
 import { usePathname } from 'next/navigation';
 import { getPageTitle } from '@/shared/utils/getPageTitle';
 

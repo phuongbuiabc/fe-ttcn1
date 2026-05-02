@@ -9,7 +9,7 @@ import { DiseaseFormCreate } from '@/modules/disease/ui/DiseaseFormCreate';
 import { DiseaseFormUpdate } from '@/modules/disease/ui/DiseaseFormUpdate';
 import { usePathname } from 'next/navigation';
 import { getPageTitle } from '@/shared/utils/getPageTitle';
-import { useAuth } from '@/modules/auth/hooks/useAuth';
+import { useAuth } from '@/shared/components/AuthProvider';
 
 import {
   DiseaseResponse,

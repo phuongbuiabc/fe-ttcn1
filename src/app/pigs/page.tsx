@@ -1,8 +1,13 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { PlusCircle, RefreshCw, Search } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
+import { useArea } from '@/modules/area/hooks/useArea';
+import { penService } from '@/modules/pens/api/pen.service';
+import { usePen } from '@/modules/pens/hooks/usePen';
+import { usePenPig } from '@/modules/penpig/hooks/usePenpig';
 import { usePig } from '@/modules/pig/hooks/usePig';
 import { useBreed } from '@/modules/breed/hooks/useBreed';
 import { PigTable } from '@/modules/pig/ui/PigTable';
@@ -12,13 +17,10 @@ import { ActionConfirmModal } from '@/modules/pig/ui/ActionConfirmModal';
 import { PigDetail } from '@/modules/pig/ui/PigDetail';
 
 import { PigType, PigStatus } from '@/shared/enums/pig.enum';
-import {
-  PigResponse,
-  CreatePigRequest,
-} from '@/modules/pig/model/pig.model';
+import { PigResponse, CreatePigRequest } from '@/modules/pig/model/pig.model';
+import { CreatePenPigRequest } from '@/modules/penpig/model/penpig.model';
 
 import { ActionType } from '@/modules/pig/constants/action-confirm';
-import { usePathname } from 'next/navigation';
 import { getPageTitle } from '@/shared/utils/getPageTitle';
 
 interface ConfirmModalState {
@@ -27,6 +29,8 @@ interface ConfirmModalState {
   targetId?: string;
   targetName?: string;
 }
+
+const getToday = () => new Date().toISOString().slice(0, 10);
 
 export default function PigPage() {
   const {
@@ -41,63 +45,101 @@ export default function PigPage() {
     deletePig,
   } = usePig();
 
-  const {
-    options: breedOptions,
-    loading: isLoadingBreeds,
-    fetchBreeds,
-  } = useBreed();
+  const { options: breedOptions, loading: isLoadingBreeds, fetchBreeds } = useBreed();
+  const { areas, fetchAreas } = useArea();
+  const { pens, fetchPens } = usePen();
+  const { assignPig, loading: isAssigningPig } = usePenPig();
 
   const pathname = usePathname();
   const title = getPageTitle(pathname);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [editingPig, setEditingPig] = useState<PigResponse | null>(null);
   const [selectedPigId, setSelectedPigId] = useState<string | null>(null);
   const [isDetailMode, setIsDetailMode] = useState(false);
-
-  const [confirmModal, setConfirmModal] = useState<ConfirmModalState>({
-    isOpen: false,
-  });
+  const [penPigCountMap, setPenPigCountMap] = useState<Record<string, number>>({});
+  const [confirmModal, setConfirmModal] = useState<ConfirmModalState>({ isOpen: false });
 
   const [formData, setFormData] = useState<CreatePigRequest>({
     type: PigType.NAI,
     status: PigStatus.ACTIVE,
   });
 
-  // ✅ FIX: chỉ load 1 lần (không phụ thuộc function)
   useEffect(() => {
     fetchPigs();
     fetchBreeds();
-  }, []);
+    fetchAreas();
+    fetchPens();
+  }, [fetchPigs, fetchBreeds, fetchAreas, fetchPens]);
+
+  useEffect(() => {
+    const loadPenCounts = async () => {
+      const entries = await Promise.all(
+        pens.map(async (pen) => {
+          try {
+            const res = await penService.getDetail(pen.id);
+            return [pen.id, res.success ? res.data?.pigCount ?? 0 : 0] as const;
+          } catch {
+            return [pen.id, 0] as const;
+          }
+        })
+      );
+
+      setPenPigCountMap(Object.fromEntries(entries));
+    };
+
+    if (pens.length > 0) {
+      loadPenCounts();
+    } else {
+      setPenPigCountMap({});
+    }
+  }, [pens]);
 
   const filteredPigs = useMemo(() => {
-    return pigs.filter((p) =>
-      [p.pigCode, p.earTag, p.species, p.type]
+    return pigs.filter((pig) =>
+      [pig.pigCode, pig.earTag, pig.species, pig.type]
         .join(' ')
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
     );
   }, [pigs, searchTerm]);
 
+  const emptyPens = useMemo(() => {
+    return pens.filter((pen) => (penPigCountMap[pen.id] ?? 0) === 0);
+  }, [pens, penPigCountMap]);
+
   const openAddModal = () => {
     setEditingPig(null);
     setIsDetailMode(false);
-
     setFormData({
       type: PigType.NAI,
       status: PigStatus.ACTIVE,
+      herdEntryDate: getToday(),
     });
-
     setIsModalOpen(true);
   };
 
-  const handleSave = async (data: CreatePigRequest) => {
+  const handleSave = async (data: CreatePigRequest & { penId?: string }) => {
+    const { penId, ...pigData } = data;
+    const entryDate = pigData.herdEntryDate || getToday();
+
     if (editingPig) {
-      await updatePig(editingPig.id, data);
+      await updatePig(editingPig.id, pigData);
     } else {
-      await createPig(data);
+      const res = await createPig(pigData);
+      const createdPigId = res?.data?.id;
+
+      if (penId && createdPigId) {
+        const payload: CreatePenPigRequest = {
+          penId,
+          pigId: createdPigId,
+          entryDate,
+        };
+
+        await assignPig(payload);
+        await fetchPens();
+      }
     }
 
     setIsModalOpen(false);
@@ -112,8 +154,6 @@ export default function PigPage() {
 
   return (
     <div className="space-y-4 pb-20 bg-[#fbfcfd] min-h-screen -m-4 p-4">
-
-      {/* HEADER */}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-extrabold uppercase">{title}</h1>
 
@@ -136,10 +176,8 @@ export default function PigPage() {
         </div>
       </div>
 
-      {/* STATS */}
       <PigStats pigs={pigs} />
 
-      {/* SEARCH */}
       <div className="bg-white p-4 rounded-xl">
         <div className="relative max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2" size={14} />
@@ -152,10 +190,7 @@ export default function PigPage() {
         </div>
       </div>
 
-      {/* MAIN */}
       <div className={`grid gap-4 ${isDetailMode ? 'grid-cols-1 lg:grid-cols-10' : 'grid-cols-1'}`}>
-
-        {/* TABLE */}
         <div className={isDetailMode ? 'bg-white rounded-xl overflow-hidden lg:col-span-6' : 'bg-white rounded-xl overflow-hidden'}>
           <PigTable
             pigs={filteredPigs}
@@ -170,7 +205,6 @@ export default function PigPage() {
             onEdit={(pig) => {
               setEditingPig(pig);
               setIsDetailMode(false);
-
               setFormData({
                 earTag: pig.earTag,
                 birthWeight: pig.birthWeight,
@@ -182,7 +216,6 @@ export default function PigPage() {
                 herdEntryDate: pig.herdEntryDate,
                 status: pig.status,
               });
-
               setIsModalOpen(true);
             }}
             onDelete={(id) =>
@@ -196,9 +229,8 @@ export default function PigPage() {
           />
         </div>
 
-        {/* DETAIL */}
         {isDetailMode && (
-            <div className="bg-white rounded-xl p-4 overflow-y-auto max-h-[80vh] lg:col-span-4">
+          <div className="bg-white rounded-xl p-4 overflow-y-auto max-h-[80vh] lg:col-span-4">
             <PigDetail
               data={pigDetail}
               loading={loadingDetail}
@@ -208,7 +240,6 @@ export default function PigPage() {
         )}
       </div>
 
-      {/* MODAL */}
       <PigFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -218,9 +249,11 @@ export default function PigPage() {
         setFormData={setFormData}
         breedOptions={breedOptions}
         isLoadingBreeds={isLoadingBreeds}
+        areas={areas}
+        pens={editingPig ? pens : emptyPens}
+        isLoadingPens={isAssigningPig}
       />
 
-      {/* CONFIRM */}
       {confirmModal.type && (
         <ActionConfirmModal
           isOpen={confirmModal.isOpen}

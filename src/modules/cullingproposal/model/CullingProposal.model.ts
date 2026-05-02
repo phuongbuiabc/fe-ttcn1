@@ -1,6 +1,7 @@
 export interface CullingProposal {
   id: string;
   pigId: string;
+  pigEarTag: string;
   proposalType: string;
   reason?: string;
   employeeId: string;

@@ -7,7 +7,7 @@ import {
   UpdatePigletHerdGrowthRequest,
 } from '../model/pigletherdgrowth.model';
 
-const BASE_URL = '/piglet-herd-growth';
+const BASE_URL = '/api/v1/piglet-herd-growth';
 
 export const pigletHerdGrowthService = {
   getAll: () =>

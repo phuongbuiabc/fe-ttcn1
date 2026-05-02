@@ -6,7 +6,7 @@ import {
   UpdateCullingProposalRequest,
 } from "@/modules/cullingproposal/model/CullingProposal.model";
 
-const BASE = "/culling-proposals";
+const BASE = '/api/v1/culling-proposals';
 
 export const cullingProposalService = {
   getAll: () =>

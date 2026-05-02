@@ -1,6 +1,6 @@
 'use client';
 
-import { PenDetailResponse } from '../model/pen.model';
+import { PenDetailResponse, PenPigSummary } from '../model/pen.model';
 
 interface Props {
   pen: PenDetailResponse | null;
@@ -27,9 +27,10 @@ export function PenDetail({ pen, loading, onClose }: Props) {
 
       <div className="mt-4">
         <h3 className="font-semibold">🐷 Danh sách lợn</h3>
-        {pen.pigs?.map((p: any) => (
-          <div key={p.id} className="text-xs border-b py-1">
-            {p.pigCode}
+        {pen.pigs?.map((p: PenPigSummary) => (
+          <div key={p.pigId} className="text-xs border-b py-1">
+            <div className="font-medium">{p.earTag}</div>
+            <div className="text-gray-600">{p.type} - {p.currentWeight} kg</div>
           </div>
         ))}
       </div>

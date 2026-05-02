@@ -1,3 +1,5 @@
+import { PigType, PigStatus } from '@/shared/enums/pig.enum';
+
 export interface PenResponse {
   id: string;
   name: string;
@@ -10,14 +12,19 @@ export interface PenResponse {
 }
 
 export interface PenPigSummary {
-  id: string;
-  pigCode: string;
+  pigId: string;
   earTag: string;
+  currentWeight: number;
+  type: PigType;
+  status: PigStatus;
 }
 
 export interface PenPigletHerdSummary {
   id: string;
   herdCode: string;
+  herdName: string;
+  quantity: number;
+  averageWeight: number;
 }
 
 export interface PenDetailResponse {

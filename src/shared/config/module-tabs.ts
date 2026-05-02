@@ -19,9 +19,8 @@ const pigTabs: ModuleTab[] = [
 ];
 
 const reproductionTabs: ModuleTab[] = [
-  { name: "Phối giống", href: "/reproductions", title: "Quản lý sinh sản" },
+  { name: "Phối giống", href: "/reproductions", title: "Quản lý phối giống" },
   { name: "Thai kỳ", href: "/reproductions/reproduction-cycles", title: "Quản lý thai kỳ" },
-  { name: "Phối giống", href: "/reproductions/mattings", title: "Quản lý phối giống" },
 ];
 
 const healthTabs: ModuleTab[] = [
