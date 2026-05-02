@@ -43,11 +43,13 @@ export const SowTable: React.FC<SowTableProps> = ({ sows, loading, onEdit, onDel
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Mã Số Nái</th>
-            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Giống / Đặc điểm</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Số tai</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Giống</th>
             <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Chuồng</th>
             <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Trạng thái</th>
-            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none text-center">Tiến độ</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Ngày phối</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Ngày dự kiến đẻ</th>
+            <th className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none text-center">Số ngày</th>
             <th className="px-6 py-3 text-right text-[9px] uppercase tracking-widest font-black text-slate-900 leading-none">Thao tác</th>
           </tr>
         </thead>
@@ -66,20 +68,30 @@ export const SowTable: React.FC<SowTableProps> = ({ sows, loading, onEdit, onDel
               <td className="px-6 py-3">
                 <span className={cn(
                   "px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest",
-                  sow.status === "PREGNANT" ? "bg-emerald-50 text-emerald-600" : 
+                  sow.status === "PREGNANT" ? "bg-emerald-50 text-emerald-600" :
                   sow.status === "FARROWING" ? "bg-rose-50 text-rose-600" :
+                  sow.status === "BRED" ? "bg-amber-50 text-amber-700" :
+                  sow.status === "LACTATING" ? "bg-cyan-50 text-cyan-700" :
+                  sow.status === "WEANED" ? "bg-slate-50 text-slate-500" :
                   "bg-slate-50 text-slate-500"
                 )}>
-                  {sow.status === "PREGNANT" ? "MANG THAI" : 
-                   sow.status === "FARROWING" ? "ĐANG ĐẺ" : "CHỜ PHỐI"}
+                  {sow.status === "PREGNANT" ? "MANG THAI" :
+                   sow.status === "FARROWING" ? "ĐANG ĐẺ" :
+                   sow.status === "BRED" ? "ĐÃ PHỐI" :
+                   sow.status === "LACTATING" ? "ĐANG CHO CON BÚ" :
+                   sow.status === "WEANED" ? "ĐÃ TÁCH" :
+                   "MỞ"}
                 </span>
               </td>
+              <td className="px-6 py-3 text-[11px]">{sow.matingDate ?? '-'}</td>
+              <td className="px-6 py-3 text-[11px]">{sow.expectedFarrowDate ?? '-'}</td>
+              <td className="px-6 py-3 text-center text-[11px]">{sow.daysInStatus ?? '-'}</td>
               <td className="px-6 py-3">
                 <div className="flex items-center justify-center gap-2">
                   <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden max-w-[40px]">
                     <div 
-                      className="h-full bg-emerald-500 rounded-full transition-all duration-1000" 
-                      style={{ width: `${sow.progress || 0}%` }} 
+                      className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                      style={{ width: `${sow.progress || 0}%` }}
                     />
                   </div>
                   <span className="text-[9px] font-black text-slate-800 tracking-tighter">{sow.progress || 0}%</span>
@@ -99,7 +111,7 @@ export const SowTable: React.FC<SowTableProps> = ({ sows, loading, onEdit, onDel
                   >
                     <Edit size={14} />
                   </button>
-                  <button 
+                  <button
                     onClick={(e) => { e.stopPropagation(); onDelete(sow.id); }}
                     className="p-1.5 text-slate-400 hover:text-rose-600 transition-all"
                   >

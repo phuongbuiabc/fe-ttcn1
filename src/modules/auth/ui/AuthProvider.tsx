@@ -32,10 +32,8 @@ export function AuthProvider({ children }: any) {
         const res = await authService.refreshToken(refreshToken);
 
         if (res.success) {
-          tokenStorage.setTokens(
-            res.data.accessToken,
-            refreshToken
-          );
+          const nextRefresh = (res.data && (res.data as any).refreshToken) || refreshToken;
+          tokenStorage.setTokens(res.data.accessToken, nextRefresh);
 
           await auth.fetchUser();
         }

@@ -7,7 +7,7 @@ import {
   UpdatePigletHerdMovementRequest,
 } from '@/modules/pigletherds/model/pigletherdmovement.model';
 
-const BASE_URL = '/piglet-herd-movement';
+const BASE_URL = '/api/v1/piglet-herd-movement';
 
 export const pigletHerdMovementService = {
   getAll: () =>

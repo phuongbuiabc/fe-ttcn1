@@ -5,7 +5,7 @@ import {
   UpdatePigletHerdRequest
 } from "@/modules/pigletherds/model/pigletherd.model";
 
-const BASE_URL = "/piglet-herds";
+const BASE_URL = "/api/v1/piglet-herds";
 
 export const pigletHerdService = {
   getAll: () =>

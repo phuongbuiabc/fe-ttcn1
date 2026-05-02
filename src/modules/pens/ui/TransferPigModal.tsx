@@ -43,13 +43,13 @@ export function TransferPigModal({ isOpen, onClose, barns }: TransferPigModalPro
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Số lượng cần chuyển</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00a67d]/10 outline-none placeholder:text-slate-300" 
-                placeholder="Nhập số lượng..." 
+                placeholder="Nhập số lượng..."
               />
             </div>
-            <button 
+            <button
               onClick={onClose}
               className="w-full py-5 bg-[#00a67d] text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-emerald-900/10 hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2"
             >

@@ -12,7 +12,7 @@ export interface PenPigResponse {
 export interface CreatePenPigRequest {
   penId: string;
   pigId: string;
-  entryDate?: string;
+  entryDate: string;
   exitDate?: string;
   status?: string;
 }

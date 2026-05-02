@@ -3,9 +3,19 @@ import { tokenStorage } from '@/modules/auth/utils/tokenStorage';
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'https://maodien.bitoj.io.vn';
 
+type QueryParamValue = string | number | boolean | null | undefined;
+type QueryParams = Record<string, QueryParamValue | QueryParamValue[]>;
+type ApiRequestOptions = RequestInit & { _retry?: boolean; params?: QueryParams };
+
 export class ApiClient {
   private static instance: ApiClient;
   private refreshPromise: Promise<string> | null = null;
+
+  private isAuthEndpoint(endpoint: string): boolean {
+    return /\/api\/v1\/auth\/(login|register|refresh-token)(?:\?|$)/i.test(
+      endpoint
+    );
+  }
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -15,7 +25,60 @@ export class ApiClient {
   }
 
   private getBaseUrl() {
-    return typeof window !== 'undefined' ? '/api/proxy' : API_URL;
+    const base = typeof window !== 'undefined' ? '/api/proxy' : API_URL;
+    return base.replace(/\/+$/, '');
+  }
+
+  private normalizeEndpoint(endpoint: string): string {
+    if (/^https?:\/\//i.test(endpoint)) return endpoint;
+
+    const trimmedEndpoint = endpoint.trim();
+    const withLeadingSlash = trimmedEndpoint.startsWith('/')
+      ? trimmedEndpoint
+      : `/${trimmedEndpoint}`;
+
+    if (
+      withLeadingSlash === '/api/v1' ||
+      withLeadingSlash.startsWith('/api/v1/') ||
+      withLeadingSlash.startsWith('/api/')
+    ) {
+      return withLeadingSlash;
+    }
+
+    return `/api/v1${withLeadingSlash}`;
+  }
+
+  private buildUrl(endpoint: string, params?: QueryParams): string {
+    const normalizedEndpoint = this.normalizeEndpoint(endpoint);
+    const baseUrl = this.getBaseUrl();
+    const url = /^https?:\/\//i.test(normalizedEndpoint)
+      ? normalizedEndpoint
+      : `${baseUrl}${normalizedEndpoint}`;
+
+    if (!params) return url;
+
+    const searchParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (item !== null && item !== undefined) {
+            searchParams.append(key, String(item));
+          }
+        });
+        return;
+      }
+
+      if (value !== null && value !== undefined) {
+        searchParams.append(key, String(value));
+      }
+    });
+
+    const query = searchParams.toString();
+    if (!query) return url;
+
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}${query}`;
   }
 
   private getHeaders(): HeadersInit {
@@ -48,8 +111,9 @@ export class ApiClient {
     }
 
     const newAccessToken = data.data.accessToken;
+    const nextRefreshToken = data.data.refreshToken || refreshToken;
 
-    tokenStorage.setTokens(newAccessToken, refreshToken);
+    tokenStorage.setTokens(newAccessToken, nextRefreshToken);
 
     return newAccessToken;
   }
@@ -57,21 +121,21 @@ export class ApiClient {
   // ===== MAIN REQUEST =====
   public async request<T>(
     endpoint: string,
-    options: RequestInit & { _retry?: boolean } = {}
+    options: ApiRequestOptions = {}
   ): Promise<T> {
-    const baseUrl = this.getBaseUrl();
-    const url = `${baseUrl}${endpoint}`;
+    const { params, ...fetchOptions } = options;
+    const url = this.buildUrl(endpoint, params);
 
     let response = await fetch(url, {
-      ...options,
+      ...fetchOptions,
       headers: {
-        ...options.headers,
         ...this.getHeaders(),
+        ...fetchOptions.headers,
       },
     });
 
     // ===== HANDLE 401 =====
-    if (response.status === 401 && !options._retry) {
+    if (response.status === 401 && !options._retry && !this.isAuthEndpoint(endpoint)) {
       try {
         if (!this.refreshPromise) {
           this.refreshPromise = this.refreshToken().finally(() => {
@@ -83,11 +147,11 @@ export class ApiClient {
 
         // ===== RETRY REQUEST =====
         response = await fetch(url, {
-          ...options,
+          ...fetchOptions,
           headers: {
-            ...options.headers,
             'Content-Type': 'application/json',
             Authorization: `Bearer ${newToken}`,
+            ...fetchOptions.headers,
           },
         });
       } catch (err) {
@@ -116,26 +180,28 @@ export class ApiClient {
   }
 
   // ===== METHODS =====
-  public get<T>(endpoint: string) {
-    return this.request<T>(endpoint, { method: 'GET' });
+  public get<T>(endpoint: string, options?: Omit<ApiRequestOptions, 'method' | 'body'>) {
+    return this.request<T>(endpoint, { ...(options || {}), method: 'GET' });
   }
 
-  public post<T>(endpoint: string, body?: any) {
+  public post<T>(endpoint: string, body?: any, options?: Omit<ApiRequestOptions, 'method' | 'body'>) {
     return this.request<T>(endpoint, {
+      ...(options || {}),
       method: 'POST',
-      body: JSON.stringify(body),
+      body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   }
 
-  public put<T>(endpoint: string, body?: any) {
+  public put<T>(endpoint: string, body?: any, options?: Omit<ApiRequestOptions, 'method' | 'body'>) {
     return this.request<T>(endpoint, {
+      ...(options || {}),
       method: 'PUT',
-      body: JSON.stringify(body),
+      body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   }
 
-  public delete<T>(endpoint: string) {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+  public delete<T>(endpoint: string, options?: Omit<ApiRequestOptions, 'method' | 'body'>) {
+    return this.request<T>(endpoint, { ...(options || {}), method: 'DELETE' });
   }
 }
 

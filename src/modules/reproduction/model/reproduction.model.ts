@@ -1,5 +1,6 @@
 export interface SowRecord {
   id: string;
+  earTag?: string;
   breed: string;
   pen: string;
   status: 'OPEN' | 'BRED' | 'PREGNANT' | 'FARROWING' | 'LACTATING' | 'WEANED';

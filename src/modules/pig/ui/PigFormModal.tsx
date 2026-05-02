@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 import { CreatePigRequest } from '@/modules/pig/model/pig.model';
 import { PigType, PigStatus } from '@/shared/enums/pig.enum';
+import { AreaResponse } from '@/modules/area/model/area.model';
+import { PenResponse } from '@/modules/pens/model/pen.model';
 import {
   PIG_TYPE_OPTIONS,
   PIG_STATUS_OPTIONS,
@@ -14,14 +16,19 @@ import {
 interface PigFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: CreatePigRequest) => void;
+  onSave: (data: CreatePigRequest & { penId?: string }) => void | Promise<void>;
   editingPig: any | null;
   formData: CreatePigRequest;
   setFormData: (data: CreatePigRequest) => void;
 
   breedOptions: { label: string; value: string | number }[];
   isLoadingBreeds?: boolean;
+  areas: AreaResponse[];
+  pens: PenResponse[];
+  isLoadingPens?: boolean;
 }
+
+const getToday = () => new Date().toISOString().slice(0, 10);
 
 export function PigFormModal({
   isOpen,
@@ -32,10 +39,41 @@ export function PigFormModal({
   setFormData,
   breedOptions = [],
   isLoadingBreeds = false,
+  areas,
+  pens,
+  isLoadingPens = false,
 }: PigFormModalProps) {
+  const [selectedAreaId, setSelectedAreaId] = useState('');
+  const [selectedPenId, setSelectedPenId] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setSelectedAreaId('');
+    setSelectedPenId('');
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || editingPig) return;
+
+    if (!formData.herdEntryDate) {
+      setFormData({
+        ...formData,
+        herdEntryDate: getToday(),
+      });
+    }
+  }, [isOpen, editingPig, formData, setFormData]);
+
+  const filteredPens = useMemo(() => {
+    if (!selectedAreaId) return pens;
+    return pens.filter((pen) => pen.areaId === selectedAreaId);
+  }, [pens, selectedAreaId]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    onSave({
+      ...formData,
+      penId: selectedPenId || undefined,
+    });
   };
 
   const inputClassName =
@@ -76,6 +114,47 @@ export function PigFormModal({
             {/* FORM */}
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                {/* area */}
+                <div>
+                  <label className={labelClassName}>Khu vực</label>
+                  <select
+                    value={selectedAreaId}
+                    onChange={(e) => {
+                      setSelectedAreaId(e.target.value);
+                      setSelectedPenId('');
+                    }}
+                    className={inputClassName}
+                  >
+                    <option value="">-- Chọn khu vực --</option>
+                    {areas.map((area) => (
+                      <option key={area.id} value={area.id}>
+                        {area.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* pen */}
+                <div>
+                  <label className={labelClassName}>Chuồng</label>
+                  <select
+                    value={selectedPenId}
+                    onChange={(e) => setSelectedPenId(e.target.value)}
+                    className={inputClassName}
+                    disabled={isLoadingPens}
+                    required
+                  >
+                    <option value="">
+                      {selectedAreaId ? '-- Chọn chuồng --' : 'Chọn khu vực trước'}
+                    </option>
+                    {filteredPens.map((pen) => (
+                      <option key={pen.id} value={pen.id}>
+                        {pen.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 {/* earTag */}
                 <div>

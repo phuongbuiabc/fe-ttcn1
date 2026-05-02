@@ -1,4 +1,5 @@
 import { PigType, PigStatus } from '@/shared/enums/pig.enum';
+import { StringList } from '@google/genai';
 
 export interface CreatePigRequest {
   earTag?: string;
@@ -80,4 +81,38 @@ export interface PigDetailResponse {
   growthHistory: PigGrowthItemResponse[];
   diseaseHistory: PigDiseaseHistoryItemResponse[];
   vaccinations: PigVaccinationItemResponse[];
+}
+
+export interface SowResponse{
+  id: string;
+  earTag: string;
+  type: PigType;
+  species: string;
+  totalPregnancies: number;
+  miscarriageCount: number;
+  status: PigStatus;
+}
+
+export interface PregnantResponse {
+  id: string;
+  earTag: string;
+  matingDate: string;
+  conceptionDate: string;
+  expectedFarrowDate: string;
+  prenancyNumber: number;
+  status: string;
+}
+
+export interface PigCurrentResponse {
+  id: string;
+  earTag: string;
+  type: PigType;
+  species: string;
+  status: PigStatus;
+  latestTrackingDate?: string;
+  weight?: number;
+  litterLength?: number;
+  chestGirth?: number;
+  adg?: number;
+  fcr?: number;
 }

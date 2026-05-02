@@ -5,7 +5,7 @@ import {
   UpdatePenPigRequest
 } from "../model/penpig.model";
 
-const BASE_URL = "/pen-pigs";
+const BASE_URL = "/api/v1/pen-pigs";
 
 export const penPigService = {
   getAll: () => apiClient.get<{ data: PenPigResponse[] }>(BASE_URL),

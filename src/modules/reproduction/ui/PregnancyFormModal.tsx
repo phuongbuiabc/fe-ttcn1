@@ -16,9 +16,9 @@ export function PregnancyFormModal({ isOpen, onClose }: PregnancyFormModalProps)
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
         <motion.div 
-          initial={{ scale: 0.9, opacity: 0 }} 
-          animate={{ scale: 1, opacity: 1 }} 
-          exit={{ scale: 0.9, opacity: 0 }} 
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
           className="bg-white rounded-[1.75rem] w-full max-w-xl overflow-hidden shadow-2xl flex flex-col border-t-8 border-blue-500"
         >
           <div className="p-8 border-b border-slate-50 flex items-center justify-between">

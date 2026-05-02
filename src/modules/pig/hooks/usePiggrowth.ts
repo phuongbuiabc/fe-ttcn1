@@ -1,5 +1,3 @@
-// useGrowth.ts
-
 import { useState, useCallback } from 'react';
 import { growthService } from '../../pig/api/piggrowth.service';
 import { GrowthTracking } from '../../pig/model/piggrowth.model';

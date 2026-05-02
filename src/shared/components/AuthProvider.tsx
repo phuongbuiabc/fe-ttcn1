@@ -55,8 +55,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await authApi.login(credentials);
       if (response.success && response.data?.accessToken) {
+        if (!response.data.refreshToken) {
+          throw new Error('Missing refresh token');
+        }
+
         localStorage.setItem('token', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken || '');
+        localStorage.setItem('refreshToken', response.data.refreshToken);
         setUser(response.data.user);
         router.push('/');
       } else {
