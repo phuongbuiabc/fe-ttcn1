@@ -43,7 +43,7 @@ export default function ReproductionManagementPage() {
   const { sows, stats, loading, refresh } = useReproduction();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSowId, setSelectedSowId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"farrowing" | "pregnancy" | "sows">("farrowing");
+  const [activeTab, setActiveTab] = useState<"farrowing" | "pregnancy" | "sows">("pregnancy");
   
   // Modals Status
   const [isModalOpen, setIsModalOpen] = useState(false);

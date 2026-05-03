@@ -37,7 +37,7 @@ export default function BarnPigPage() {
 
     const fetchPigDetailsForPen = async () => {
       const details = await Promise.all(
-        penDetail.pigs.map((p) => fetchPigDetail(p.id))
+        penDetail.pigs.map((p) => fetchPigDetail(p.pigId))
       );
       setPigDetails(details.filter((d): d is PigDetailResponse => d !== null));
     };
@@ -173,7 +173,7 @@ export default function BarnPigPage() {
             <div className="text-sm text-gray-400">Chưa triển khai đàn con</div>
           )}
         </div>
-      </section>
+      </section>  
     </div>
   );
 }

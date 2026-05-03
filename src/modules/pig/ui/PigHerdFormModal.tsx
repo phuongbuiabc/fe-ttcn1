@@ -46,7 +46,7 @@ export function LitterFormModal({
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Mã đàn</label>
                 <input 
                   type="text" required 
-                  value={litterFormData.id} 
+                  value={litterFormData.id}
                   onChange={(e) => setLitterFormData({...litterFormData, id: e.target.value})}
                   className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 outline-none" 
                 />
@@ -85,9 +85,8 @@ export function LitterFormModal({
                   value={litterFormData.status}
                   onChange={(e) => setLitterFormData({...litterFormData, status: e.target.value})}
                 >
-                  <option>Khỏe mạnh</option>
-                  <option>Cần theo dõi</option>
-                  <option>Yếu</option>
+                  <option>Cai sữa</option>
+                  <option>Sơ sinh</option>
                 </select>
               </div>
             </div>
