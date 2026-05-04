@@ -1,12 +1,23 @@
-export interface Supply {
-  id: string;
-  supply_id: string;
-  supply_name: string;
-  quantity: number;
-  unit: string;
-  supply_type: string;
-  description: string;
+export enum MaterialType {
+  FEED = "FEED",
+  VACCINE = "VACCINE",
+  MEDICINE = "MEDICINE"
 }
+
+export interface LivestockMaterial {
+  id: string;
+  name: string;
+  unit: string;
+  materialType: MaterialType | string;
+  quantity: number;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+
+// Keeping Supply alias for backward compatibility during migration
+export type Supply = LivestockMaterial;
 
 export interface SupplyLoss {
   id: string;
@@ -18,3 +29,4 @@ export interface SupplyLoss {
   reason: string;
   note: string;
 }
+

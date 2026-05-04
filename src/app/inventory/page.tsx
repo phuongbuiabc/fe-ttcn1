@@ -15,7 +15,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/utils/utils";
 import { usePathname } from "next/navigation";
 import { getPageTitle } from "@/shared/utils/getPageTitle";
-import { Supply, SupplyLoss } from "@/modules/inventory/model/inventory.model";
+import { Supply, SupplyLoss, MaterialType } from "@/modules/inventory/model/inventory.model";
+
 
 
 import { inventoryService } from "@/modules/inventory/api/inventory.service";
@@ -28,15 +29,15 @@ import { InventoryTable } from "@/modules/inventory/ui/InventoryTable";
 
 export default function InventoryPage() {
   const pathname = usePathname();
-  
+
   const [supplies, setSuppliers] = useState<Supply[]>([]);
   const [lossHistory, setLossHistory] = useState<SupplyLoss[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const activeTab = pathname.endsWith("/losses") ? "losses" : "inventory";
   const [searchTerm, setSearchTerm] = useState("");
 
-  
+
   const [activeType, setActiveType] = useState("Tất cả");
 
 
@@ -55,13 +56,15 @@ export default function InventoryPage() {
   const [selectedSupplyForDelete, setSelectedSupplyForDelete] = useState<Supply | null>(null);
 
   // Forms
-  const [supplyForm, setSupplyForm] = useState<any>({ supply_id: "", supply_type: "Thức ăn", supply_name: "", quantity: 0, unit: "kg", description: "" });
+  const [supplyForm, setSupplyForm] = useState<any>({ name: "", materialType: MaterialType.FEED, quantity: 0, unit: "Kg", description: "" });
+
   const [lossForm, setLossForm] = useState<any>({ loss_id: "", date: "", employee_id: "", quantity: 0, reason: "Hỏng hóc", note: "" });
   const [adjForm, setAdjForm] = useState<any>({ quantity_change: 0, reason: "", note: "" });
 
-  const fetchInventoryData = async () => {
+
+  const fetchInventoryData = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const [resSupplies, resLosses] = await Promise.all([
         inventoryService.getSupplies(),
         inventoryService.getLossHistory()
@@ -69,19 +72,30 @@ export default function InventoryPage() {
       if (resSupplies.success) setSuppliers(resSupplies.data);
       if (resLosses.success) setLossHistory(resLosses.data);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
+
   useEffect(() => {
-    fetchInventoryData();
+    const cached = inventoryService.getCachedSupplies();
+    if (cached) {
+      setSuppliers(cached);
+      setLoading(false);
+      fetchInventoryData(false); // Background update
+    } else {
+      fetchInventoryData(true);
+    }
   }, []);
+
 
   const handleOpenAddModal = () => {
     setEditingSupply(null);
-    setSupplyForm({ supply_id: `VT${Math.floor(100+Math.random()*900)}`, supply_type: "Thức ăn", supply_name: "", quantity: 0, unit: "kg", description: "" });
+    setSupplyForm({ name: "", materialType: MaterialType.FEED, quantity: 0, unit: "Kg", description: "" });
     setIsModalOpen(true);
   };
+
+
 
   const handleOpenEditModal = (e: any, supply: Supply) => {
     if (e) e.stopPropagation();
@@ -92,13 +106,22 @@ export default function InventoryPage() {
 
   const handleSaveSupply = async (e: React.FormEvent) => {
     e.preventDefault();
+    let res;
     if (editingSupply) {
-      setSuppliers(supplies.map(s => s.id === editingSupply.id ? { ...supplyForm, id: s.id } : s));
+      res = await inventoryService.updateSupply(editingSupply.id, supplyForm);
     } else {
-      setSuppliers([{ ...supplyForm, id: `m-${Math.random()}` }, ...supplies]);
+      res = await inventoryService.createSupply(supplyForm);
     }
-    setIsModalOpen(false);
+
+    if (res.success) {
+      fetchInventoryData(false);
+      setIsModalOpen(false);
+    } else {
+
+      alert(res.message || "Có lỗi xảy ra");
+    }
   };
+
 
   const handleRecordLoss = (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,22 +135,30 @@ export default function InventoryPage() {
 
   const confirmDelete = async () => {
     if (selectedSupplyForDelete) {
-      setSuppliers(supplies.filter(s => s.id !== selectedSupplyForDelete.id));
-      setIsDeleteModalOpen(false);
+      const res = await inventoryService.deleteSupply(selectedSupplyForDelete.id);
+      if (res.success) {
+        fetchInventoryData(false);
+        setIsDeleteModalOpen(false);
+      } else {
+
+        alert(res.message || "Không thể xóa vật tư");
+      }
     }
   };
 
+
   const filteredSupplies = supplies.filter(s =>
-    (activeType === "Tất cả" || s.supply_type === activeType) &&
-    (s.supply_name.toLowerCase().includes(searchTerm.toLowerCase()) || s.supply_id.toLowerCase().includes(searchTerm.toLowerCase()))
+    (activeType === "Tất cả" || s.materialType === activeType) &&
+    (s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.id.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
 
   return (
     <div className="space-y-4 pb-20 bg-[#fbfcfd] min-h-screen -m-4 p-4">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">
+          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">
             {getPageTitle(pathname)}
           </h1>
         </div>
@@ -137,35 +168,59 @@ export default function InventoryPage() {
         </button>
       </div>
 
-      {/* Search Controls */}
-      <div className="flex flex-col lg:flex-row justify-start items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <div className="flex items-center gap-4 w-full lg:w-auto">
-          <div className="relative flex-1 lg:w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 shadow-inner" size={16} />
-            <input 
-              type="text" 
-              placeholder="Tìm tên vật tư, mã kho..." 
-              value={searchTerm} 
-              onChange={e => setSearchTerm(e.target.value)} 
-              className="w-full pl-10 pr-6 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#00a67d]/10" 
+      {/* Search & Filter Controls */}
+      <div className="bg-white p-4 rounded-[1.75rem] border border-slate-100 shadow-sm space-y-4">
+        <div className="flex flex-col lg:flex-row justify-start items-center gap-4">
+          <div className="relative flex-1 w-full lg:w-80">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <input
+              type="text"
+              placeholder="Tìm tên vật tư, mã..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-11 pr-6 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#00a67d]/10 transition-all"
             />
           </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 w-full lg:w-auto no-scrollbar">
+            {[
+              { label: "Tất cả", value: "Tất cả" },
+              { label: "Thức ăn", value: MaterialType.FEED },
+              { label: "Vaccine", value: MaterialType.VACCINE },
+              { label: "Thuốc", value: MaterialType.MEDICINE }
+            ].map((type) => (
+              <button
+                key={type.value}
+                onClick={() => setActiveType(type.value)}
+                className={cn(
+                  "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap",
+                  activeType === type.value
+                    ? "bg-[#00a67d] text-white shadow-lg shadow-emerald-900/10"
+                    : "bg-slate-50 text-slate-400 hover:bg-slate-100"
+                )}
+              >
+                {type.label}
+              </button>
+            ))}
+          </div>
+
         </div>
       </div>
+
 
       {/* Main Content */}
 
       <div className="space-y-6">
         {activeTab === "inventory" ? (
           <div className="bg-white rounded-[1.75rem] border border-slate-100 shadow-sm overflow-hidden">
-            <InventoryTable 
-               supplies={filteredSupplies} 
-               loading={loading}
-               onView={(item) => { setSelectedSupplyForDetail(item); setIsDetailModalOpen(true); }}
-               onEditStock={(item) => { setSelectedSupplyForAdj(item); setAdjForm({ quantity_change: 0, reason: "", note: "" }); setIsAdjustmentModalOpen(true); }}
-               onRecordLoss={(item) => { setSelectedSupplyForLoss(item); setLossForm({ loss_id: `LOSS${Date.now().toString().slice(-4)}`, date: new Date().toISOString().split('T')[0], employee_id: "", quantity: 0, reason: "Hỏng hóc", note: "" }); setIsLossModalOpen(true); }}
-               onDelete={(item) => { setSelectedSupplyForDelete(item); setIsDeleteModalOpen(true); }}
+            <InventoryTable
+              supplies={filteredSupplies}
+              loading={loading}
+              onView={(item) => { setSelectedSupplyForDetail(item); setIsDetailModalOpen(true); }}
+              onEdit={(item) => handleOpenEditModal(null, item)}
+              onDelete={(item) => { setSelectedSupplyForDelete(item); setIsDeleteModalOpen(true); }}
             />
+
           </div>
         ) : (
           <div className="bg-white rounded-[1.75rem] border border-slate-100 shadow-sm p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -174,6 +229,7 @@ export default function InventoryPage() {
                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><AlertTriangle size={64} className="text-rose-500" /></div>
                 <div className="flex justify-between items-start mb-4"><span className="text-[10px] font-black text-rose-600 bg-rose-50 px-3 py-1 rounded-lg">-{loss.quantity}</span><span className="text-[10px] font-black text-slate-400">{loss.date}</span></div>
                 <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight mb-2">Vật tư: {loss.supply_id}</h4>
+
                 <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase"><User size={12} /> {loss.employee_id} • <Tag size={12} /> {loss.reason}</div>
               </div>
             ))}
@@ -182,22 +238,27 @@ export default function InventoryPage() {
       </div>
 
       {/* Feature Modals */}
-      <SupplyFormModal 
-        isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleSaveSupply} 
-        editingSupply={editingSupply} supplyForm={supplyForm} setSupplyForm={setSupplyForm} 
-      />
-      
-      <SupplyDetailModal 
-        isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)} 
-        supply={selectedSupplyForDetail} onEdit={(s) => handleOpenEditModal(null, s)} 
+      <SupplyFormModal
+        isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleSaveSupply}
+        editingSupply={editingSupply} supplyForm={supplyForm} setSupplyForm={setSupplyForm}
       />
 
-      <LossModal 
+      <SupplyDetailModal
+        isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)}
+        supply={selectedSupplyForDetail}
+        onEdit={(s) => {
+          setIsDetailModalOpen(false);
+          handleOpenEditModal(null, s);
+        }}
+      />
+
+
+      <LossModal
         isOpen={isLossModalOpen} onClose={() => setIsLossModalOpen(false)} onSave={handleRecordLoss}
         supply={selectedSupplyForLoss} lossForm={lossForm} setLossForm={setLossForm}
       />
 
-      <AdjustmentModal 
+      <AdjustmentModal
         isOpen={isAdjustmentModalOpen} onClose={() => setIsAdjustmentModalOpen(false)} onSave={handleAdjustStock}
         supply={selectedSupplyForAdj} adjForm={adjForm} setAdjForm={setAdjForm}
       />
@@ -209,7 +270,8 @@ export default function InventoryPage() {
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl p-10 text-center">
               <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-6"><Trash2 size={32} /></div>
               <p className="text-xl font-bold text-slate-800 uppercase">Xác nhận xóa?</p>
-              <p className="text-slate-500 text-sm mt-2 mb-8 leading-relaxed">Vật tư <span className="font-bold text-slate-900">{selectedSupplyForDelete.supply_name}</span> sẽ bị xóa vĩnh viễn.</p>
+              <p className="text-slate-500 text-sm mt-2 mb-8 leading-relaxed">Vật tư <span className="font-bold text-slate-900">{selectedSupplyForDelete.name}</span> sẽ bị xóa vĩnh viễn.</p>
+
               <div className="flex gap-4">
                 <button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-4 bg-slate-50 text-slate-700 rounded-2xl text-sm font-bold">Hủy</button>
                 <button onClick={confirmDelete} className="flex-1 py-4 bg-rose-500 text-white rounded-2xl text-sm font-bold shadow-lg shadow-rose-900/10 active:scale-95 transition-all">Xác nhận xóa</button>

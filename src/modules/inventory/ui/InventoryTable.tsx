@@ -1,25 +1,27 @@
-'use client'
-
 import React from 'react';
 import { Trash2, Edit, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/shared/utils/utils';
-import { Supply } from '@/shared/types';
+import { Supply, MaterialType } from '@/modules/inventory/model/inventory.model';
 
 interface InventoryTableProps {
   supplies: Supply[];
   loading: boolean;
-  onEditStock: (item: Supply) => void;
-  onRecordLoss: (item: Supply) => void;
+  onEdit: (item: Supply) => void;
   onDelete: (item: Supply) => void;
   onView: (item: Supply) => void;
 }
 
+const materialTypeLabels: Record<string, string> = {
+  [MaterialType.FEED]: "Thức ăn",
+  [MaterialType.VACCINE]: "Vaccine",
+  [MaterialType.MEDICINE]: "Thuốc",
+};
+
 export function InventoryTable({ 
   supplies, 
   loading, 
-  onEditStock, 
-  onRecordLoss, 
+  onEdit, 
   onDelete,
   onView 
 }: InventoryTableProps) {
@@ -58,19 +60,20 @@ export function InventoryTable({
                     "w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs", 
                     item.quantity < 10 ? "bg-rose-50 text-rose-500" : "bg-emerald-50 text-emerald-600"
                   )}>
-                    {item.supply_name.charAt(0)}
+                    {item.name?.charAt(0) || 'V'}
                   </div>
                   <div>
-                    <p className="text-sm font-black text-slate-800 leading-none">{item.supply_name}</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase mt-1.5 tracking-tighter">ID: {item.supply_id}</p>
+                    <p className="text-sm font-black text-slate-800 leading-none">{item.name}</p>
                   </div>
+
                 </div>
               </td>
               <td className="px-6 py-3">
                 <span className="px-3 py-1 bg-slate-50 text-slate-500 text-[10px] font-black rounded-lg border border-slate-100 uppercase tracking-widest">
-                  {item.supply_type}
+                  {materialTypeLabels[item.materialType] || item.materialType}
                 </span>
               </td>
+
               <td className="px-8 py-3.5 text-center">
                 <span className={cn("text-lg font-black tracking-tighter", item.quantity < 10 ? "text-rose-500" : "text-emerald-600")}>
                   {item.quantity}
@@ -80,16 +83,10 @@ export function InventoryTable({
               <td className="px-8 py-3.5 text-right">
                 <div className="flex justify-end gap-2 transition-all">
                   <button 
-                    onClick={(e) => { e.stopPropagation(); onEditStock(item); }} 
+                    onClick={(e) => { e.stopPropagation(); onEdit(item); }} 
                     className="p-2.5 text-slate-400 hover:text-blue-600 transition-all"
                   >
                     <Edit size={18}/>
-                  </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); onRecordLoss(item); }} 
-                    className="p-2.5 text-slate-400 hover:text-rose-600 transition-all"
-                  >
-                    <AlertTriangle size={18}/>
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); onDelete(item); }} 
@@ -106,3 +103,4 @@ export function InventoryTable({
     </div>
   );
 }
+
