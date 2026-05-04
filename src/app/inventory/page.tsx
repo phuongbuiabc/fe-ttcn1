@@ -14,7 +14,9 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/utils/utils";
 import { usePathname } from "next/navigation";
+import { getPageTitle } from "@/shared/utils/getPageTitle";
 import { Supply, SupplyLoss } from "@/modules/inventory/model/inventory.model";
+
 
 import { inventoryService } from "@/modules/inventory/api/inventory.service";
 
@@ -125,8 +127,11 @@ export default function InventoryPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">Kho Vật tư</h1>
+          <h1 className="text-xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">
+            {getPageTitle(pathname)}
+          </h1>
         </div>
+
         <button onClick={handleOpenAddModal} className="px-6 py-2.5 bg-[#00a67d] text-white rounded-full text-xs font-bold shadow-lg shadow-emerald-900/10 flex items-center gap-2 active:scale-95 transition-all">
           <Plus size={16} /> Nhập kho mới
         </button>
