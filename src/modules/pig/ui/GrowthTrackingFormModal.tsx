@@ -5,9 +5,9 @@ import { X, Plus, Trash2 } from 'lucide-react';
 import { useArea } from '@/modules/area/hooks/useArea';
 import { usePen } from '@/modules/pens/hooks/usePen';
 import { usePig } from '@/modules/pig/hooks/usePig';
-import { usePiggrowth } from '@/modules/pig/hooks/usePiggrowth';
+import { useGrowthtracking } from '@/modules/growth/hooks/useGrowthtracking';
 import { PigDetailResponse } from '@/modules/pig/model/pig.model';
-import { CreateGrowthTrackingRequest } from '@/modules/pig/model/piggrowth.model';
+import { CreateGrowthTrackingRequest } from '@/modules/growth/model/growthtracking.model';
 
 type RowDraft = {
 	pigId: string;
@@ -38,7 +38,7 @@ export default function GrowthTrackingFormModal({ onClose, onSuccess }: GrowthTr
 	const { areas, fetchAreas } = useArea();
 	const { pens, penDetail, fetchPens, fetchPenDetail, loadingDetail } = usePen();
 	const { fetchPigDetail } = usePig();
-	const { createGrowth, loading } = usePiggrowth();
+	const { createGrowth, loading } = useGrowthtracking();
 
 	const [selectedArea, setSelectedArea] = useState<string>('ALL');
 	const [selectedPen, setSelectedPen] = useState<string>('');
@@ -159,14 +159,17 @@ export default function GrowthTrackingFormModal({ onClose, onSuccess }: GrowthTr
 					pigId: draft.pigId,
 					trackingDate: draft.trackingDate,
 					...(toNumberOrUndefined(draft.litterLength) !== undefined
-						? { litterLength: toNumberOrUndefined(draft.litterLength) }
+						? { litterLegth: toNumberOrUndefined(draft.litterLength) }
 						: {}),
 					...(toNumberOrUndefined(draft.chestGirth) !== undefined
 						? { chestGirth: toNumberOrUndefined(draft.chestGirth) }
 						: {}),
 					...(toNumberOrUndefined(draft.weight) !== undefined
-						? { weight: toNumberOrUndefined(draft.weight) }
+						? { weigth: toNumberOrUndefined(draft.weight) }
 						: {}),
+					growthRate: 0,
+					adg: 0,
+					fcr: 0,
 					...(draft.note.trim() ? { note: draft.note.trim() } : {}),
 				};
 
@@ -176,9 +179,9 @@ export default function GrowthTrackingFormModal({ onClose, onSuccess }: GrowthTr
 			.filter(
 				(item) =>
 					item.trackingDate &&
-					(item.litterLength !== undefined ||
+					(item.litterLegth !== undefined ||
 						item.chestGirth !== undefined ||
-						item.weight !== undefined ||
+						item.weigth !== undefined ||
 						item.note)
 			);
 

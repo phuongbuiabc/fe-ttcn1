@@ -11,7 +11,7 @@ export type ModuleConfig = {
 };
 
 // ===== DEFINE TABS =====
-const pigTabs: ModuleTab[] = [
+export const pigTabs: ModuleTab[] = [
   { name: "Lợn", href: "/pigs", title: "Danh mục lợn" },
   { name: "Đàn con", href: "/pigs/piglet-herds", title: "Danh mục đàn con" },
   { name: "Giống", href: "/pigs/breeds", title: "Danh mục giống" },
@@ -20,7 +20,7 @@ const pigTabs: ModuleTab[] = [
 
 const reproductionTabs: ModuleTab[] = [
   { name: "Phối giống", href: "/reproductions", title: "Quản lý phối giống" },
-  { name: "Thai kỳ", href: "/reproductions/reproduction-cycles", title: "Quản lý thai kỳ" },
+  { name: "Thai kỳ", href: "/reproductions/mating", title: "Quản lý thai kỳ" },
 ];
 
 const healthTabs: ModuleTab[] = [

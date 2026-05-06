@@ -36,12 +36,17 @@ export const useCullingProposal = () => {
   }, []);
 
   const disposeList = useMemo(
-    () => data.filter(i => i.proposalType === "CULLING"),
+    () => data.filter(i => i.proposalType === "CULLING" && i.status !== "APPROVED"),
     [data]
   );
 
   const sellOffList = useMemo(
-    () => data.filter(i => i.proposalType === "SELL_OFF"),
+    () => data.filter(i => i.proposalType === "SELL_OFF" && i.status !== "APPROVED"),
+    [data]
+  );
+
+  const approvedList = useMemo(
+    () => data.filter(i => i.status === "APPROVED"),
     [data]
   );
 
@@ -49,6 +54,7 @@ export const useCullingProposal = () => {
     data,
     disposeList,
     sellOffList,
+    approvedList,
     loading,
     fetchAll,
     create,

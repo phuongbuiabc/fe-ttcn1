@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { usePig } from '@/modules/pig/hooks/usePig';
 import { PigResponse } from '@/modules/pig/model/pig.model';
-import { usePiggrowth } from '@/modules/pig/hooks/usePiggrowth';
+import { useGrowthtracking } from '@/modules/growth/hooks/useGrowthtracking';
 import { CreateGrowthTrackingRequest } from '@/modules/growth/model/growthtracking.model';
 
 type RowDraft = {
@@ -45,24 +45,18 @@ interface PiggrowthFormProps {
 
 export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps = {}) {
 	const { pigs, fetchPigs, loadingList } = usePig();
-	const { createGrowth, loading } = usePiggrowth();
+	const { createGrowth, loading } = useGrowthtracking();
 	const isModal = typeof onClose === 'function';
 
 	const [trackingDate, setTrackingDate] = useState<string>(getToday());
 	const [rows, setRows] = useState<RowDraft[]>([createEmptyRow()]);
 	const [activeSuggestionRowId, setActiveSuggestionRowId] = useState<string | null>(null);
+	const [suggestionPos, setSuggestionPos] = useState<{top: number, left: number, width: number} | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 
 	useEffect(() => {
 		fetchPigs();
 	}, [fetchPigs]);
-
-	const pigById = useMemo(() => {
-		return pigs.reduce<Record<string, PigResponse>>((acc, pig) => {
-			acc[pig.id] = pig;
-			return acc;
-		}, {});
-	}, [pigs]);
 
 	const handleChangeCell = (rowId: string, field: 'litterLength' | 'chestGirth' | 'weight' | 'note', value: string) => {
 		setRows((prev) =>
@@ -211,50 +205,25 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 
 	const content = (
 		<>
-			<div className="flex flex-wrap items-end justify-between gap-3 bg-white border rounded-xl p-3">
-				<div className="min-w-[220px]">
-					<p className="text-xs font-semibold text-slate-500 mb-1">Ngày đo chung</p>
+			<div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+				<div className="px-4 py-3 border-b flex items-start justify-between gap-3">
+					<div>
+						<h2 className="font-bold text-slate-800">Bảng theo dõi tăng trưởng</h2>
+					</div>
 					<input
 						type="date"
 						value={trackingDate}
 						onChange={(e) => setTrackingDate(e.target.value)}
-						className="w-full border rounded-lg px-3 py-2 bg-white text-sm"
+						className="w-[220px] border rounded-lg px-3 py-2 bg-white text-sm"
 					/>
 				</div>
 
-				<div className="flex items-center gap-2">
-					<button
-						onClick={handleAddRow}
-						className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold disabled:opacity-60"
-					>
-						+ Thêm dòng
-					</button>
-					<button
-						onClick={handleConfirm}
-						disabled={submitting || loading}
-						className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold disabled:opacity-60"
-					>
-						{submitting ? 'Đang lưu...' : 'Xác nhận'}
-					</button>
-				</div>
-			</div>
-
-			<div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-				<div className="px-4 py-3 border-b">
-					<h2 className="font-bold text-slate-800">Bảng nhập tăng trưởng</h2>
-					<p className="text-xs text-slate-500">
-						Nhập theo dạng bảng, mỗi dòng là một bản ghi của lợn.
-					</p>
-				</div>
-
-			<div className="overflow-x-auto overflow-y-visible">
-					<table className="w-full min-w-[1200px] text-sm">
+			<div className="overflow-x-auto">
+				<table className="w-full min-w-[980px] text-sm">
 						<thead className="bg-slate-50 text-xs uppercase text-slate-500">
 							<tr>
 								<th className="p-3 text-left">STT</th>
-								<th className="p-3 text-left">Số tai</th>
-								<th className="p-3 text-left">Mã lợn</th>
-								<th className="p-3 text-left">Giống</th>
+								<th className="p-3 text-left w-[190px]">Số tai</th>
 								<th className="p-3 text-left">Dài lưng (cm)</th>
 								<th className="p-3 text-left">Vòng ngực (cm)</th>
 								<th className="p-3 text-left">Cân nặng (kg)</th>
@@ -265,49 +234,53 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 
 						<tbody>
 							{rows.map((row, index) => {
-								const selectedPig = row.pigId ? pigById[row.pigId] : undefined;
 								const suggestions = getSuggestions(row.earTagInput);
 
 								return (
 									<tr key={row.rowId} className="border-t">
 										<td className="p-2">{index + 1}</td>
-										<td className="p-2 min-w-[240px]">
-											<div className="relative">
-												<input
-													type="text"
-													placeholder="Gõ số tai để chọn"
-													value={row.earTagInput}
-													onFocus={() => setActiveSuggestionRowId(row.rowId)}
-													onBlur={() => {
-														setTimeout(() => setActiveSuggestionRowId(null), 120);
+										<td className="p-2 w-[190px] min-w-[170px]">
+										<div className="relative">
+									<input
+										type="text"
+										placeholder="Gõ số tai để chọn"
+										value={row.earTagInput}
+										onFocus={(e) => {
+											setActiveSuggestionRowId(row.rowId);
+											const rect = e.currentTarget.getBoundingClientRect();
+											setSuggestionPos({top: rect.bottom + window.scrollY, left: rect.left + window.scrollX, width: rect.width});
+										}}
+										onBlur={() => {
+											setTimeout(() => {
+												setActiveSuggestionRowId(null);
+												setSuggestionPos(null);
+											}, 120);
+										}}
+										onChange={(e) => {
+											setActiveSuggestionRowId(row.rowId);
+											handleEarTagInputChange(row.rowId, e.target.value);
+										}}
+										className="w-full border rounded px-2 py-1 bg-white"
+									/>
+									{activeSuggestionRowId === row.rowId && suggestions.length > 0 && suggestionPos && (
+										<div className="fixed z-50 w-64 max-h-48 overflow-y-auto rounded-md border bg-white shadow-lg" style={{ top: suggestionPos.top, left: suggestionPos.left, width: suggestionPos.width, maxHeight: "200px" }}>
+											{suggestions.map((pig) => (
+												<button
+													type="button"
+													key={pig.id}
+													onMouseDown={(e) => {
+														e.preventDefault();
+														handleSelectPig(row.rowId, pig);
 													}}
-													onChange={(e) => {
-														setActiveSuggestionRowId(row.rowId);
-														handleEarTagInputChange(row.rowId, e.target.value);
-													}}
-													className="w-full border rounded px-2 py-1 bg-white"
-												/>
-												{activeSuggestionRowId === row.rowId && suggestions.length > 0 && (
-													<div className="absolute z-50 mt-1 w-full max-h-48 overflow-auto rounded-md border bg-white shadow-lg">
-														{suggestions.map((pig) => (
-															<button
-																type="button"
-																key={pig.id}
-																onMouseDown={(e) => {
-																	e.preventDefault();
-																	handleSelectPig(row.rowId, pig);
-																}}
-																className="block w-full px-3 py-2 text-left text-xs hover:bg-slate-50"
-															>
-																{pig.earTag} - {pig.pigCode}
-															</button>
-														))}
-													</div>
-												)}
-											</div>
+													className="block w-full px-3 py-2 text-left text-xs hover:bg-slate-50 whitespace-nowrap"
+												>
+													{pig.earTag} - {pig.id}
+												</button>
+											))}
+										</div>
+									)}
+									</div>
 										</td>
-										<td className="p-2 font-semibold">{selectedPig?.pigCode || '-'}</td>
-										<td className="p-2">{selectedPig?.species || '-'}</td>
 										<td className="p-2">
 											<input
 												type="number"
@@ -373,13 +346,28 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 						Đang tải danh sách lợn...
 					</p>
 				)}
-				<div className="flex items-center gap-2">
+				<div className="px-4 py-3 border-t">
+					<button
+						onClick={handleAddRow}
+						className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold disabled:opacity-60"
+					>
+						+ Thêm dòng
+					</button>
+				</div>
+				<div className="px-4 py-3 border-t flex items-center justify-end gap-2">
 					<button
 						onClick={handleCancel}
 						disabled={submitting || loading}
 						className="px-4 py-2 bg-gray-200 text-slate-700 rounded-lg text-sm font-semibold disabled:opacity-60"
 					>
 						Hủy
+					</button>
+					<button
+						onClick={handleConfirm}
+						disabled={submitting || loading}
+						className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold disabled:opacity-60"
+					>
+						{submitting ? 'Đang lưu...' : 'Xác nhận'}
 					</button>
 				</div>
 			</div>
@@ -393,7 +381,6 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 					<div className="px-6 py-4 border-b flex items-center justify-between">
 						<div>
 							<h2 className="font-bold text-lg text-slate-900">Thêm bản ghi tăng trưởng</h2>
-							<p className="text-xs text-slate-500 mt-1">Nhập theo dạng bảng, mỗi dòng là một bản ghi của lợn.</p>
 						</div>
 						<button
 							onClick={handleCancel}

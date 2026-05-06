@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { usePig } from '@/modules/pig/hooks/usePig';
 import { PigCurrentTable } from '@/modules/pig/ui/PigCurrentTable';
-import PiggrowthForm from '@/modules/pig/ui/PiggrowthForm';
+import PiggrowthForm from '@/modules/growth/ui/PiggrowthForm';
 
 export default function GrowthTrackingPage() {
 	const { pigCurrent, loadingList, fetchPigCurrent } = usePig();

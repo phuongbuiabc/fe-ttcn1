@@ -1,5 +1,7 @@
 import { PigType, PigStatus } from '@/shared/enums/pig.enum';
-import { StringList } from '@google/genai';
+import { Pig } from '@/shared/types';
+import { de } from 'date-fns/locale';
+import { Average } from 'next/font/google';
 
 export interface CreatePigRequest {
   earTag?: string;
@@ -29,13 +31,13 @@ export interface UpdatePigRequest {
 
 export interface PigResponse {
   id: string;
-  pigCode: string;
   earTag?: string;
   birthWeight?: number;
   birthDate?: string;
   type: PigType;
   origin?: string;
   species?: string;
+  breedName: string;
   nippleCount?: number;
   herdEntryDate?: string;
   status?: PigStatus;
@@ -55,11 +57,11 @@ export interface PigGrowthItemResponse {
 
 export interface PigDiseaseHistoryItemResponse {
   id: string;
-  diseaseCode: string;
+  diseaseCode?: string;
   diseaseName: string;
   sickDate: string;
   recoveryDate?: string;
-  status: string;// cần enum cho trạng thái bệnh: 'SICK' | 'RECOVERED' | 'DECEASED'
+  status: string;
 }
 
 export interface PigVaccinationItemResponse {
@@ -72,12 +74,15 @@ export interface PigVaccinationItemResponse {
 
 export interface PigDetailResponse {
   pig: PigResponse;
+
   currentPenId?: string;
   currentPenName?: string;
   penEntryDate?: string;
+
   currentWeight?: number;
   adg?: number;
   fcr?: number;
+
   growthHistory: PigGrowthItemResponse[];
   diseaseHistory: PigDiseaseHistoryItemResponse[];
   vaccinations: PigVaccinationItemResponse[];
@@ -115,4 +120,16 @@ export interface PigCurrentResponse {
   chestGirth?: number;
   adg?: number;
   fcr?: number;
+}
+
+export interface PigHistoryFarrowingResponse {
+  cycleId: string;
+  actualFarrowDate: string;
+  bornCount: number; //số con đẻ ra
+  deadCount: number; //Thai gỗ
+  crushedCount: number; //đè chết
+  deformedCount: number; //dị tật
+  aliveCount: number; //sống
+  averageWeight: number; //trung bình trọng lượng
+  status: string; //trạng thái thai kỳ
 }

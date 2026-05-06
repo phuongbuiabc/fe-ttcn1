@@ -23,9 +23,9 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
   }
 
   return (
-    <div className="responsive-table">
+    <div className="responsive-table max-h-[65vh] overflow-y-auto overflow-x-auto">
       <table className="w-full text-left border-collapse">
-        <thead className="bg-slate-50/50">
+        <thead className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur">
           <tr>
             <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Mã / Tai</th>
             <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Loại</th>
@@ -47,9 +47,6 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
             >
               {/* CODE + EARTAG */}
               <td className="px-6 py-3">
-                <p className="font-black text-slate-900 text-[13px]">
-                  {pig.pigCode}
-                </p>
                 <p className="text-[10px] text-slate-400">
                   Tai: {pig.earTag || '--'}
                 </p>
@@ -65,7 +62,7 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
               {/* SPECIES */}
               <td className="px-6 py-3">
                 <span className="text-xs text-slate-700">
-                  {pig.species || '--'}
+                  {pig.breedName || '--'}
                 </span>
               </td>
 
@@ -76,7 +73,7 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
                 </span>
               </td>
 
-              {/* WEIGHT */}
+              {/* BIRTH WEIGHT */}
               <td className="px-6 py-3 text-center">
                 <span className="font-bold text-sm">
                   {pig.birthWeight ?? '--'}

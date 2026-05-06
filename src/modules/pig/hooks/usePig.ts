@@ -5,6 +5,8 @@ import {
   PigDetailResponse,
   SowResponse,
   PigCurrentResponse,
+  PregnantResponse,
+  PigHistoryFarrowingResponse,
   CreatePigRequest,
   UpdatePigRequest,
 } from '../model/pig.model';
@@ -14,9 +16,12 @@ export function usePig() {
   const [sows, setSows] = useState<SowResponse[]>([]);
   const [pigCurrent, setPigCurrent] = useState<PigCurrentResponse[]>([]);
   const [pigDetail, setPigDetail] = useState<PigDetailResponse | null>(null);
+  const [pregnantPigs, setPregnantPigs] = useState<PregnantResponse[]>([]);
+  const [pigHistoryFarrowing, setPigHistoryFarrowing] = useState<PigHistoryFarrowingResponse[]>([]);
 
   const [loadingList, setLoadingList] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   // ===== FETCH LIST =====
   const fetchPigs = useCallback(async () => {
@@ -58,19 +63,65 @@ export function usePig() {
     }
   }, []);
 
-  const fetchPigCurrent = useCallback(async () => {
+  const fetchPigCurrent = useCallback(async (type?: string) => {
     setLoadingList(true);
     try {
-      const res = await pigService.getPigCurrent();
+      const res = await pigService.getPigCurrent(type);
       if (res.success) {
-        setPigCurrent(res.data || []);
+        const normalized = (res.data || []).map((item: any): PigCurrentResponse => {
+          const latestGrowth = item.latestGrowth || {};
+
+          return {
+            id: item.id || item.pigId || item.pig?.id || '',
+            earTag: item.earTag || item.pigEarTag || item.pig?.earTag || '',
+            type: item.type || item.pig?.type,
+            species: item.species || item.pig?.species,
+            status: item.status || item.pig?.status,
+            latestTrackingDate:
+              item.latestTrackingDate || item.trackingDate || latestGrowth.trackingDate,
+            weight: item.weight ?? item.weigth ?? latestGrowth.weight ?? latestGrowth.weigth,
+            litterLength:
+              item.litterLength ?? item.litterLegth ?? latestGrowth.litterLength ?? latestGrowth.litterLegth,
+            chestGirth: item.chestGirth ?? latestGrowth.chestGirth,
+            adg: item.adg ?? latestGrowth.adg,
+            fcr: item.fcr ?? latestGrowth.fcr,
+          };
+        });
+
+        setPigCurrent(normalized);
       }
     } finally {
       setLoadingList(false);
     }
   }, []);
 
+  const fetchPregnantPigs = useCallback(async () => {
+    setLoadingList(true);
+    try {
+      const res = await pigService.getPregnantPigs();
+      if (res.success) {
+        setPregnantPigs(res.data || []);
+      }
+    } finally {
+      setLoadingList(false);
+    }
+  }, []);
 
+  const fetchPigHistoryFarrowing = useCallback(async (id: string) => {
+    setLoadingHistory(true);
+    try {
+      const res = await pigService.getPigHistoryFarrowing(id);
+      if (res.success) {
+        setPigHistoryFarrowing(res.data || []);
+        return res.data || [];
+      }
+
+      setPigHistoryFarrowing([]);
+      return [];
+    } finally {
+      setLoadingHistory(false);
+    }
+  }, []);
 
   // ===== CREATE =====
   const createPig = async (data: CreatePigRequest) => {
@@ -104,14 +155,18 @@ export function usePig() {
     sows,
     pigDetail,
     pigCurrent,
+    pregnantPigs,
+    pigHistoryFarrowing,
     loadingList,
     loadingDetail,
+    loadingHistory,
 
     fetchPigs,
     fetchSows,
     fetchPigDetail,
     fetchPigCurrent,
-
+    fetchPregnantPigs,
+    fetchPigHistoryFarrowing,
     createPig,
     updatePig,
     deletePig,

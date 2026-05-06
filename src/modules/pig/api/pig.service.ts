@@ -6,8 +6,11 @@ import {
   PigDetailResponse,
   SowResponse,
   PigCurrentResponse,
+  PregnantResponse,
+  PigHistoryFarrowingResponse
 } from '../model/pig.model';
 import { ApiResponse } from '@/shared/types';
+import { get } from 'http';
 
 const endpoint = '/api/v1/pigs';
 
@@ -29,13 +32,24 @@ export const pigService = {
       `${endpoint}/${id}/detail`
     ),
 
-  getPigCurrent: () =>
-    apiClient.get<ApiResponse<PigCurrentResponse[]>>(`${endpoint}/with-lastest-growth`),
-
+  getPigCurrent: (type?: string) =>
+    apiClient.get<ApiResponse<PigCurrentResponse[]>>(
+      `${endpoint}/with-latest-growth${
+        type ? `?type=${encodeURIComponent(type)}` : ''
+      }`
+    ),
+  
   getSow: () =>
     apiClient.get<ApiResponse<SowResponse[]>>(`${endpoint}/sows`),
 
+  getPregnantPigs: () =>
+    apiClient.get<ApiResponse<PregnantResponse[]>>(`${endpoint}/pregnant`),
 
+  getPigHistoryFarrowing: (id: string) =>
+    apiClient.get<ApiResponse<PigHistoryFarrowingResponse[]>>(
+      `${endpoint}/${id}/farrowing-history`
+    ),
+    
   delete: (id: string) =>
     apiClient.delete<ApiResponse<any>>(`${endpoint}/${id}`),
 };

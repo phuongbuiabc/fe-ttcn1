@@ -35,11 +35,16 @@ const getToday = () => new Date().toISOString().slice(0, 10);
 export default function PigPage() {
   const {
     pigs,
+    pigCurrent,
     pigDetail,
+    pigHistoryFarrowing,
     loadingList,
     loadingDetail,
+    loadingHistory,
     fetchPigs,
+    fetchPigCurrent,
     fetchPigDetail,
+    fetchPigHistoryFarrowing,
     createPig,
     updatePig,
     deletePig,
@@ -68,10 +73,11 @@ export default function PigPage() {
 
   useEffect(() => {
     fetchPigs();
+    fetchPigCurrent();
     fetchBreeds();
     fetchAreas();
     fetchPens();
-  }, [fetchPigs, fetchBreeds, fetchAreas, fetchPens]);
+  }, [fetchPigs, fetchPigCurrent, fetchBreeds, fetchAreas, fetchPens]);
 
   useEffect(() => {
     const loadPenCounts = async () => {
@@ -98,7 +104,7 @@ export default function PigPage() {
 
   const filteredPigs = useMemo(() => {
     return pigs.filter((pig) =>
-      [pig.pigCode, pig.earTag, pig.species, pig.type]
+      [pig.id, pig.earTag, pig.species, pig.type]
         .join(' ')
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
@@ -200,7 +206,12 @@ export default function PigPage() {
 
               setSelectedPigId(pig.id);
               setIsDetailMode(true);
-              await fetchPigDetail(pig.id);
+
+              const detail = await fetchPigDetail(pig.id);
+
+              if (detail?.pig.type === PigType.NAI) {
+                await fetchPigHistoryFarrowing(pig.id);
+              }
             }}
             onEdit={(pig) => {
               setEditingPig(pig);
@@ -234,6 +245,9 @@ export default function PigPage() {
             <PigDetail
               data={pigDetail}
               loading={loadingDetail}
+              pigCurrent={pigCurrent.find((item) => item.id === pigDetail?.pig.id) ?? null}
+              farrowingHistory={pigDetail?.pig.type === PigType.NAI ? pigHistoryFarrowing : []}
+              farrowingLoading={loadingHistory}
               onClose={() => setIsDetailMode(false)}
             />
           </div>
