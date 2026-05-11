@@ -12,22 +12,23 @@ import { cn } from "@/shared/utils/utils";
 
 import { useCullingProposal } from "@/modules/cullingproposal/hooks/useCullingProposal";
 import { cullingProposalService } from "@/modules/cullingproposal/api/CullingProposal.service";
-import { CullingProposal } from "@/modules/cullingproposal/model/CullingProposal.model";
+import { CullingProposalResponse } from "@/modules/cullingproposal/model/CullingProposal.model";
+import { CullingProposalStatus, CullingProposalType } from "@/shared/enums/cullingproposal.enum";
 
 type ProposalBucket = "dispose" | "sellOff" | "approved";
 
 type SelectionState = Record<ProposalBucket, string[]>;
 
-const statusMeta: Record<string, { label: string; className: string }> = {
-	APPROVED: {
+const statusMeta: Record<CullingProposalStatus, { label: string; className: string }> = {
+	[CullingProposalStatus.APPROVED]: {
 		label: "Phê duyệt",
 		className: "bg-emerald-50 text-emerald-600",
 	},
-	REJECTED: {
+	[CullingProposalStatus.REJECTED]: {
 		label: "Từ chối",
 		className: "bg-rose-50 text-rose-600",
 	},
-	PENDING: {
+	[CullingProposalStatus.PENDING]: {
 		label: "Chờ duyệt",
 		className: "bg-amber-50 text-amber-600",
 	},
@@ -66,7 +67,7 @@ const toDayEnd = (value: string) => {
 	return date.getTime();
 };
 
-const isInDateRange = (proposal: CullingProposal, fromDate: string, toDate: string) => {
+const isInDateRange = (proposal: CullingProposalResponse, fromDate: string, toDate: string) => {
 	const createdAt = new Date(proposal.createdAt).getTime();
 
 	if (fromDate && createdAt < toDayStart(fromDate)) {
@@ -90,9 +91,9 @@ const formatDateTime = (value: string) => {
 	return format(parsed, "dd/MM/yyyy HH:mm");
 };
 
-const getStatusMeta = (status?: string) => {
+const getStatusMeta = (status?: CullingProposalStatus) => {
 	if (!status) {
-		return statusMeta.PENDING;
+		return statusMeta[CullingProposalStatus.PENDING];
 	}
 
 	return statusMeta[status] ?? {
@@ -117,7 +118,7 @@ const BucketTable = ({
 	onClearFilter,
 }: {
 	bucket: ProposalBucket;
-	rows: CullingProposal[];
+	rows: CullingProposalResponse[];
 	selectedIds: string[];
 	onToggleOne: (bucket: ProposalBucket, id: string) => void;
 	onToggleAll: (bucket: ProposalBucket, ids: string[], checked: boolean) => void;
@@ -131,6 +132,7 @@ const BucketTable = ({
 	onClearFilter: () => void;
 }) => {
 	const meta = bucketMeta[bucket];
+	const isApprovedBucket = bucket === "approved";
 	const allSelected = rows.length > 0 && selectedIds.length === rows.length;
 	const selectedCount = selectedIds.length;
 
@@ -175,19 +177,21 @@ const BucketTable = ({
 					<thead className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur">
 						<tr>
 							<th className="w-12 px-4 py-3">
-								<input
-									type="checkbox"
-									checked={allSelected}
-									onChange={(e) => onToggleAll(bucket, rows.map((r) => r.id), e.target.checked)}
-									className="h-4 w-4 rounded border-slate-300"
-								/>
+								{!isApprovedBucket && (
+									<input
+										type="checkbox"
+										checked={allSelected}
+										onChange={(e) => onToggleAll(bucket, rows.map((r) => r.id), e.target.checked)}
+										className="h-4 w-4 rounded border-slate-300"
+									/>
+								)}
 							</th>
-							<th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Mã ĐX</th>
 							<th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Số tai</th>
 							<th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Loại</th>
 							<th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Lý do</th>
 							<th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Nhân viên</th>
 							<th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Ngày tạo</th>
+							<th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase">Trạng thái</th>
 						</tr>
 					</thead>
 
@@ -209,14 +213,15 @@ const BucketTable = ({
 										className={cn("bg-white transition-colors", selected ? "bg-emerald-50" : "hover:bg-slate-50")}
 									>
 										<td className="px-4 py-3">
-											<input
-												type="checkbox"
-												checked={selected}
-												onChange={() => onToggleOne(bucket, row.id)}
-												className="h-4 w-4 rounded border-slate-300"
-											/>
+											{!isApprovedBucket && (
+												<input
+													type="checkbox"
+													checked={selected}
+													onChange={() => onToggleOne(bucket, row.id)}
+													className="h-4 w-4 rounded border-slate-300"
+												/>
+											)}
 										</td>
-										<td className="px-4 py-3 text-sm font-semibold text-slate-900">{row.id}</td>
 										<td className="px-4 py-3 text-sm text-slate-600">{row.pigEarTag || "--"}</td>
 										<td className="px-4 py-3 text-sm text-slate-600">{row.proposalType}</td>
 										<td className="px-4 py-3 text-sm text-slate-600">{row.reason || "--"}</td>
@@ -238,11 +243,11 @@ const BucketTable = ({
 			{/* Footer */}
 			<div className="flex items-center justify-between">
 				<div className="text-xs text-slate-600">Đã chọn {selectedCount}/{rows.length} dòng</div>
-				{bucket !== "approved" && (
+				{!isApprovedBucket && (
 					<div className="flex flex-wrap gap-2">
 						<button
 							type="button"
-							onClick={() => { /* TODO: API call pending */ }}
+							onClick={() => onApprove(bucket)}
 							disabled={selectedCount === 0 || busy}
 							className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-bold text-white transition hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400"
 						>
@@ -251,7 +256,7 @@ const BucketTable = ({
 						</button>
 						<button
 							type="button"
-							onClick={() => { /* TODO: API call pending */ }}
+							onClick={() => onReject(bucket)}
 							disabled={selectedCount === 0 || busy}
 							className="inline-flex items-center gap-2 rounded-lg bg-rose-500 px-3 py-2 text-sm font-bold text-white transition hover:bg-rose-600 disabled:bg-slate-200 disabled:text-slate-400"
 						>
@@ -308,7 +313,7 @@ export default function CullingProposalTable() {
 		}));
 	};
 
-	const runBulkAction = async (bucket: ProposalBucket, status: "APPROVED" | "REJECTED") => {
+	const runBulkAction = async (bucket: ProposalBucket, status: CullingProposalStatus) => {
 		const ids = selection[bucket];
 		if (ids.length === 0) return;
 
@@ -340,8 +345,8 @@ export default function CullingProposalTable() {
 					selectedIds={selection.dispose}
 					onToggleOne={handleToggleOne}
 					onToggleAll={handleToggleAll}
-					onApprove={(bucket) => runBulkAction(bucket, "APPROVED")}
-					onReject={(bucket) => runBulkAction(bucket, "REJECTED")}
+					onApprove={(bucket) => runBulkAction(bucket, CullingProposalStatus.APPROVED)}
+					onReject={(bucket) => runBulkAction(bucket, CullingProposalStatus.REJECTED)}
 					busy={actionLoading === "dispose"}
 					fromDate={disposeFromDate}
 					toDate={disposeToDate}
@@ -360,8 +365,8 @@ export default function CullingProposalTable() {
 					selectedIds={selection.sellOff}
 					onToggleOne={handleToggleOne}
 					onToggleAll={handleToggleAll}
-					onApprove={(bucket) => runBulkAction(bucket, "APPROVED")}
-					onReject={(bucket) => runBulkAction(bucket, "REJECTED")}
+					onApprove={(bucket) => runBulkAction(bucket, CullingProposalStatus.APPROVED)}
+					onReject={(bucket) => runBulkAction(bucket, CullingProposalStatus.REJECTED)}
 					busy={actionLoading === "sellOff"}
 					fromDate={sellOffFromDate}
 					toDate={sellOffToDate}
@@ -382,8 +387,8 @@ export default function CullingProposalTable() {
 				selectedIds={selection.approved}
 				onToggleOne={handleToggleOne}
 				onToggleAll={handleToggleAll}
-				onApprove={(bucket) => runBulkAction(bucket, "APPROVED")}
-				onReject={(bucket) => runBulkAction(bucket, "REJECTED")}
+				onApprove={(bucket) => runBulkAction(bucket, CullingProposalStatus.APPROVED)}
+				onReject={(bucket) => runBulkAction(bucket, CullingProposalStatus.REJECTED)}
 				busy={actionLoading === "approved"}
 				fromDate={approvedFromDate}
 				toDate={approvedToDate}

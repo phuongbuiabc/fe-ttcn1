@@ -24,6 +24,9 @@ export const matingService = {
     updateMating: (id: string, data: UpdateMatingRequest) =>
         apiClient.put<ApiResponse<MatingResponse>>(`${endpoint}/${id}`, data),
 
+    updatePregnancyStatus: (id: string, status: string) =>
+        apiClient.post<ApiResponse<MatingResponse>>(`${endpoint}/${id}/pregnancy-status`, { status }),
+
     deleteMating: (id: string) =>
         apiClient.delete<ApiResponse<MatingResponse>>(`${endpoint}/${id}`),
 };

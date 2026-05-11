@@ -17,9 +17,9 @@ export function useReproduction() {
   const [error, setError] = useState<string | null>(null);
 
   const mapPigToSow = (pig: PigResponse, penName?: string): SowRecord => ({
-    id: pig.pigCode,
-    earTag: pig.earTag ?? pig.pigCode,
-    breed: pig.species || pig.origin || pig.earTag || pig.pigCode,
+    id: pig.id,
+    earTag: pig.earTag ?? pig.id,
+    breed: pig.species || pig.origin || pig.earTag || pig.id,
     pen: penName || pig.herdEntryDate || "Chưa có",
     status: pig.status === "SOLD" ? "WEANED" : "OPEN",
     matingDate: pig.herdEntryDate,

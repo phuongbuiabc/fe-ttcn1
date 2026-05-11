@@ -63,7 +63,7 @@ export function PigDetail({
       : 0;
 
   return (
-    <aside className="w-full min-w-0 bg-white border-l shadow-2xl overflow-y-auto flex flex-col h-full">
+    <aside className="w-full min-w-0 bg-white shadow-2xl overflow-y-auto flex flex-col h-full">
 
       {/* HEADER */}
       <div className="p-6 sticky top-0 bg-white z-20 border-b flex justify-between items-center">
@@ -95,7 +95,7 @@ export function PigDetail({
             <Info label="Số tai" value={pig.earTag} />
             <Info label="Loại" value={pig.type} />
 
-            <Info label="Giống" value={pig.species} />
+            <Info label="Giống" value={pig.breedName} />
             <Info label="Trạng thái" value={pig.status} />
 
             <Info label="Ngày sinh" value={pig.birthDate} />

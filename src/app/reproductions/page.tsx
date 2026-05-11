@@ -4,10 +4,7 @@ import React, { useState } from "react";
 import { 
   Search as SearchIcon, 
   PlusCircle, 
-  CheckCircle2, 
-  Baby, 
   RefreshCw,
-  AlertTriangle,
   PawPrint,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -23,9 +20,9 @@ import {
 
 import { useReproduction } from "@/modules/reproduction/hooks/useReproduction";
 import { SowTable } from "@/modules/pig/ui/SowTable";
-import { SowResponse } from "@/modules/pig/model/pig.model";
-import { PigType, PigStatus } from "@/shared/enums/pig.enum";
 import { ReproductionStats } from "@/modules/reproduction/ui/ReproductionStats";
+import { PigType, PigStatus } from "@/shared/enums/pig.enum";
+import type { SowResponse } from "@/modules/pig/model/pig.model";
 
 // Feature Modals
 import { MatingFormModal } from "@/modules/reproduction/ui/MatingFormModal";
@@ -61,20 +58,18 @@ export default function ReproductionManagementPage() {
       sowBreed.includes(normalizedSearchTerm)
     );
   });
-
-  const selectedSow = sows.find(s => s.id === selectedSowId) || sows[0];
-  const faTabActive = activeTab === "farrowing";
-
-  // map reproduction `SowRecord` to `SowResponse` expected by pig's SowTable
-  const pigSows: SowResponse[] = filteredSows.map((s) => ({
-    id: s.id,
-    earTag: (s as any).earTag ?? s.id,
+  const sowTableData: SowResponse[] = filteredSows.map((sow) => ({
+    id: sow.id,
+    earTag: sow.earTag || sow.id,
     type: PigType.NAI,
-    species: s.breed ?? "",
+    species: sow.breed,
+    breedName: sow.breed,
     totalPregnancies: 0,
     miscarriageCount: 0,
     status: PigStatus.ACTIVE,
   }));
+
+  const selectedSow = sows.find(s => s.id === selectedSowId) || sows[0];
 
   return (
     <div className="space-y-4 pb-20 bg-[#fbfcfd] min-h-screen -m-4 p-4 ">
@@ -145,11 +140,9 @@ export default function ReproductionManagementPage() {
           {activeTab === "sows" ? (
             <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden min-h-[300px]">
               <SowTable
-                sows={pigSows}
+                sows={sowTableData}
                 loading={loading}
                 onView={(sow) => setSelectedSowId(sow.id)}
-                onEdit={(sow: any) => {}}
-                onDelete={(id: string) => {}}
               />
             </div>
           ) : activeTab === "farrowing" ? (

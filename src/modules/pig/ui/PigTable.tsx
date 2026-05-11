@@ -27,7 +27,7 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
       <table className="w-full text-left border-collapse">
         <thead className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur">
           <tr>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Mã / Tai</th>
+            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Số Tai</th>
             <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Loại</th>
             <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Giống</th>
             <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Nguồn</th>
@@ -45,7 +45,7 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
               className="bg-white hover:bg-slate-50 transition-all cursor-pointer"
               onClick={() => onView(pig)}
             >
-              {/* CODE + EARTAG */}
+              {/* EARTAG */}
               <td className="px-6 py-3">
                 <p className="text-[10px] text-slate-400">
                   Tai: {pig.earTag || '--'}
@@ -59,7 +59,7 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
                 </span>
               </td>
 
-              {/* SPECIES */}
+              {/* BREED */}
               <td className="px-6 py-3">
                 <span className="text-xs text-slate-700">
                   {pig.breedName || '--'}

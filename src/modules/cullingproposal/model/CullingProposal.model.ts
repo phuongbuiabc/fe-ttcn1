@@ -1,11 +1,13 @@
-export interface CullingProposal {
+import { CullingProposalStatus } from "@/shared/enums/cullingproposal.enum";
+
+export interface CullingProposalResponse {
   id: string;
   pigId: string;
   pigEarTag: string;
   proposalType: string;
   reason?: string;
   employeeId: string;
-  status?: string;
+  status?: CullingProposalStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -15,7 +17,7 @@ export interface CreateCullingProposalRequest {
   proposalType: string;
   reason?: string;
   employeeId: string;
-  status?: string;
+  status?: CullingProposalStatus;
 }
 
 export interface UpdateCullingProposalRequest {
@@ -23,5 +25,10 @@ export interface UpdateCullingProposalRequest {
   proposalType?: string;
   reason?: string;
   employeeId?: string;
-  status?: string;
+  status?: CullingProposalStatus;
+}
+
+export interface CullingProposalReview {
+  id: string;
+  status: CullingProposalStatus;
 }

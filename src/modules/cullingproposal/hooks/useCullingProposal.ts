@@ -1,15 +1,43 @@
 import { useEffect, useState, useMemo } from "react";
 import { cullingProposalService } from "@/modules/cullingproposal/api/CullingProposal.service";
-import { CullingProposal } from "@/modules/cullingproposal/model/CullingProposal.model";
+import { CullingProposalResponse } from "@/modules/cullingproposal/model/CullingProposal.model";
+import { CullingProposalStatus } from "@/shared/enums/cullingproposal.enum";
 
 export const useCullingProposal = () => {
-  const [data, setData] = useState<CullingProposal[]>([]);
+  const [data, setData] = useState<CullingProposalResponse[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const res = await cullingProposalService.getAll();
+      const [allRes, processedRes] = await Promise.all([
+        cullingProposalService.getAll(),
+        cullingProposalService.getProcessed(),
+      ]);
+
+      const merged = [...(allRes.data ?? []), ...(processedRes.data ?? [])];
+      const uniqueById = Array.from(new Map(merged.map((item) => [item.id, item])).values());
+
+      setData(uniqueById);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProcessed = async () => {
+    setLoading(true);
+    try {
+      const res = await cullingProposalService.getProcessed();
+      setData(res.data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchByType = async (proposalType: string) => {
+    setLoading(true);
+    try {
+      const res = await cullingProposalService.getByType(proposalType);
       setData(res.data);
     } finally {
       setLoading(false);
@@ -31,22 +59,27 @@ export const useCullingProposal = () => {
     setData(prev => prev.filter(i => i.id !== id));
   };
 
+  const review = async (id: string, status: CullingProposalStatus) => {
+    await cullingProposalService.review(id, status);
+    await fetchAll();
+  };
+
   useEffect(() => {
     fetchAll();
   }, []);
 
   const disposeList = useMemo(
-    () => data.filter(i => i.proposalType === "CULLING" && i.status !== "APPROVED"),
+    () => data.filter(i => i.proposalType === "CULLING" && i.status === CullingProposalStatus.PENDING),
     [data]
   );
 
   const sellOffList = useMemo(
-    () => data.filter(i => i.proposalType === "SELL_OFF" && i.status !== "APPROVED"),
+    () => data.filter(i => i.proposalType === "SELL_OFF" && i.status === CullingProposalStatus.PENDING),
     [data]
   );
 
   const approvedList = useMemo(
-    () => data.filter(i => i.status === "APPROVED"),
+    () => data.filter(i => i.status === CullingProposalStatus.APPROVED),
     [data]
   );
 
@@ -60,5 +93,8 @@ export const useCullingProposal = () => {
     create,
     update,
     remove,
+    review,
+    fetchProcessed,
+    fetchByType,
   };
 };

@@ -7,13 +7,14 @@ import { CreateCullingProposalRequest } from '@/modules/cullingproposal/model/Cu
 import { usePig } from '@/modules/pig/hooks/usePig';
 import { PigResponse } from '@/modules/pig/model/pig.model';
 import { useAuth } from '@/shared/components/AuthProvider';
+import { CullingProposalStatus, CullingProposalType } from '@/shared/enums/cullingproposal.enum';
 
 interface ProposalRow {
 	id: string;
 	pigId: string;
 	earTagInput: string;
 	pigEarTag: string;
-	proposalType: 'CULLING' | 'SELL_OFF';
+	proposalType: CullingProposalType;
 	reason: string;
 	employeeId: string;
 }
@@ -29,7 +30,7 @@ const createEmptyRow = (): ProposalRow => ({
 	pigId: '',
 	earTagInput: '',
 	pigEarTag: '',
-	proposalType: 'CULLING',
+	proposalType: CullingProposalType.CULLING,
 	reason: '',
 	employeeId: '',
 });

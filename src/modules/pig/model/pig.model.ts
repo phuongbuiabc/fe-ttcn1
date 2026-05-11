@@ -93,6 +93,7 @@ export interface SowResponse{
   earTag: string;
   type: PigType;
   species: string;
+  breedName: string;
   totalPregnancies: number;
   miscarriageCount: number;
   status: PigStatus;
