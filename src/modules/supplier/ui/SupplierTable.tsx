@@ -3,7 +3,8 @@
 import React from 'react';
 import { Edit, Trash2, Truck, Phone, Mail, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Supplier } from '@/shared/types';
+import { Supplier } from '../model/supplier.model';
+
 import { cn } from '@/shared/utils/utils';
 
 interface SupplierTableProps {
@@ -28,8 +29,7 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
         <thead className="bg-slate-50/50">
           <tr>
             <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Đối tác / Nhà cung cấp</th>
-            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Phân loại hàng</th>
-            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Thông tin liên hệ</th>
+            <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Thông tin liên hệ & Địa chỉ</th>
             <th className="px-6 py-3 text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none text-right">Thao tác</th>
           </tr>
         </thead>
@@ -49,25 +49,25 @@ export function SupplierTable({ suppliers, loading, onEdit, onDelete }: Supplier
                   </div>
                   <div>
                     <p className="text-[13px] font-bold text-slate-800 leading-none">{item.name}</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase mt-0.5 tracking-tighter">{item.supplierCode}</p>
                   </div>
                 </div>
-              </td>
-              <td className="px-6 py-3">
-                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-black rounded-lg uppercase tracking-wider">
-                  {item.type}
-                </span>
               </td>
               <td className="px-6 py-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-[13px] font-bold text-slate-600">
-                    <Phone size={12} className="text-slate-300" /> {item.phone}
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5 text-[13px] font-bold text-slate-600">
+                      <Phone size={12} className="text-slate-300" /> {item.phone}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                      <Mail size={12} className="text-slate-300" /> {item.email}
+                    </div>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
-                    <Mail size={12} className="text-slate-300" /> {item.email}
+                    <MapPin size={12} className="text-slate-300" /> {item.address}
                   </div>
                 </div>
               </td>
+
               <td className="px-6 py-1.5 text-right">
                 <div className="flex justify-end gap-1.5 transition-all">
                   <button 

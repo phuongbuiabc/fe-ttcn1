@@ -133,22 +133,22 @@ export interface CreateScheduleRequest {
 
 export interface Supplier {
   id: string;
-  supplierCode: string;
   name: string;
-  type: string;
   address: string;
   phone: string;
   email: string;
 }
 
+
 export interface Supply {
   id: string;
-  supply_id: string;
-  supply_name: string;
-  quantity: number;
+  name: string;
   unit: string;
-  supply_type: string;
+  materialType: string;
+  quantity: number;
   description: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface SupplyLoss {
@@ -160,4 +160,4 @@ export interface SupplyLoss {
   quantity: number;
   reason: string;
   note: string;
-}
+}

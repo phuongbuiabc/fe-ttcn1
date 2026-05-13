@@ -34,15 +34,16 @@ export function SupplyDetailModal({ isOpen, onClose, supply, onEdit }: SupplyDet
 					<div className="space-y-8">
 						<div>
 							<span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-lg uppercase tracking-widest">
-								Chi tiết vật tư • {supply.supply_id}
+								Chi tiết vật tư
 							</span>
-							<h2 className="text-3xl font-black text-slate-900 mt-2">{supply.supply_name}</h2>
+
+							<h2 className="text-3xl font-black text-slate-900 mt-2">{supply.name}</h2>
 						</div>
 
 						<div className="grid grid-cols-2 gap-8 py-8 border-y border-slate-50">
 							<div className="space-y-1">
 								<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Loại vật tư</p>
-								<p className="text-sm font-bold text-slate-700">{supply.supply_type}</p>
+								<p className="text-sm font-bold text-slate-700">{supply.materialType}</p>
 							</div>
 							<div className="space-y-1">
 								<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Số lượng hiện tại</p>
@@ -74,3 +75,4 @@ export function SupplyDetailModal({ isOpen, onClose, supply, onEdit }: SupplyDet
 		</AnimatePresence>
 	);
 }
+
