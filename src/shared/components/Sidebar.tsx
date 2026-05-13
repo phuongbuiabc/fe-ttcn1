@@ -35,7 +35,7 @@ const navItems = [
   { name: "Bảng điều khiển", icon: LayoutDashboard, href: "/" },
   { name: "Quản lý Đàn lợn", icon: PawPrint, href: "/pigs" },
   { name: "Sinh sản", icon: Baby, href: "/reproductions" },
-  { name: "Sức khỏe", icon: Stethoscope, href: "/health" },
+  { name: "Sức khỏe", icon: Stethoscope, href: "/health/growth-tracking" },
   { name: "Chuồng nuôi", icon: Warehouse, href: "/pens" },
   { name: "Vật tư", icon: Database, href: "/inventory" },
   { 
@@ -99,7 +99,10 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
       <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto no-scrollbar pt-3">
         {navItems.map((item) => {
           const hasChildren = !!item.children;
-          const isActive = pathname === item.href || (hasChildren && pathname.startsWith(item.href));
+          const isActive =
+            pathname === item.href ||
+            (hasChildren && pathname.startsWith(item.href)) ||
+            (item.name === 'Sức khỏe' && pathname.startsWith('/health'));
           
           if (hasChildren) {
             const isExpanded = expandedItems.includes(item.name);

@@ -30,9 +30,7 @@ export function PigCurrentTable({ pigs, loading }: PigCurrentTableProps) {
             <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Dài lưng</th>
             <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Vòng ngực</th>
             <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Ngày đo</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Tăng trưởng</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Hiệu quả</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Trạng thái</th>
+            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">ADG/FCR</th>
           </tr>
         </thead>
 
@@ -58,7 +56,7 @@ export function PigCurrentTable({ pigs, loading }: PigCurrentTableProps) {
 
                 {/* SPECIES */}
                 <td className="px-6 py-3">
-                  <span className="text-xs text-slate-700">{pig.species || '--'}</span>
+                  <span className="text-xs text-slate-700">{pig.breedName || '--'}</span>
                 </td>
 
                 {/* WEIGHT */}
@@ -86,33 +84,12 @@ export function PigCurrentTable({ pigs, loading }: PigCurrentTableProps) {
                     : '--'}
                 </td>
 
-                {/* ADG (Average Daily Gain) */}
+                {/* ADG/FCR */}
                 <td className="px-6 py-3 text-center">
                   <span className="text-xs font-semibold text-emerald-600">
-                    {pig.adg ? `${pig.adg.toFixed(2)}` : '--'}
+                    {pig.adg ? `${pig.adg.toFixed(2)}` : '--'}/{pig.fcr ? pig.fcr.toFixed(2) : '--'}
                   </span>
-                  <span className="ml-1 text-[10px] text-slate-400">g/ngày</span>
-                </td>
 
-                {/* FCR (Feed Conversion Ratio) */}
-                <td className="px-6 py-3 text-center">
-                  <span className="text-xs font-semibold">
-                    {pig.fcr ? pig.fcr.toFixed(2) : '--'}
-                  </span>
-                </td>
-
-                {/* STATUS */}
-                <td className="px-6 py-3 text-center">
-                  <span
-                    className={cn(
-                      'px-2 py-0.5 rounded-full text-[9px] font-bold uppercase',
-                      pig.status === 'ACTIVE'
-                        ? 'bg-emerald-50 text-emerald-600'
-                        : 'bg-slate-100 text-slate-500'
-                    )}
-                  >
-                    {pig.status || '--'}
-                  </span>
                 </td>
               </tr>
             ))

@@ -1,30 +1,29 @@
-import { CullingProposalStatus } from "@/shared/enums/cullingproposal.enum";
+import { CullingProposalStatus, CullingProposalType } from "@/shared/enums/cullingproposal.enum";
 
 export interface CullingProposalResponse {
   id: string;
   pigId: string;
   pigEarTag: string;
-  proposalType: string;
+  proposalType: CullingProposalType;
   reason?: string;
   employeeId: string;
+  employeeName: string;
   status?: CullingProposalStatus;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateCullingProposalRequest {
-  pigId: string;
-  proposalType: string;
+  pigEarTag: string;
+  proposalType: CullingProposalType;
   reason?: string;
-  employeeId: string;
-  status?: CullingProposalStatus;
 }
 
 export interface UpdateCullingProposalRequest {
   pigId?: string;
-  proposalType?: string;
+  proposalType?: CullingProposalType;
   reason?: string;
-  employeeId?: string;
+  employeeName?: string;
   status?: CullingProposalStatus;
 }
 

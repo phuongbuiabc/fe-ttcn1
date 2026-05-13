@@ -114,6 +114,7 @@ export interface PigCurrentResponse {
   earTag: string;
   type: PigType;
   species: string;
+  breedName: string;
   status: PigStatus;
   latestTrackingDate?: string;
   weight?: number;

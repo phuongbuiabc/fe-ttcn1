@@ -166,9 +166,9 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 				const payload: CreateGrowthTrackingRequest = {
 					pigId: row.pigId,
 					trackingDate,
-					litterLegth: litterLegthVal ?? 0,
+					litterLength: litterLegthVal ?? 0,
 					chestGirth: chestGirthVal ?? 0,
-					weigth: weigthVal ?? 0,
+					weight: weigthVal ?? 0,
 					growthRate: 0,
 					adg: 0,
 					fcr: 0,
@@ -274,7 +274,7 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 													}}
 													className="block w-full px-3 py-2 text-left text-xs hover:bg-slate-50 whitespace-nowrap"
 												>
-													{pig.earTag} - {pig.id}
+													{pig.earTag}
 												</button>
 											))}
 										</div>

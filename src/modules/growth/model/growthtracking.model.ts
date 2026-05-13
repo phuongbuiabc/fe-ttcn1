@@ -17,9 +17,9 @@ export interface GrowthTrackingResponse {
 export interface CreateGrowthTrackingRequest {
     pigId: string;
     trackingDate: string;
-    litterLegth: number;
+    litterLength: number;
     chestGirth: number;
-    weigth: number;
+    weight: number;
     growthRate: number;
     adg: number;
     fcr: number;
@@ -29,9 +29,9 @@ export interface CreateGrowthTrackingRequest {
 export interface UpdateGrowthTrackingRequest {
     pigId?: string;
     trackingDate?: string;
-    litterLegth?: number;
+    litterLength?: number;
     chestGirth?: number;
-    weigth?: number;
+    weight?: number;
     growthRate?: number;
     adg?: number;
     fcr?: number;

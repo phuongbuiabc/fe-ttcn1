@@ -11,8 +11,11 @@ export const growthTrackingService = {
     getById: (id: string) =>
         apiClient.get<ApiResponse<GrowthTrackingResponse>>(`${endpoint}/${id}`),
 
-    create: (data: CreateGrowthTrackingRequest) =>
-        apiClient.post<ApiResponse<GrowthTrackingResponse>>(endpoint, data),
+    create: (data: CreateGrowthTrackingRequest | CreateGrowthTrackingRequest[]) =>
+        apiClient.post<ApiResponse<GrowthTrackingResponse | GrowthTrackingResponse[]>>(
+            endpoint,
+            Array.isArray(data) ? data : [data]
+        ),
 
     update: (id: string, data: UpdateGrowthTrackingRequest) =>
         apiClient.put<ApiResponse<GrowthTrackingResponse>>(`${endpoint}/${id}`, data),

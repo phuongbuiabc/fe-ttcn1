@@ -7,6 +7,8 @@ import { useDisease } from '@/modules/disease/hooks/useDisease';
 import { DiseaseTable } from '@/modules/disease/ui/DiseaseTable';
 import { DiseaseFormCreate } from '@/modules/disease/ui/DiseaseFormCreate';
 import { DiseaseFormUpdate } from '@/modules/disease/ui/DiseaseFormUpdate';
+import { DiseaseHistoryTable } from '@/modules/diseasehistory/ui/DiseaseHistoryTable';
+import { useDiseaseHistory } from '@/modules/diseasehistory/hooks/useDiseasehistory';
 import { usePathname } from 'next/navigation';
 import { getPageTitle } from '@/shared/utils/getPageTitle';
 import { useAuth } from '@/shared/components/AuthProvider';
@@ -28,9 +30,15 @@ export default function DiseasePage() {
     updateDisease,
     deleteDisease,
   } = useDisease();
+  const {
+    data: diseaseHistories,
+    loading: loadingHistories,
+    fetchAll: fetchDiseaseHistories,
+  } = useDiseaseHistory();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'DISEASE' | 'HISTORY'>('DISEASE');
 
   const [selected, setSelected] = useState<DiseaseResponse | null>(null);
   const pathname = usePathname();
@@ -47,8 +55,9 @@ export default function DiseasePage() {
   useEffect(() => {
     if (user) {
       fetchDiseases();
+      fetchDiseaseHistories();
     }
-  }, [user]);
+  }, [user, fetchDiseases, fetchDiseaseHistories]);
 
   const handleCreate = async (data: CreateDiseaseRequest) => {
     await createDisease(data);
@@ -97,13 +106,46 @@ export default function DiseasePage() {
         </div>
       </div>
 
+      <div className="flex gap-2 border-b border-slate-200">
+        <button
+          type="button"
+          onClick={() => setActiveTab('DISEASE')}
+          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${
+            activeTab === 'DISEASE'
+              ? 'border-emerald-600 text-emerald-700'
+              : 'border-transparent text-slate-500'
+          }`}
+        >
+          Danh mục bệnh
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('HISTORY')}
+          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${
+            activeTab === 'HISTORY'
+              ? 'border-emerald-600 text-emerald-700'
+              : 'border-transparent text-slate-500'
+          }`}
+        >
+          Lịch sử bệnh
+        </button>
+      </div>
+
       {/* TABLE */}
-      <DiseaseTable
-        diseases={diseases}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={deleteDisease}
-      />
+      {activeTab === 'DISEASE' ? (
+        <DiseaseTable
+          diseases={diseases}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={deleteDisease}
+        />
+      ) : (
+        <DiseaseHistoryTable
+          diseaseHistories={diseaseHistories}
+          loading={loadingHistories}
+        />
+      )}
 
       {/* CREATE */}
       <DiseaseFormCreate

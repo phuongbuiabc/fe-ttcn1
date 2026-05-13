@@ -7,7 +7,7 @@ import { CreateCullingProposalRequest } from '@/modules/cullingproposal/model/Cu
 import { usePig } from '@/modules/pig/hooks/usePig';
 import { PigResponse } from '@/modules/pig/model/pig.model';
 import { useAuth } from '@/shared/components/AuthProvider';
-import { CullingProposalStatus, CullingProposalType } from '@/shared/enums/cullingproposal.enum';
+import { CullingProposalType } from '@/shared/enums/cullingproposal.enum';
 
 interface ProposalRow {
 	id: string;
@@ -133,7 +133,7 @@ export const CullingProposalForm: React.FC<Props> = ({ isOpen, onClose, onSucces
 	const handleSubmit = async () => {
 		// Validate that all required fields are filled
 		const isValid = rows.every(
-			(row) => row.pigId && row.proposalType
+			(row) => (row.pigEarTag || row.earTagInput) && row.proposalType
 		);
 
 		if (!isValid) {
@@ -143,15 +143,14 @@ export const CullingProposalForm: React.FC<Props> = ({ isOpen, onClose, onSucces
 
 		setLoading(true);
 		try {
-			const proposals: CreateCullingProposalRequest[] = rows.map((row) => ({
-				pigId: row.pigId,
+			const proposals = rows.map((row) => ({
+				pigEarTag: (row.pigEarTag || row.earTagInput || '').trim(),
 				proposalType: row.proposalType,
 				reason: row.reason || undefined,
-				employeeId: row.employeeId,
 			}));
 
-			// Create all proposals
-			await Promise.all(proposals.map((p) => cullingProposalService.create(p)));
+			// backend expects array of { pigEarTag, proposalType, reason }
+			await cullingProposalService.createBulk(proposals as any);
 
 			alert('Thêm đề xuất thành công!');
 			setRows([createEmptyRow()]);
@@ -271,13 +270,13 @@ export const CullingProposalForm: React.FC<Props> = ({ isOpen, onClose, onSucces
 														handleRowChange(
 															row.id,
 															'proposalType',
-															e.target.value as 'CULLING' | 'SELL_OFF'
+															e.target.value as CullingProposalType
 														)
 													}
 													className="w-full px-2 py-1 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
 												>
-													<option value="CULLING">Tiêu hủy</option>
-													<option value="SELL_OFF">Bán loại</option>
+													<option value={CullingProposalType.CULLING}>Tiêu hủy</option>
+													<option value={CullingProposalType.SELL_OFF}>Bán loại</option>
 												</select>
 											</td>
 											<td className="px-4 py-3">

@@ -159,13 +159,13 @@ export default function GrowthTrackingFormModal({ onClose, onSuccess }: GrowthTr
 					pigId: draft.pigId,
 					trackingDate: draft.trackingDate,
 					...(toNumberOrUndefined(draft.litterLength) !== undefined
-						? { litterLegth: toNumberOrUndefined(draft.litterLength) }
+						? { litterLength: toNumberOrUndefined(draft.litterLength) }
 						: {}),
 					...(toNumberOrUndefined(draft.chestGirth) !== undefined
 						? { chestGirth: toNumberOrUndefined(draft.chestGirth) }
 						: {}),
 					...(toNumberOrUndefined(draft.weight) !== undefined
-						? { weigth: toNumberOrUndefined(draft.weight) }
+						? { weight: toNumberOrUndefined(draft.weight) }
 						: {}),
 					growthRate: 0,
 					adg: 0,
@@ -179,9 +179,9 @@ export default function GrowthTrackingFormModal({ onClose, onSuccess }: GrowthTr
 			.filter(
 				(item) =>
 					item.trackingDate &&
-					(item.litterLegth !== undefined ||
+						(item.litterLength !== undefined ||
 						item.chestGirth !== undefined ||
-						item.weigth !== undefined ||
+							item.weight !== undefined ||
 						item.note)
 			);
 

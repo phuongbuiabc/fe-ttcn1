@@ -49,6 +49,11 @@ export const useCullingProposal = () => {
     await fetchAll();
   };
 
+  const createBulk = async (payload: any[]) => {
+    await cullingProposalService.createBulk(payload);
+    await fetchAll();
+  };
+
   const update = async (id: string, payload: any) => {
     await cullingProposalService.update(id, payload);
     await fetchAll();
@@ -91,6 +96,7 @@ export const useCullingProposal = () => {
     loading,
     fetchAll,
     create,
+    createBulk,
     update,
     remove,
     review,

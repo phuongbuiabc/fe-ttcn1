@@ -7,30 +7,33 @@ import {
   CullingProposalReview
 } from "@/modules/cullingproposal/model/CullingProposal.model";
 
-const BASE = '/api/v1/culling-proposals';
+const BASE_URL = '/api/v1/culling-proposals';
 
 export const cullingProposalService = {
   getAll: () =>
-    apiClient.get<ApiResponse<CullingProposalResponse[]>>(`${BASE}`),
+    apiClient.get<ApiResponse<CullingProposalResponse[]>>(`${BASE_URL}`),
 
   getById: (id: string) =>
-    apiClient.get<ApiResponse<CullingProposalResponse>>(`${BASE}/${id}`),
+    apiClient.get<ApiResponse<CullingProposalResponse>>(`${BASE_URL}/${id}`),
 
   getProcessed: () =>
-    apiClient.get<ApiResponse<CullingProposalResponse[]>>(`${BASE}/processed`),
+    apiClient.get<ApiResponse<CullingProposalResponse[]>>(`${BASE_URL}/processed`),
 
   getByType: (proposalType: string) =>
-    apiClient.get<ApiResponse<CullingProposalResponse[]>>(`${BASE}/by-type/${proposalType}`),
+    apiClient.get<ApiResponse<CullingProposalResponse[]>>(`${BASE_URL}/by-type/${proposalType}`),
 
   create: (data: CreateCullingProposalRequest) =>
-    apiClient.post<ApiResponse<CullingProposalResponse>>(`${BASE}`, data),
+    apiClient.post<ApiResponse<CullingProposalResponse>>(`${BASE_URL}`, data),
+
+  createBulk: (data: CreateCullingProposalRequest[]) =>
+    apiClient.post<ApiResponse<CullingProposalResponse[]>>(`${BASE_URL}/bulk`, data),
 
   update: (id: string, data: UpdateCullingProposalRequest) =>
-    apiClient.put<ApiResponse<CullingProposalResponse>>(`${BASE}/${id}`, data),
+    apiClient.put<ApiResponse<CullingProposalResponse>>(`${BASE_URL}/${id}`, data),
 
   review: (id: string, status: string) =>
-    apiClient.put<ApiResponse<CullingProposalReview[]>>(`${BASE}/review`, { status }),
+    apiClient.put<ApiResponse<CullingProposalReview[]>>(`${BASE_URL}/review`, { status }),
 
   delete: (id: string) =>
-    apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`),
+    apiClient.delete<ApiResponse<void>>(`${BASE_URL}/${id}`),
 };
