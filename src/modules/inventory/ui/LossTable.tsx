@@ -47,41 +47,50 @@ export function LossTable({ losses, employees, loading, onView, onVoid }: LossTa
         <tbody className="divide-y divide-slate-50">
           {losses.map((loss, i) => (
             <motion.tr 
-              key={i} 
-              initial={{ opacity: 0, y: 10 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ delay: i * 0.05 }} 
+              key={loss.id} 
+              initial={{ opacity: 0, x: -10 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              transition={{ delay: i * 0.04 }} 
               onClick={() => onView(loss)}
-              className="hover:bg-slate-50 transition-all cursor-pointer group"
+              className="hover:bg-slate-50/80 transition-all group cursor-pointer"
             >
-              <td className="px-6 py-4">
-                <div>
-                  <p className="text-sm font-black text-slate-800 leading-none mb-1">{loss.supply_id}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">#{loss.loss_id || 'ISSUE-'+i}</p>
+              <td className="px-6 py-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center font-black text-[10px] shadow-sm">
+                    LOSS
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-slate-800 leading-none">{loss.supply_id}</p>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mã: {loss.loss_id?.slice(0, 8)}</p>
+                  </div>
                 </div>
               </td>
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <Calendar size={14} />
-                  <span className="text-xs font-bold">{loss.date}</span>
-                </div>
-              </td>
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <User size={14} />
-                  <span className="text-xs font-bold uppercase">
-                    {employees.find(e => e.id === loss.employee_id)?.fullName || loss.employee_id}
+              <td className="px-6 py-5 text-center">
+                <div className="flex items-center justify-center gap-2 text-slate-400">
+                  <Calendar size={13} />
+                  <span className="text-xs font-bold text-slate-600">
+                    {new Date(loss.date).toLocaleDateString('vi-VN')}
                   </span>
                 </div>
               </td>
-              <td className="px-6 py-4 text-center">
-                <span className="px-3 py-1 bg-rose-50 text-rose-500 text-xs font-black rounded-lg">
-                  -{loss.quantity}
+              <td className="px-6 py-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                    <User size={12} />
+                  </div>
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">
+                    {employees.find(e => e.id === loss.employee_id)?.fullName || "N/A"}
+                  </span>
+                </div>
+              </td>
+              <td className="px-6 py-5 text-center">
+                <span className="px-3 py-1.5 bg-rose-50 text-rose-500 text-[11px] font-black rounded-xl border border-rose-100/50">
+                  -{loss.quantity.toLocaleString()}
                 </span>
               </td>
-              <td className="px-6 py-4">
+              <td className="px-6 py-5">
                 <div className="flex items-center gap-2">
-                  <Tag size={12} className="text-slate-400" />
+                  <div className="w-2 h-2 rounded-full bg-rose-400" />
                   <span className="text-xs font-bold text-slate-600">{loss.reason}</span>
                 </div>
               </td>

@@ -49,7 +49,8 @@ export default function LoginPage() {
     
     try {
       console.log("Attempting login for:", email);
-      await login({ email, password });
+      // Gửi cả email và username để tương thích với nhiều kiểu Backend
+      await login({ email, username: email, password });
       console.log("Login successful");
     } catch (err: any) {
       console.error("Login catch error:", err);

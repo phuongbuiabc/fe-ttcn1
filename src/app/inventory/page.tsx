@@ -14,7 +14,6 @@ import { InventoryDashboard } from "@/modules/inventory/ui/InventoryDashboard";
 import { InventoryFilters } from "@/modules/inventory/ui/InventoryFilters";
 import { InventoryTable } from "@/modules/inventory/ui/InventoryTable";
 import { LossTable } from "@/modules/inventory/ui/LossTable";
-import { ReceiptTable } from "@/modules/inventory/ui/ReceiptTable";
 import { TableSkeleton } from "@/modules/inventory/ui/TableSkeleton";
 import { Pagination } from "@/shared/components/Pagination";
 
@@ -55,9 +54,6 @@ export default function InventoryPage() {
   const totalLossPages = Math.ceil(filtered.filteredLosses.length / itemsPerPage);
   const paginatedLosses = filtered.filteredLosses.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  const totalReceiptPages = Math.ceil(filtered.filteredReceipts.length / itemsPerPage);
-  const paginatedReceipts = filtered.filteredReceipts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
   return (
     <div className="space-y-6 pb-20 bg-[#fbfcfd] min-h-screen -m-4 p-6">
       {/* Header */}
@@ -90,7 +86,6 @@ export default function InventoryPage() {
         <div className="p-8 border-b border-slate-50 flex items-center justify-between">
           <div className="flex gap-4">
             <button onClick={() => router.push('/inventory')} className={cn("text-[10px] font-black uppercase tracking-widest px-2 py-1 transition-all", activeTab === "inventory" ? "text-emerald-600 border-b-2 border-emerald-500" : "text-slate-400")}>Kho hàng</button>
-            <button onClick={() => router.push('/inventory/receipts')} className={cn("text-[10px] font-black uppercase tracking-widest px-2 py-1 transition-all", activeTab === "receipts" ? "text-emerald-600 border-b-2 border-emerald-500" : "text-slate-400")}>Lịch sử nhập</button>
             <button onClick={() => router.push('/inventory/losses')} className={cn("text-[10px] font-black uppercase tracking-widest px-2 py-1 transition-all", activeTab === "losses" ? "text-emerald-600 border-b-2 border-emerald-500" : "text-slate-400")}>Lịch sử hao hụt</button>
           </div>
           {activeTab === "losses" && lossHistory.length > 0 && (
@@ -121,11 +116,6 @@ export default function InventoryPage() {
               onVoid={(loss) => { selected.setSelectedLossForVoid(loss); modals.setIsVoidModalOpen(true); }}
             />
             <Pagination currentPage={currentPage} totalPages={totalLossPages} onPageChange={setCurrentPage} />
-          </>
-        ) : (
-          <>
-            <ReceiptTable receipts={paginatedReceipts} loading={false} />
-            <Pagination currentPage={currentPage} totalPages={totalReceiptPages} onPageChange={setCurrentPage} />
           </>
         )}
       </motion.div>

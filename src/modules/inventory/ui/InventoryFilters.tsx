@@ -21,13 +21,12 @@ export function InventoryFilters({
   dateRange,
   setDateRange
 }: InventoryFiltersProps) {
-  const materialTypes = ["Tất cả", "FEED", "VACCINE", "MEDICINE", "EQUIPMENT"];
+  const materialTypes = ["Tất cả", "FEED", "VACCINE", "MEDICINE"];
   const typeLabels: Record<string, string> = {
     "Tất cả": "Tất cả",
     "FEED": "Thức ăn",
     "VACCINE": "Vaccine",
-    "MEDICINE": "Thuốc",
-    "EQUIPMENT": "Dụng cụ"
+    "MEDICINE": "Thuốc"
   };
 
   return (
@@ -51,13 +50,23 @@ export function InventoryFilters({
 
           {activeTab !== "inventory" && (
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
-                <span className="text-[10px] font-black text-slate-400 uppercase">Từ</span>
-                <input type="date" value={dateRange.start} onChange={e => setDateRange({...dateRange, start: e.target.value})} className="bg-transparent border-none text-[10px] font-bold outline-none"/>
+              <div className="flex items-center gap-3 px-5 py-2.5 bg-slate-50 rounded-xl border border-slate-100 transition-all focus-within:border-slate-300 focus-within:bg-white">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Từ</span>
+                <input 
+                  type="date" 
+                  value={dateRange.start} 
+                  onChange={e => setDateRange({...dateRange, start: e.target.value})} 
+                  className="bg-transparent border-none text-[11px] font-bold outline-none text-slate-700 cursor-pointer"
+                />
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
-                <span className="text-[10px] font-black text-slate-400 uppercase">Đến</span>
-                <input type="date" value={dateRange.end} onChange={e => setDateRange({...dateRange, end: e.target.value})} className="bg-transparent border-none text-[10px] font-bold outline-none"/>
+              <div className="flex items-center gap-3 px-5 py-2.5 bg-slate-50 rounded-xl border border-slate-100 transition-all focus-within:border-slate-300 focus-within:bg-white">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Đến</span>
+                <input 
+                  type="date" 
+                  value={dateRange.end} 
+                  onChange={e => setDateRange({...dateRange, end: e.target.value})} 
+                  className="bg-transparent border-none text-[11px] font-bold outline-none text-slate-700 cursor-pointer"
+                />
               </div>
             </div>
           )}

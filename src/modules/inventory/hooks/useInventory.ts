@@ -8,11 +8,10 @@ export function useInventory() {
   const pathname = usePathname();
   const [supplies, setSuppliers] = useState<Supply[]>([]);
   const [lossHistory, setLossHistory] = useState<SupplyLoss[]>([]);
-  const [receiptHistory, setReceiptHistory] = useState<any[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const activeTab = pathname.endsWith("/losses") ? "losses" : (pathname.endsWith("/receipts") ? "receipts" : "inventory");
+  const activeTab = pathname.endsWith("/losses") ? "losses" : "inventory";
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [activeType, setActiveType] = useState("Tất cả");
@@ -43,18 +42,21 @@ export function useInventory() {
   const [supplyForm, setSupplyForm] = useState<any>({ name: "", materialType: MaterialType.FEED, quantity: 0, unit: "Kg", description: "" });
   const [lossForm, setLossForm] = useState<any>({ loss_id: "", date: "", employee_id: "", quantity: 0, reason: "Hỏng hóc", note: "" });
 
+  // Reset page on tab/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, debouncedSearchTerm, activeType, dateRange]);
+
   const fetchInventoryData = async (showLoading = true) => {
     try {
       if (showLoading) setLoading(true);
-      const [resSupplies, resLosses, resReceipts, resEmployees] = await Promise.all([
+      const [resSupplies, resLosses, resEmployees] = await Promise.all([
         inventoryService.getSupplies(),
         inventoryService.getLossHistory(),
-        inventoryService.getReceiptHistory(),
         staffService.getEmployees()
       ]);
       if (resSupplies.success) setSuppliers(resSupplies.data);
       if (resLosses.success) setLossHistory(resLosses.data);
-      if (resReceipts.success) setReceiptHistory(resReceipts.data);
       if (resEmployees.success) setEmployees(resEmployees.data);
     } finally {
       if (showLoading) setLoading(false);
@@ -129,7 +131,9 @@ export function useInventory() {
   const filteredLosses = useMemo(() => 
     lossHistory.filter(l => {
       const dateMatch = (!dateRange.start || l.date >= dateRange.start) && (!dateRange.end || l.date <= dateRange.end);
-      const searchMatch = !debouncedSearchTerm || l.supply_id?.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+      const searchMatch = !debouncedSearchTerm || 
+                         l.supply_id?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                         l.loss_id?.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       return dateMatch && searchMatch;
     }), [lossHistory, debouncedSearchTerm, dateRange]
   );
@@ -141,7 +145,7 @@ export function useInventory() {
   );
 
   return {
-    supplies, lossHistory, receiptHistory, employees, loading, activeTab,
+    supplies, lossHistory, employees, loading, activeTab,
     searchTerm, setSearchTerm, activeType, setActiveType, dateRange, setDateRange,
     currentPage, setCurrentPage, itemsPerPage,
     modals: {
@@ -157,6 +161,6 @@ export function useInventory() {
     },
     forms: { supplyForm, setSupplyForm, lossForm, setLossForm },
     handlers: { handleSaveSupply, handleRecordLoss, handleVoidLoss, confirmDelete, fetchInventoryData },
-    filtered: { filteredSupplies, filteredLosses, filteredReceipts }
+    filtered: { filteredSupplies, filteredLosses }
   };
 }

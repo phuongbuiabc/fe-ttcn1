@@ -66,7 +66,6 @@ export function SupplyFormModal({
                 <option value="FEED">Thức ăn</option>
                 <option value="VACCINE">Vaccine</option>
                 <option value="MEDICINE">Thuốc thú y</option>
-                <option value="EQUIPMENT">Dụng cụ / Khác</option>
               </select>
             </div>
 
@@ -84,7 +83,6 @@ export function SupplyFormModal({
                 <option value="Chai">Chai / Lọ</option>
                 <option value="Viên">Viên</option>
                 <option value="Liều">Liều</option>
-                <option value="Cái">Cái / Chiếc</option>
                 <option value="Hộp">Hộp / Thùng</option>
               </select>
             </div>

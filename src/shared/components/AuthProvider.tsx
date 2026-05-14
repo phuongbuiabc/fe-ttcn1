@@ -55,19 +55,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await authApi.login(credentials);
       if (response.success && response.data?.accessToken) {
-        if (!response.data.refreshToken) {
-          throw new Error('Missing refresh token');
+        const { accessToken, refreshToken, user } = response.data;
+        
+        localStorage.setItem('token', accessToken);
+        if (refreshToken) {
+          localStorage.setItem('refreshToken', refreshToken);
         }
-
-        localStorage.setItem('token', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-        setUser(response.data.user);
+        
+        setUser(user);
         router.push('/');
       } else {
         throw new Error(response.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
       }
     } catch (error: any) {
-      console.error('Login error details:', error);
+      console.error('Full Login Error Response:', error);
+      // Nếu có thông tin chi tiết từ server, hãy hiện ra để debug
+      if (error.response?.data) {
+        console.log('Server Error Detail:', error.response.data);
+      }
       throw error;
     }
   };

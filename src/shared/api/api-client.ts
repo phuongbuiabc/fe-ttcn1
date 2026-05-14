@@ -108,7 +108,8 @@ export class ApiClient {
       return Promise.reject('SESSION_EXPIRED');
     }
 
-    const res = await fetch(`/api/proxy/api/v1/auth/refresh-token`, {
+    const url = this.buildUrl('/auth/refresh-token');
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),

@@ -54,55 +54,55 @@ export function InventoryTable({
           {supplies.map((item, i) => (
             <motion.tr 
               key={item.id} 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              transition={{ delay: i * 0.02 }} 
+              initial={{ opacity: 0, y: 10 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              transition={{ delay: i * 0.03 }} 
               onClick={() => onView(item)} 
-              className="hover:bg-slate-50 transition-all group cursor-pointer"
+              className="hover:bg-slate-50/80 transition-all group cursor-pointer relative"
             >
-              <td className="px-6 py-3">
+              <td className="px-6 py-5">
                 <div className="flex items-center gap-4">
                   <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs", 
-                    item.quantity < 10 ? "bg-rose-50 text-rose-500" : "bg-emerald-50 text-emerald-600"
+                    "w-11 h-11 rounded-2xl flex items-center justify-center font-black text-sm shadow-sm transition-transform group-hover:scale-110", 
+                    item.quantity < 10 ? "bg-rose-50 text-rose-500 shadow-rose-100" : "bg-emerald-50 text-emerald-600 shadow-emerald-100"
                   )}>
-                    {item.name?.charAt(0) || 'V'}
+                    {item.name?.charAt(0).toUpperCase() || 'V'}
                   </div>
-                  <div>
-                    <p className="text-sm font-black text-slate-800 leading-none">{item.name}</p>
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-slate-800 leading-none group-hover:text-emerald-600 transition-colors">{item.name}</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">ID: {item.id?.slice(0, 8)}</p>
                   </div>
-
                 </div>
               </td>
-              <td className="px-6 py-3">
-                <span className="px-3 py-1 bg-slate-50 text-slate-500 text-[10px] font-black rounded-lg border border-slate-100 uppercase tracking-widest">
+              <td className="px-6 py-5">
+                <span className="px-3 py-1.5 bg-slate-100/50 text-slate-500 text-[9px] font-black rounded-lg border border-slate-200/50 uppercase tracking-widest">
                   {materialTypeLabels[item.materialType] || item.materialType}
                 </span>
               </td>
 
-              <td className="px-8 py-3.5 text-center">
+              <td className="px-8 py-5 text-center">
                 <div className="flex flex-col items-center justify-center">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     {item.quantity < 10 && (
                       <motion.div
-                        animate={{ opacity: [1, 0.4, 1], scale: [1, 1.1, 1] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
+                        transition={{ repeat: Infinity, duration: 2 }}
                       >
                         <AlertTriangle size={14} className="text-rose-500" />
                       </motion.div>
                     )}
-                    <span className={cn("text-lg font-black tracking-tighter", item.quantity < 10 ? "text-rose-500" : "text-emerald-600")}>
-                      {item.quantity}
+                    <span className={cn("text-xl font-black tracking-tight", item.quantity < 10 ? "text-rose-500" : "text-emerald-600")}>
+                      {item.quantity.toLocaleString()}
                     </span>
                   </div>
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.unit}</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{item.unit}</span>
                 </div>
               </td>
-              <td className="px-8 py-3.5 text-right">
-                <div className="flex justify-end gap-2 transition-all">
+              <td className="px-8 py-5 text-right">
+                <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
                   <button 
                     onClick={(e) => { e.stopPropagation(); onLoss(item); }} 
-                    className="p-2.5 text-slate-400 hover:text-rose-500 transition-all"
+                    className="p-2.5 bg-white text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl shadow-sm border border-slate-100 transition-all"
                     title="Báo hao hụt"
                   >
                     <AlertTriangle size={18}/>
@@ -111,13 +111,13 @@ export function InventoryTable({
                     <>
                       <button 
                         onClick={(e) => { e.stopPropagation(); onEdit(item); }} 
-                        className="p-2.5 text-slate-400 hover:text-blue-600 transition-all"
+                        className="p-2.5 bg-white text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl shadow-sm border border-slate-100 transition-all"
                       >
                         <Edit size={18}/>
                       </button>
                       <button 
                         onClick={(e) => { e.stopPropagation(); onDelete(item); }} 
-                        className="p-2.5 text-slate-400 hover:text-rose-600 transition-all"
+                        className="p-2.5 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl shadow-sm border border-slate-100 transition-all"
                       >
                         <Trash2 size={18}/>
                       </button>
