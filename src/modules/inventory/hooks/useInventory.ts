@@ -138,12 +138,6 @@ export function useInventory() {
     }), [lossHistory, debouncedSearchTerm, dateRange]
   );
 
-  const filteredReceipts = useMemo(() => 
-    receiptHistory.filter(r => 
-      !debouncedSearchTerm || r.supply_id?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-    ), [receiptHistory, debouncedSearchTerm]
-  );
-
   return {
     supplies, lossHistory, employees, loading, activeTab,
     searchTerm, setSearchTerm, activeType, setActiveType, dateRange, setDateRange,

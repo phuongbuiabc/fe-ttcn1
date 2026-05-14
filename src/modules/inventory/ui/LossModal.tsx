@@ -126,9 +126,9 @@ export function LossModal({ isOpen, onClose, onSave, supply, lossForm, setLossFo
                     <AlertTriangle className={cn("absolute left-5 top-1/2 -translate-y-1/2", lossForm.quantity > supply.quantity ? "text-rose-600" : "text-rose-400")} size={16} />
                     <input
                       type="number" 
-                      required 
+                      required min="1"
                       value={lossForm.quantity} 
-                      onChange={e => setLossForm({ ...lossForm, quantity: parseInt(e.target.value) || 0 })}
+                      onChange={e => setLossForm({ ...lossForm, quantity: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
                       className={cn(
                         "w-full pl-12 pr-5 py-4 bg-slate-50 border-2 rounded-2xl text-sm font-bold transition-all outline-none",
                         lossForm.quantity > supply.quantity ? "border-rose-500 bg-rose-50 text-rose-600" : "border-transparent focus:border-rose-500/20 focus:bg-white text-rose-600"

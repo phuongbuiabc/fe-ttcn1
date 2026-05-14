@@ -90,9 +90,9 @@ export function SupplyFormModal({
             <div className="col-span-2 space-y-2">
               <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Số lượng tồn ban đầu</label>
               <input
-                type="number" required
+                type="number" required min="0"
                 value={supplyForm.quantity}
-                onChange={e => setSupplyForm({ ...supplyForm, quantity: parseInt(e.target.value) || 0 })}
+                onChange={e => setSupplyForm({ ...supplyForm, quantity: e.target.value === '' ? '' : parseInt(e.target.value) || 0 })}
                 className="w-full px-5 py-4 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:border-emerald-500/10 focus:bg-white transition-all outline-none"
               />
             </div>

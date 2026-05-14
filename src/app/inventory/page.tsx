@@ -117,7 +117,7 @@ export default function InventoryPage() {
             />
             <Pagination currentPage={currentPage} totalPages={totalLossPages} onPageChange={setCurrentPage} />
           </>
-        )}
+        ) : null}
       </motion.div>
 
       {/* Modals Section */}
