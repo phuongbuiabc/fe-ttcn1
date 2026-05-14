@@ -216,48 +216,28 @@ export default function StaffDetailPage() {
 
             {/* Right Column: Tables */}
             <div className="col-span-12 lg:col-span-8 space-y-8">
-              {/* Schedule Section */}
-              <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                <div className="p-8 flex justify-between items-center bg-slate-50/50">
-                  <h3 className="text-lg font-bold text-slate-900 font-headline">Lịch làm việc Tuần này</h3>
-                  <button className="text-emerald-600 text-sm font-bold flex items-center gap-2 hover:underline">
-                    <PlusCircle size={18} />
-                    Tạo lịch
-                  </button>
+              {/* Simplified Schedule Section */}
+              <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Lịch làm việc tuần này</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-50/30">
-                        <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Ngày</th>
-                        <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Ca trực</th>
-                        <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Ghi chú</th>
-                        <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Trạng thái</th>
+                      <tr className="bg-slate-50/30 border-b border-slate-100">
+                        <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Ngày</th>
+                        <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Ca</th>
+                        <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Ghi chú</th>
+                        <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Trạng thái</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                       {scheduleData.map((item, i) => (
-                        <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="px-8 py-6 text-sm font-bold text-slate-900">{item.day}</td>
-                          <td className="px-8 py-6">
-                            <span className={cn(
-                              "px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider",
-                              item.shift.includes("Sáng") ? "bg-amber-50 text-amber-600" :
-                              item.shift.includes("Chiều") ? "bg-blue-50 text-blue-600" : "bg-purple-50 text-purple-600"
-                            )}>
-                              {item.shift}
-                            </span>
-                          </td>
-                          <td className="px-8 py-6 text-sm text-slate-500 italic">{item.note}</td>
-                          <td className="px-8 py-6">
-                            <div className="flex items-center gap-2">
-                              <div className={cn(
-                                "w-2 h-2 rounded-full",
-                                item.status === "Đã duyệt" ? "bg-emerald-500" : "bg-slate-300"
-                              )} />
-                              <span className="text-xs font-bold text-slate-700">{item.status}</span>
-                            </div>
-                          </td>
+                        <tr key={i} className="hover:bg-slate-50/50">
+                          <td className="px-6 py-4 text-sm text-slate-700">{item.day}</td>
+                          <td className="px-6 py-4 text-sm font-bold text-slate-700">{item.shift}</td>
+                          <td className="px-6 py-4 text-sm text-slate-500 italic">{item.note}</td>
+                          <td className="px-6 py-4 text-sm font-bold text-emerald-600">{item.status}</td>
                         </tr>
                       ))}
                     </tbody>

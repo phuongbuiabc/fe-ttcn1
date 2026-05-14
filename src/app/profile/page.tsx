@@ -2,258 +2,227 @@
 
 import React from "react";
 import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  Shield, 
-  Award, 
-  Clock, 
-  Edit3, 
-  Camera,
-  Briefcase,
-  Building2,
-  CheckCircle2,
-  Zap
+  User, Mail, Phone, MapPin, Calendar, 
+  Shield, Briefcase, Camera, LogOut, CheckCircle,
+  ShieldCheck, UserCircle
 } from "lucide-react";
-import { motion } from "motion/react";
-import Image from "next/image";
 import { cn } from "@/shared/utils/utils";
+import { staffService } from "@/modules/staff/api/staff.service";
+import { Employee } from "@/shared/types";
+import { motion } from "motion/react";
 
 export default function ProfilePage() {
-  const stats = [
-    { label: "Ngày tham gia", value: "12/05/2023", icon: Calendar, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Vai trò", value: "Quản trị viên", icon: Shield, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { label: "Trạng thái", value: "Đang hoạt động", icon: CheckCircle2, color: "text-amber-600", bg: "bg-amber-50" },
-  ];
+  const [profile, setProfile] = React.useState<Employee | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
-  const activities = [
-    { action: "Đã cập nhật trạng thái đàn P-102", time: "10 phút trước", icon: Clock, type: "update" },
-    { action: "Đã phê duyệt đơn nhập cám #IM-992", time: "2 giờ trước", icon: CheckCircle2, type: "approval" },
-    { action: "Đã thay đổi lịch tiêm phòng chuồng B", time: "Hôm qua", icon: Calendar, type: "schedule" },
-  ];
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await staffService.getMe();
+        if (res.success) {
+          setProfile(res.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
-  const skills = [
-    "Quản lý trang trại", "Thú y cơ bản", "Phân tích dữ liệu", "Vận hành máy móc", "Quản lý nhân sự"
-  ];
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[70vh]">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="max-w-2xl mx-auto mt-20 text-center p-12 bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50">
+        <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
+          <Shield size={40} />
+        </div>
+        <h2 className="text-2xl font-black text-slate-800 uppercase mb-4">Hồ sơ chưa sẵn sàng</h2>
+        <p className="text-slate-500 font-medium">Tài khoản này chưa được liên kết với dữ liệu nhân sự của trang trại.</p>
+      </div>
+    );
+  }
+
+  const isAdmin = profile.position?.toLowerCase().includes("quản trị") || profile.position?.toLowerCase().includes("admin");
+
+  const InfoItem = ({ label, value, icon: Icon }: any) => (
+    <div className={cn(
+      "flex items-center gap-4 p-4 bg-white rounded-2xl border-2 transition-all group",
+      isAdmin ? "border-indigo-50 hover:border-amber-400/50" : "border-slate-100 hover:border-emerald-500"
+    )}>
+      <div className={cn(
+        "w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 shadow-inner",
+        isAdmin ? "bg-indigo-50 text-indigo-500 group-hover:bg-amber-500 group-hover:text-white" : "bg-slate-50 text-slate-500 group-hover:bg-emerald-500 group-hover:text-white"
+      )}>
+        <Icon size={18} />
+      </div>
+      <div className="flex-1">
+        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5 leading-relaxed">{label}</p>
+        <p className="text-sm font-black text-slate-800 leading-tight">{value || "Chưa cập nhật"}</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-20">
-      {/* Profile Header Card */}
-      <div className="relative bg-white rounded-[1.75rem] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="h-48 bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-500 relative">
-          <div className="absolute inset-0 opacity-30 pointer-events-none">
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_70%)]" />
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20" />
-          </div>
-        </div>
+    <div className="max-w-5xl mx-auto space-y-6 pb-12 px-4">
+      {/* Dynamic Header based on Role */}
+      <motion.div 
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={cn(
+          "relative rounded-[2rem] p-8 shadow-2xl overflow-hidden",
+          isAdmin ? "bg-slate-950 shadow-indigo-900/20" : "bg-slate-900 shadow-slate-900/10"
+        )}
+      >
+        {/* Background Accents */}
+        <div className={cn(
+          "absolute top-0 right-0 w-[400px] h-[400px] rounded-full blur-[80px] -mr-48 -mt-48 opacity-20",
+          isAdmin ? "bg-amber-500" : "bg-emerald-500"
+        )} />
         
-        <div className="px-8 pb-10">
-          <div className="relative flex flex-col md:flex-row items-end gap-8 -mt-20 mb-8">
-            <div className="relative group">
-              <div className="w-40 h-40 rounded-[2.5rem] overflow-hidden border-8 border-white shadow-2xl relative bg-white transition-transform duration-500 group-hover:scale-[1.02]">
-                <Image 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU8H1s-kjjlI2NWZ__-jyblSSG7AHeOmfBWSF8MxnkOItZRulZPOyAz2qjUhh1OL64lfdFM3kKVyoIqsyWJn5zjUx7eLL_HW8pI7vf7kinoqASkg8UI3plURqUft8OU90He4GSu8H6s1eeSLihn2CxkXvzfLfGOt1_K0f_R5CcwU5SWhzTWWSwqDfcNCrJcqrvpPZbGJ421OUkC2tzipzeMZWNrpeeEb8uqSfmGHmEmiduDR15CCVyTYCHUQc6re0vxz3nNLuM4UFJ"
-                  alt="Marcus Thorne"
-                  fill
-                  className="object-cover"
-                  referrerPolicy="no-referrer"
-                />
+        <div className="relative flex flex-col md:flex-row items-center gap-8">
+          <div className="relative">
+            <div className={cn(
+              "w-32 h-32 rounded-[1.5rem] overflow-hidden p-1 border shadow-xl transition-all",
+              isAdmin ? "bg-amber-500/10 border-amber-500/30 rotate-1" : "bg-white/10 border-white/20"
+            )}>
+              <div className={cn(
+                "w-full h-full rounded-[1.25rem] flex items-center justify-center text-5xl font-black text-white shadow-inner",
+                isAdmin ? "bg-gradient-to-br from-amber-500 to-orange-600" : "bg-emerald-500"
+              )}>
+                {profile.firstName.charAt(0)}
               </div>
-              <button className="absolute bottom-2 right-2 p-3 bg-emerald-600 text-white rounded-2xl shadow-xl hover:bg-emerald-700 hover:scale-110 transition-all border-4 border-white">
-                <Camera size={18} />
-              </button>
+            </div>
+            <button className={cn(
+              "absolute -bottom-1 -right-1 w-10 h-10 rounded-xl flex items-center justify-center shadow-xl transition-all border-[3px]",
+              isAdmin ? "bg-white text-indigo-900 border-slate-950" : "bg-white text-slate-900 border-slate-900"
+            )}>
+              <Camera size={16} />
+            </button>
+          </div>
+
+          <div className="flex-1 text-center md:text-left space-y-2">
+            <div className={cn(
+              "inline-flex items-center gap-2 px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-lg shadow-lg",
+              isAdmin ? "bg-amber-500 text-slate-950 shadow-amber-500/20" : "bg-emerald-500 text-white shadow-emerald-500/20"
+            )}>
+              {isAdmin ? <ShieldCheck size={10} /> : <CheckCircle size={10} />}
+              {isAdmin ? "Hệ thống Quản trị viên" : "Nhân viên chính thức"}
             </div>
             
-            <div className="flex-1 space-y-2 mb-4">
-              <div className="flex items-center gap-4">
-                <h1 className="text-4xl font-black text-slate-900 font-headline tracking-tight">Marcus Thorne</h1>
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-100">
-                  <Shield size={10} /> Verified Expert
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-slate-500 font-bold">
-                <p className="flex items-center gap-2 text-sm">
-                  <Briefcase size={16} className="text-emerald-500" /> Quản lý Trang trại cấp cao
-                </p>
-                <p className="flex items-center gap-2 text-sm">
-                  <Building2 size={16} className="text-emerald-500" /> AgriIntel Global HQ
-                </p>
-                <p className="flex items-center gap-2 text-sm">
-                  <MapPin size={16} className="text-emerald-500" /> Hà Nội, Việt Nam
-                </p>
+            <h1 className="text-3xl font-black text-white tracking-tight leading-none flex items-center justify-center md:justify-start gap-3">
+              {profile.firstName} <span className={isAdmin ? "text-amber-400" : "text-emerald-400"}>{profile.lastName}</span>
+              {isAdmin && <span className="p-1.5 bg-white/5 rounded-lg border border-white/10 text-amber-500"><Shield size={16} /></span>}
+            </h1>
+            
+            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">
+              {isAdmin ? "Toàn quyền quản lý hệ thống MDFarm Digital" : "Thành viên thuộc hệ thống MDFarm Digital"}
+            </p>
+          </div>
+
+          <div className="shrink-0 flex gap-3">
+             <button className="px-8 py-4 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg hover:scale-105 transition-all active:scale-95">
+                <LogOut size={14} className="inline mr-2" /> Đăng xuất
+             </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center gap-3 ml-2">
+            <div className={cn("w-1.5 h-6 rounded-full", isAdmin ? "bg-indigo-500" : "bg-emerald-500")} />
+            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Hồ sơ cá nhân</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <InfoItem label="Họ và tên đầy đủ" value={`${profile.lastName} ${profile.firstName}`} icon={User} />
+            </div>
+            <InfoItem label="Giới tính" value={profile.gender === "MALE" ? "Nam giới" : "Nữ giới"} icon={UserCircle} />
+            <InfoItem label="Ngày sinh" value={profile.dateOfBirth} icon={Calendar} />
+            <InfoItem label="Email quản trị" value={profile.email} icon={Mail} />
+            <InfoItem label="Số điện thoại" value={profile.phone} icon={Phone} />
+            <div className="md:col-span-2">
+              <InfoItem label="Địa chỉ liên hệ" value={profile.currentAddress} icon={MapPin} />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 ml-2">
+            <div className={cn("w-1.5 h-6 rounded-full", isAdmin ? "bg-amber-500" : "bg-slate-900")} />
+            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+              {isAdmin ? "Bảng điều khiển" : "Hệ thống"}
+            </h2>
+          </div>
+
+          <div className={cn(
+            "border-2 rounded-[2rem] p-6 space-y-5",
+            isAdmin ? "bg-indigo-50/30 border-indigo-100" : "bg-slate-50 border-slate-100"
+          )}>
+            <div className="space-y-1.5">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-relaxed">Quyền hạn</p>
+              <div className="flex items-center gap-2.5">
+                <div className={cn("w-3 h-3 rounded-full animate-pulse shadow-lg", isAdmin ? "bg-indigo-500 shadow-indigo-500/50" : "bg-emerald-500")} />
+                <p className="text-base font-black text-slate-800">{isAdmin ? "Full Access Admin" : "Standard Employee"}</p>
               </div>
             </div>
 
-            <div className="flex gap-3 mb-4">
-              <button className="px-8 py-3 bg-emerald-600 text-white rounded-2xl text-sm font-bold shadow-xl shadow-emerald-900/20 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all flex items-center gap-2 active:scale-95">
-                <Edit3 size={18} /> Chỉnh sửa hồ sơ
+            <div className="pt-2 space-y-2">
+              <button className={cn(
+                "w-full py-3.5 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                isAdmin ? "bg-white border-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white" : "bg-white border-slate-200 text-slate-700 hover:border-emerald-500"
+              )}>
+                {isAdmin ? "Cài đặt hệ thống" : "Đổi mật khẩu"}
+              </button>
+              <button className={cn(
+                "w-full py-3.5 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                isAdmin ? "bg-white border-indigo-100 text-indigo-600 hover:bg-slate-900 hover:text-white" : "bg-white border-slate-200 text-slate-700 hover:border-slate-900"
+              )}>
+                {isAdmin ? "Nhật ký truy cập" : "Lịch sử hoạt động"}
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {stats.map((stat, idx) => (
-              <div key={idx} className="flex items-center gap-4 p-5 bg-slate-50/50 rounded-[2rem] border border-slate-100/50 hover:bg-white hover:shadow-md transition-all group">
-                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", stat.bg, stat.color)}>
-                  <stat.icon size={24} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">{stat.label}</p>
-                  <p className="text-base font-black text-slate-800">{stat.value}</p>
-                </div>
+          {isAdmin ? (
+            <div className="bg-slate-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-indigo-900/20 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-20 text-amber-500">
+                 <ShieldCheck size={80} />
               </div>
-            ))}
-            <div className="flex items-center gap-4 p-5 bg-emerald-600 rounded-[2rem] text-white shadow-lg shadow-emerald-900/20">
-              <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
-                <Award size={24} />
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-0.5">Điểm uy tín</p>
-                <p className="text-base font-black">2,840 XP</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Left Column: Info & Skills */}
-        <div className="space-y-8">
-          <section className="space-y-4">
-            <h2 className="text-2xl font-black text-slate-900 font-headline flex items-center gap-3">
-              <User size={24} className="text-emerald-600" /> Giới thiệu
-            </h2>
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                Với hơn 10 năm kinh nghiệm trong lĩnh vực nông nghiệp công nghệ cao, tôi chuyên về tối ưu hóa quy trình chăn nuôi và quản lý đàn lợn quy mô lớn. Đam mê ứng dụng dữ liệu vào việc ra quyết định để nâng cao năng suất và phúc lợi động vật.
+              <h3 className="text-lg font-black uppercase mb-2 relative z-10 text-amber-500">Security Mode</h3>
+              <p className="text-slate-400 text-xs font-bold leading-relaxed mb-4 relative z-10">
+                Tài khoản của bạn được bảo mật lớp 2 (2FA) và có quyền thay đổi cấu hình lõi của hệ thống.
               </p>
-            </div>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-2xl font-black text-slate-900 font-headline flex items-center gap-3">
-              <Zap size={24} className="text-emerald-600" /> Kỹ năng chuyên môn
-            </h2>
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
-              <div className="flex flex-wrap gap-2">
-                {skills.map((skill) => (
-                  <span key={skill} className="px-4 py-2 bg-slate-50 text-slate-600 text-xs font-bold rounded-xl border border-slate-100 hover:border-emerald-200 hover:text-emerald-600 transition-all cursor-default">
-                    {skill}
-                  </span>
-                ))}
+              <div className="px-3 py-1.5 bg-amber-500 text-slate-950 rounded-lg inline-block text-[9px] font-black uppercase tracking-widest relative z-10">
+                Super User Verified
               </div>
             </div>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-2xl font-black text-slate-900 font-headline flex items-center gap-3">
-              <Mail size={24} className="text-emerald-600" /> Liên hệ
-            </h2>
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 space-y-6 shadow-sm">
-              {[
-                { label: "Email", value: "marcus@agriintel.vn", icon: Mail, color: "text-blue-500" },
-                { label: "Số điện thoại", value: "+84 901 234 567", icon: Phone, color: "text-emerald-500" },
-                { label: "Địa chỉ", value: "Thường Tín, Hà Nội", icon: MapPin, color: "text-rose-500" },
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-5 group">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-white group-hover:shadow-md transition-all">
-                    <item.icon size={20} className={item.color} />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">{item.label}</p>
-                    <p className="text-sm font-black text-slate-700">{item.value}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
-
-        {/* Right Column: Activity & Performance */}
-        <div className="lg:col-span-2 space-y-8">
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-black text-slate-900 font-headline flex items-center gap-3">
-                <Clock size={24} className="text-emerald-600" /> Hoạt động gần đây
-              </h2>
-              <button className="text-sm font-bold text-emerald-600 hover:underline">Xem tất cả</button>
-            </div>
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-              <div className="divide-y divide-slate-50">
-                {activities.map((activity, idx) => (
-                  <div key={idx} className="p-8 flex items-start gap-6 hover:bg-slate-50/50 transition-colors group">
-                    <div className={cn(
-                      "w-14 h-14 rounded-[1.25rem] flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 shadow-sm",
-                      activity.type === "update" ? "bg-blue-50 text-blue-600" : 
-                      activity.type === "approval" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
-                    )}>
-                      <activity.icon size={24} />
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <p className="text-base font-black text-slate-800">{activity.action}</p>
-                        <span className="text-xs font-bold text-slate-400">{activity.time}</span>
-                      </div>
-                      <p className="text-sm text-slate-500 font-medium">Thực hiện bởi Marcus Thorne tại Phân khu A</p>
-                      <div className="pt-3 flex gap-2">
-                        <button className="px-4 py-1.5 bg-slate-100 hover:bg-emerald-100 hover:text-emerald-700 text-slate-600 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all">
-                          Chi tiết
-                        </button>
-                        <button className="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all">
-                          Báo cáo
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          ) : (
+            <div className="bg-emerald-600 rounded-[2rem] p-6 text-white shadow-xl shadow-emerald-600/10 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                 <Shield size={80} />
+              </div>
+              <h3 className="text-lg font-black uppercase mb-2 relative z-10">Độ tin cậy</h3>
+              <p className="text-emerald-100 text-xs font-bold leading-relaxed mb-4 relative z-10">
+                Hồ sơ đã được Admin xác thực bảo mật 100%.
+              </p>
+              <div className="px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-lg inline-block text-[9px] font-black uppercase tracking-widest relative z-10 border border-white/10">
+                Verified Profile
               </div>
             </div>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-2xl font-black text-slate-900 font-headline flex items-center gap-3">
-              <Shield size={24} className="text-emerald-600" /> Bảo mật & Quyền hạn
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm flex flex-col justify-between">
-                <div className="space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <Shield size={28} />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-black text-slate-900 font-headline">Xác thực 2 lớp</h4>
-                    <p className="text-xs text-slate-400 font-bold mt-1 leading-relaxed">Tài khoản của bạn đang được bảo vệ bởi 2FA qua Google Authenticator.</p>
-                  </div>
-                </div>
-                <button className="mt-6 w-full py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-black uppercase tracking-widest rounded-xl border border-slate-100 transition-all">
-                  Quản lý thiết bị
-                </button>
-              </div>
-              
-              <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] p-8 text-white relative overflow-hidden flex flex-col justify-between">
-                <div className="absolute top-0 right-0 p-6 opacity-10">
-                  <Zap size={100} />
-                </div>
-                <div className="space-y-4 relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center">
-                    <Award size={28} className="text-emerald-400" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-black font-headline">Quyền hạn Admin</h4>
-                    <p className="text-xs text-slate-400 font-bold mt-1 leading-relaxed">Bạn có toàn quyền truy cập vào tất cả các phân khu và báo cáo tài chính.</p>
-                  </div>
-                </div>
-                <button className="mt-6 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg shadow-emerald-900/40 transition-all relative z-10">
-                  Xem nhật ký quyền
-                </button>
-              </div>
-            </div>
-          </section>
+          )}
         </div>
       </div>
     </div>
   );
 }
-

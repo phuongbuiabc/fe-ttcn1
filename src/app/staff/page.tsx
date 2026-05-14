@@ -9,24 +9,17 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { staffService } from "@/modules/staff/api/staff.service";
+import { authService } from "@/modules/auth/api/auth.service";
 
-// Feature Components
+import { Employee, CreateEmployeeRequest } from "@/shared/types";
 import { StaffFormModal } from "@/modules/staff/ui/StaffFormModal";
 import { StaffDetailModal } from "@/modules/staff/ui/StaffDetailModal";
 import { StaffTable } from "@/modules/staff/ui/StaffTable";
 
-// --- Mock Data ---
-const mockEmployees: any[] = [
-  { id: "m-001", employee_id: "NV001", full_name: "Nguyễn Quang Minh", gender: "Nam", birth_date: "1992-05-15", address: "Ba Đình, Hà Nội", phone: "0912.345.678", email: "minh.nq@mdfarm.vn", position: "Quản lý Kỹ thuật", qualification: "Thạc sĩ Chăn nuôi" },
-  { id: "m-002", employee_id: "NV002", full_name: "Trần Thị Hường", gender: "Nữ", birth_date: "1995-08-22", address: "Từ Sơn, Bắc Ninh", phone: "0988.777.666", email: "huong.tt@mdfarm.vn", position: "Bác sĩ Thú y", qualification: "Bác sĩ Thú y" },
-  { id: "m-003", employee_id: "NV003", full_name: "Lê Văn Hải", gender: "Nam", birth_date: "1990-11-02", address: "Thanh Hóa", phone: "0977.123.456", email: "hai.lv@mdfarm.vn", position: "Kỹ thuật Chăn nuôi", qualification: "Đại học Nông nghiệp" },
-  { id: "m-004", employee_id: "NV004", full_name: "Phạm Phương Thảo", gender: "Nữ", birth_date: "1998-03-30", address: "Cẩm Giàng, Hải Dương", phone: "0345.678.901", email: "thao.pp@mdfarm.vn", position: "Kế toán Kho", qualification: "Cử nhân Kế toán" },
-  { id: "m-005", employee_id: "NV005", full_name: "Hoàng Anh Tuấn", gender: "Nam", birth_date: "1994-12-12", address: "Kim Động, Hưng Yên", phone: "0909.123.456", email: "tuan.ha@mdfarm.vn", position: "Vận hành Hệ thống", qualification: "Cao đẳng Kỹ thuật" }
-];
-
 export default function StaffPage() {
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [members, setMembers] = useState<any[]>([]);
+  const [members, setMembers] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Modals Status
@@ -35,44 +28,108 @@ export default function StaffPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Selected Data
-  const [editingMember, setEditingMember] = useState<any | null>(null);
-  const [selectedForDetail, setSelectedForDetail] = useState<any | null>(null);
-  const [selectedStaffForDelete, setSelectedStaffForDelete] = useState<any | null>(null);
+  const [editingMember, setEditingMember] = useState<Employee | null>(null);
+  const [selectedForDetail, setSelectedForDetail] = useState<Employee | null>(null);
+  const [selectedStaffForDelete, setSelectedStaffForDelete] = useState<Employee | null>(null);
 
   const [formData, setFormData] = useState<any>({
-    employee_id: "", full_name: "", gender: "Nam", birth_date: "", address: "", phone: "", email: "", position: "Công nhân", qualification: ""
+    userId: "", firstName: "", lastName: "", email: "", phone: "", dateOfBirth: "", gender: "MALE", currentAddress: "", position: "Công nhân",
+    password: ""
   });
 
+  const fetchMembers = async (showLoading = true) => {
+    try {
+      if (showLoading) setLoading(true);
+      const res = await staffService.getEmployees();
+      if (res.success) setMembers(res.data);
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setTimeout(() => {
-      setMembers(mockEmployees);
+    const cached = staffService.getCachedEmployees();
+    if (cached) {
+      setMembers(cached);
       setLoading(false);
-    }, 600);
+      fetchMembers(false);
+    } else {
+      fetchMembers(true);
+    }
   }, []);
 
   const openAddModal = () => {
     setEditingMember(null);
     setFormData({
-      employee_id: `NV${Math.floor(100 + Math.random() * 900)}`, full_name: "", gender: "Nam", birth_date: "", address: "", phone: "", email: "", position: "Kỹ thuật viên", qualification: ""
+      userId: "", firstName: "", lastName: "", email: "", phone: "", dateOfBirth: "", gender: "MALE", currentAddress: "", position: "Kỹ thuật viên",
+      password: ""
     });
+
     setIsModalOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingMember) {
-      setMembers(members.map(m => m.id === editingMember.id ? { ...formData, id: editingMember.id } : m));
-    } else {
-      setMembers([{ ...formData, id: `m-${Math.random()}` }, ...members]);
+    let res;
+    let finalUserId = formData.userId;
+
+    try {
+      // Step 1: Create User Account for new staff
+      if (!editingMember) {
+        const regRes = await authService.register({
+          givenName: formData.firstName,
+          familyName: formData.lastName,
+          email: formData.email,
+          password: formData.password
+        });
+        
+        if (!regRes.success) {
+          alert(regRes.message || "Không thể tạo tài khoản người dùng");
+          return;
+        }
+        // Correct path based on Swagger: regRes.data.user.id
+        finalUserId = regRes.data.user.id;
+      }
+
+      // Step 2: Create/Update Employee Profile
+      const { password, ...employeeData } = { ...formData, userId: finalUserId };
+      
+      if (editingMember) {
+        res = await staffService.updateEmployee(editingMember.id, employeeData);
+      } else {
+        res = await staffService.createEmployee(employeeData);
+      }
+
+
+      if (res.success) {
+        fetchMembers(false);
+        setIsModalOpen(false);
+      } else {
+        alert(res.message || "Có lỗi xảy ra khi tạo hồ sơ");
+      }
+    } catch (error: any) {
+      alert(error.message || "Lỗi hệ thống");
     }
-    setIsModalOpen(false);
+  };
+
+
+  const confirmDelete = async () => {
+    if (selectedStaffForDelete) {
+      const res = await staffService.deleteEmployee(selectedStaffForDelete.id);
+      if (res.success) {
+        fetchMembers(false);
+        setIsDeleteModalOpen(false);
+      } else {
+        alert(res.message || "Không thể xóa nhân viên");
+      }
+    }
   };
 
   const filteredMembers = members.filter(m =>
-    m.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.employee_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (m.firstName + " " + m.lastName).toLowerCase().includes(searchTerm.toLowerCase()) ||
     m.position.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   return (
     <div className="space-y-6 pb-20 bg-[#fbfcfd] min-h-screen -m-6 p-6">
@@ -137,7 +194,7 @@ export default function StaffPage() {
       <AnimatePresence>
         {isDeleteModalOpen && selectedStaffForDelete && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl p-10 text-center"><div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-6"><Trash2 size={32} /></div><p className="text-xl font-extrabold text-slate-800 mb-2 uppercase">Xác nhận xóa?</p><p className="text-slate-500 text-sm mb-8 leading-relaxed">Hồ sơ nhân viên <span className="font-bold text-slate-900">{selectedStaffForDelete.full_name}</span> sẽ bị gỡ khỏi hệ thống.</p><div className="flex gap-4"><button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-700 rounded-2xl text-sm font-bold">Hủy bỏ</button><button onClick={() => { setMembers(members.filter(m => m.id !== selectedStaffForDelete.id)); setIsDeleteModalOpen(false); }} className="flex-1 py-4 bg-rose-500 text-white rounded-2xl text-sm font-bold shadow-lg shadow-rose-900/20 active:scale-95 transition-all">Xác nhận xóa</button></div></motion.div>
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl p-10 text-center"><div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-6"><Trash2 size={32} /></div><p className="text-xl font-extrabold text-slate-800 mb-2 uppercase">Xác nhận xóa?</p><p className="text-slate-500 text-sm mb-8 leading-relaxed">Hồ sơ nhân viên <span className="font-bold text-slate-900">{selectedStaffForDelete.firstName} {selectedStaffForDelete.lastName}</span> sẽ bị gỡ khỏi hệ thống.</p><div className="flex gap-4"><button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-700 rounded-2xl text-sm font-bold">Hủy bỏ</button><button onClick={confirmDelete} className="flex-1 py-4 bg-rose-500 text-white rounded-2xl text-sm font-bold shadow-lg shadow-rose-900/20 active:scale-95 transition-all">Xác nhận xóa</button></div></motion.div>
           </div>
         )}
       </AnimatePresence>
