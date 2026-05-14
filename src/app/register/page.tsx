@@ -145,8 +145,8 @@ export default function RegisterPage() {
           </div>
 
           <div className="mb-10">
-            <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-3">Tạo tài khoản mới</h2>
-            <p className="text-slate-500 font-medium">Hoàn thành thông tin bên dưới để bắt đầu quản lý trang trại.</p>
+            <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-3">Đăng ký Quản trị viên</h2>
+            <p className="text-slate-500 font-medium">Khởi tạo tài khoản quản lý hệ thống MDFARM.</p>
           </div>
 
           {error && (
@@ -157,28 +157,8 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4 p-1 bg-slate-100 rounded-2xl">
-              <button
-                type="button"
-                onClick={() => setRole("OWNER")}
-                className={cn(
-                  "flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
-                  role === "OWNER" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
-                )}
-              >
-                <ShieldCheck size={16} /> Chủ trang trại
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole("WORKER")}
-                className={cn(
-                  "flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
-                  role === "WORKER" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
-                )}
-              >
-                <Briefcase size={16} /> Công nhân
-              </button>
-            </div>
+            <input type="hidden" value="ADMIN" />
+
 
             <div className="space-y-2">
               <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Họ và tên</label>
