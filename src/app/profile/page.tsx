@@ -10,8 +10,11 @@ import { cn } from "@/shared/utils/utils";
 import { staffService } from "@/modules/staff/api/staff.service";
 import { Employee } from "@/shared/types";
 import { motion } from "motion/react";
+import { useAuth } from "@/modules/auth/hooks/useAuth";
 
 export default function ProfilePage() {
+  const { user, logout } = useAuth();
+
   const [profile, setProfile] = React.useState<Employee | null>(null);
   const [loading, setLoading] = React.useState(true);
 
@@ -19,8 +22,21 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         const res = await staffService.getMe();
-        if (res.success) {
+        if (res.success && res.data) {
           setProfile(res.data);
+        } else if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) {
+          // Fallback cho Admin/Owner nếu chưa liên kết với Employee record
+          setProfile({
+            id: user.id,
+            firstName: user.givenName || "",
+            lastName: user.familyName || "Admin",
+            email: user.email,
+            phone: "Chưa cập nhật",
+            dateOfBirth: "Chưa cập nhật",
+            gender: "N/A",
+            currentAddress: "Hệ thống Quản trị",
+            position: user.role === 'ADMIN' ? "Quản trị viên" : "Chủ trang trại",
+          });
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
@@ -29,7 +45,7 @@ export default function ProfilePage() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -129,7 +145,10 @@ export default function ProfilePage() {
           </div>
 
           <div className="shrink-0 flex gap-3">
-             <button className="px-8 py-4 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg hover:scale-105 transition-all active:scale-95">
+             <button 
+               onClick={logout}
+               className="px-8 py-4 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg hover:scale-105 transition-all active:scale-95"
+             >
                 <LogOut size={14} className="inline mr-2" /> Đăng xuất
              </button>
           </div>

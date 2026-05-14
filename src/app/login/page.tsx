@@ -35,6 +35,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   
+  useEffect(() => {
+    // Xóa sạch token cũ khi vào trang login để tránh lỗi auth loop
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.clear();
+  }, []);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

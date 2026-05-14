@@ -3,6 +3,7 @@ import { Trash2, Edit, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/shared/utils/utils';
 import { Supply, MaterialType } from '@/modules/inventory/model/inventory.model';
+import { useAuth } from '@/shared/components/AuthProvider';
 
 interface InventoryTableProps {
   supplies: Supply[];
@@ -10,6 +11,7 @@ interface InventoryTableProps {
   onEdit: (item: Supply) => void;
   onDelete: (item: Supply) => void;
   onView: (item: Supply) => void;
+  onLoss: (item: Supply) => void;
 }
 
 const materialTypeLabels: Record<string, string> = {
@@ -23,8 +25,12 @@ export function InventoryTable({
   loading, 
   onEdit, 
   onDelete,
-  onView 
+  onView,
+  onLoss
 }: InventoryTableProps) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'OWNER';
+
   if (loading) {
     return (
       <div className="py-20 text-center font-black text-slate-400 uppercase tracking-widest">
@@ -75,25 +81,48 @@ export function InventoryTable({
               </td>
 
               <td className="px-8 py-3.5 text-center">
-                <span className={cn("text-lg font-black tracking-tighter", item.quantity < 10 ? "text-rose-500" : "text-emerald-600")}>
-                  {item.quantity}
-                </span>
-                <span className="ml-1.5 text-[10px] font-black text-slate-400 uppercase">{item.unit}</span>
+                <div className="flex flex-col items-center justify-center">
+                  <div className="flex items-center gap-1.5">
+                    {item.quantity < 10 && (
+                      <motion.div
+                        animate={{ opacity: [1, 0.4, 1], scale: [1, 1.1, 1] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                      >
+                        <AlertTriangle size={14} className="text-rose-500" />
+                      </motion.div>
+                    )}
+                    <span className={cn("text-lg font-black tracking-tighter", item.quantity < 10 ? "text-rose-500" : "text-emerald-600")}>
+                      {item.quantity}
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.unit}</span>
+                </div>
               </td>
               <td className="px-8 py-3.5 text-right">
                 <div className="flex justify-end gap-2 transition-all">
                   <button 
-                    onClick={(e) => { e.stopPropagation(); onEdit(item); }} 
-                    className="p-2.5 text-slate-400 hover:text-blue-600 transition-all"
+                    onClick={(e) => { e.stopPropagation(); onLoss(item); }} 
+                    className="p-2.5 text-slate-400 hover:text-rose-500 transition-all"
+                    title="Báo hao hụt"
                   >
-                    <Edit size={18}/>
+                    <AlertTriangle size={18}/>
                   </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); onDelete(item); }} 
-                    className="p-2.5 text-slate-400 hover:text-rose-600 transition-all"
-                  >
-                    <Trash2 size={18}/>
-                  </button>
+                  {isAdmin && (
+                    <>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onEdit(item); }} 
+                        className="p-2.5 text-slate-400 hover:text-blue-600 transition-all"
+                      >
+                        <Edit size={18}/>
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onDelete(item); }} 
+                        className="p-2.5 text-slate-400 hover:text-rose-600 transition-all"
+                      >
+                        <Trash2 size={18}/>
+                      </button>
+                    </>
+                  )}
                 </div>
               </td>
             </motion.tr>

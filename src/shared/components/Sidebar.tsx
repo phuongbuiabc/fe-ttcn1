@@ -101,6 +101,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           const hasChildren = !!item.children;
           const isActive =
             pathname === item.href ||
+            (item.href !== "/" && pathname.startsWith(item.href)) ||
             (hasChildren && pathname.startsWith(item.href)) ||
             (item.name === 'Sức khỏe' && pathname.startsWith('/health'));
           
