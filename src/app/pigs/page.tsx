@@ -58,7 +58,6 @@ export default function PigPage() {
   const pathname = usePathname();
   const title = getPageTitle(pathname);
 
-  const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPig, setEditingPig] = useState<PigResponse | null>(null);
   const [selectedPigId, setSelectedPigId] = useState<string | null>(null);
@@ -102,14 +101,7 @@ export default function PigPage() {
     }
   }, [pens]);
 
-  const filteredPigs = useMemo(() => {
-    return pigs.filter((pig) =>
-      [pig.id, pig.earTag, pig.species, pig.type]
-        .join(' ')
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    );
-  }, [pigs, searchTerm]);
+
 
   const emptyPens = useMemo(() => {
     return pens.filter((pen) => (penPigCountMap[pen.id] ?? 0) === 0);
@@ -184,22 +176,10 @@ export default function PigPage() {
 
       <PigStats pigs={pigs} />
 
-      <div className="bg-white p-4 rounded-xl">
-        <div className="relative max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2" size={14} />
-          <input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm theo mã, tai, giống..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl text-sm"
-          />
-        </div>
-      </div>
-
       <div className={`grid gap-4 ${isDetailMode ? 'grid-cols-1 lg:grid-cols-10' : 'grid-cols-1'}`}>
         <div className={isDetailMode ? 'bg-white rounded-xl overflow-hidden lg:col-span-6' : 'bg-white rounded-xl overflow-hidden'}>
           <PigTable
-            pigs={filteredPigs}
+            pigs={pigs}
             loading={loadingList}
             onView={async (pig) => {
               if (pig.id === selectedPigId && isDetailMode) return;

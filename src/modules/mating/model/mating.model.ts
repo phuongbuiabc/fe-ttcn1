@@ -17,7 +17,6 @@ export interface MatingResponse {
 export interface CreateMatingRequest {
     sowPigId: string;
     semenId: string;
-    boarBreed: string;
     litterLength: number;
     matingRound: number;
     employeeId: string;
@@ -28,7 +27,6 @@ export interface CreateMatingRequest {
 export interface UpdateMatingRequest {
     sowPigId?: string;
     semenId?: string;
-    boarBreed?: string;
     litterLength?: number;
     matingRound?: number;
     employeeId?: string;

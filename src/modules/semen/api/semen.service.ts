@@ -15,6 +15,9 @@ export const semenService = {
     createSemen: (data: CreateSemenRequest) =>
         apiClient.post<ApiResponse<SemenResponse>>(`${BASE_URL}`, data),
 
+    createBulkSemen: (data: CreateSemenRequest[]) =>
+        apiClient.post<ApiResponse<SemenResponse[]>>(`${BASE_URL}/bulk`, data),
+
     updateSemen: (id: string, data: UpdateSemenRequest) =>
         apiClient.put<ApiResponse<SemenResponse>>(`${BASE_URL}/${id}`, data),
 
