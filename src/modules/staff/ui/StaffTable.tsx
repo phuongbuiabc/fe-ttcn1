@@ -37,12 +37,12 @@ export function StaffTable({ staffs, loading, onEdit, onDelete, onView }: StaffT
               <td className="px-6 py-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center font-black text-xs">
-                    {staff.full_name.charAt(0)}
+                    {staff.firstName?.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-black text-slate-900 leading-none text-[13px]">{staff.full_name}</p>
-                    <p className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-bold">{staff.employee_id}</p>
+                    <p className="font-black text-slate-900 leading-none text-[13px]">{staff.firstName} {staff.lastName}</p>
                   </div>
+
                 </div>
               </td>
               <td className="px-6 py-3">

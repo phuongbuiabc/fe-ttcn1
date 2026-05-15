@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { 
-  User, 
-  Bell, 
-  Shield, 
-  Database, 
-  Globe, 
+import {
+  User,
+  Bell,
+  Shield,
+  Database,
+  Globe,
   CreditCard,
   ChevronRight,
   LogOut,
@@ -24,6 +24,9 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/utils/utils";
 import Image from "next/image";
+import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { staffService } from "@/modules/staff/api/staff.service";
+import { Employee } from "@/shared/types";
 
 // --- Types ---
 interface FarmSettings {
@@ -46,20 +49,59 @@ function SettingsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   const tabParam = searchParams.get("tab");
-  
+
   const activeTab = tabParam || "general";
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [profile, setProfile] = useState<Employee | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await staffService.getMe();
+        if (res.success && res.data) {
+          setProfile(res.data);
+        } else if (user) {
+          // Fallback if no employee record
+          setProfile({
+            id: user.id,
+            firstName: user.givenName || "",
+            lastName: user.familyName || "",
+            email: user.email,
+            phone: "",
+            dateOfBirth: "",
+            gender: "N/A",
+            currentAddress: "",
+            position: user.role === 'ADMIN' ? "Quản trị viên" : "Nhân viên",
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      }
+    };
+    fetchProfile();
+
+    // Load farm settings from localStorage
+    const savedSettings = localStorage.getItem("farm_settings");
+    if (savedSettings) {
+      try {
+        setSettings(JSON.parse(savedSettings));
+      } catch (e) {
+        console.error("Failed to parse saved settings", e);
+      }
+    }
+  }, [user]);
 
   const handleTabChange = (tabId: string) => {
     router.push(`${pathname}?tab=${tabId}`);
   };
 
   const [settings, setSettings] = useState<FarmSettings>({
-    farmName: "AgriIntel Farm - Chi nhánh Miền Bắc",
-    ownerName: "Nguyễn Văn An",
-    email: "an.nv@agriintel.com",
+    farmName: "MDFARM - Chăn nuôi lợn giống",
+    ownerName: "Nguyễn Viết ",
+    email: "contact@mdfarm.vn",
     phone: "0901 234 567",
     address: "Km 15, Quốc lộ 1A, Huyện Thường Tín, Hà Nội",
     language: "Tiếng Việt",
@@ -72,14 +114,41 @@ function SettingsContent() {
     }
   });
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      if (activeTab === "account" && profile) {
+        const res = await staffService.updateEmployee(profile.id, {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          phone: profile.phone,
+          currentAddress: profile.currentAddress,
+        });
+
+        if (res.success) {
+          setShowSuccess(true);
+          setTimeout(() => setShowSuccess(false), 3000);
+        } else {
+          alert(res.message || "Không thể cập nhật hồ sơ");
+        }
+      } else if (activeTab === "general" || activeTab === "notifications") {
+        // Lưu vào localStorage cho General và Notifications
+        localStorage.setItem("farm_settings", JSON.stringify(settings));
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      } else {
+        // Mock save cho Security
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+      alert("Đã xảy ra lỗi khi lưu thông tin");
+    } finally {
       setIsSaving(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    }, 1000);
+    }
   };
 
   const tabs = [
@@ -100,7 +169,7 @@ function SettingsContent() {
         <div className="flex items-center gap-3">
           <AnimatePresence>
             {showSuccess && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
@@ -110,7 +179,7 @@ function SettingsContent() {
               </motion.div>
             )}
           </AnimatePresence>
-          <button 
+          <button
             onClick={handleSave}
             disabled={isSaving}
             className={cn(
@@ -133,8 +202,8 @@ function SettingsContent() {
               onClick={() => handleTabChange(tab.id)}
               className={cn(
                 "w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold transition-all",
-                activeTab === tab.id 
-                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/20" 
+                activeTab === tab.id
+                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/20"
                   : "bg-white text-slate-500 hover:bg-slate-50 border border-transparent hover:border-slate-100"
               )}
             >
@@ -143,7 +212,10 @@ function SettingsContent() {
             </button>
           ))}
           <div className="pt-8">
-            <button className="w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold text-rose-600 hover:bg-rose-50 transition-all">
+            <button
+              onClick={logout}
+              className="w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold text-rose-600 hover:bg-rose-50 transition-all"
+            >
               <LogOut size={20} />
               Đăng xuất
             </button>
@@ -169,10 +241,10 @@ function SettingsContent() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tên trang trại</label>
                         <div className="relative">
                           <Home className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             value={settings.farmName}
-                            onChange={(e) => setSettings({...settings, farmName: e.target.value})}
+                            onChange={(e) => setSettings({ ...settings, farmName: e.target.value })}
                             className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
                           />
                         </div>
@@ -181,10 +253,10 @@ function SettingsContent() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Chủ sở hữu</label>
                         <div className="relative">
                           <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             value={settings.ownerName}
-                            onChange={(e) => setSettings({...settings, ownerName: e.target.value})}
+                            onChange={(e) => setSettings({ ...settings, ownerName: e.target.value })}
                             className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
                           />
                         </div>
@@ -193,10 +265,10 @@ function SettingsContent() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Email liên hệ</label>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input 
-                            type="email" 
+                          <input
+                            type="email"
                             value={settings.email}
-                            onChange={(e) => setSettings({...settings, email: e.target.value})}
+                            onChange={(e) => setSettings({ ...settings, email: e.target.value })}
                             className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
                           />
                         </div>
@@ -205,10 +277,10 @@ function SettingsContent() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Số điện thoại</label>
                         <div className="relative">
                           <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             value={settings.phone}
-                            onChange={(e) => setSettings({...settings, phone: e.target.value})}
+                            onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
                             className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
                           />
                         </div>
@@ -217,10 +289,10 @@ function SettingsContent() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Địa chỉ</label>
                         <div className="relative">
                           <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             value={settings.address}
-                            onChange={(e) => setSettings({...settings, address: e.target.value})}
+                            onChange={(e) => setSettings({ ...settings, address: e.target.value })}
                             className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
                           />
                         </div>
@@ -235,9 +307,9 @@ function SettingsContent() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ngôn ngữ</label>
                         <div className="relative">
                           <Languages className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select 
+                          <select
                             value={settings.language}
-                            onChange={(e) => setSettings({...settings, language: e.target.value})}
+                            onChange={(e) => setSettings({ ...settings, language: e.target.value })}
                             className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none appearance-none"
                           >
                             <option>Tiếng Việt</option>
@@ -249,9 +321,9 @@ function SettingsContent() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tiền tệ</label>
                         <div className="relative">
                           <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select 
+                          <select
                             value={settings.currency}
-                            onChange={(e) => setSettings({...settings, currency: e.target.value})}
+                            onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
                             className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none appearance-none"
                           >
                             <option>VND</option>
@@ -263,9 +335,9 @@ function SettingsContent() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Múi giờ</label>
                         <div className="relative">
                           <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select 
+                          <select
                             value={settings.timezone}
-                            onChange={(e) => setSettings({...settings, timezone: e.target.value})}
+                            onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
                             className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none appearance-none"
                           >
                             <option>GMT+7 (Hanoi)</option>
@@ -290,14 +362,20 @@ function SettingsContent() {
                     <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Thông tin Cá nhân</h3>
                     <div className="flex flex-col md:flex-row items-center gap-10 mb-10">
                       <div className="relative group">
-                        <div className="w-40 h-40 rounded-[2.5rem] overflow-hidden border-4 border-slate-100 shadow-xl relative bg-white">
-                          <Image 
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU8H1s-kjjlI2NWZ__-jyblSSG7AHeOmfBWSF8MxnkOItZRulZPOyAz2qjUhh1OL64lfdFM3kKVyoIqsyWJn5zjUx7eLL_HW8pI7vf7kinoqASkg8UI3plURqUft8OU90He4GSu8H6s1eeSLihn2CxkXvzfLfGOt1_K0f_R5CcwU5SWhzTWWSwqDfcNCrJcqrvpPZbGJ421OUkC2tzipzeMZWNrpeeEb8uqSfmGHmEmiduDR15CCVyTYCHUQc6re0vxz3nNLuM4UFJ" 
-                            alt="Owner" 
-                            fill 
-                            className="object-cover"
-                            referrerPolicy="no-referrer"
-                          />
+                        <div className="w-40 h-40 rounded-[2.5rem] overflow-hidden border-4 border-slate-100 shadow-xl relative bg-white flex items-center justify-center">
+                          {user?.avatarUrl ? (
+                            <Image
+                              src={user.avatarUrl}
+                              alt="Avatar"
+                              fill
+                              className="object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-emerald-500 flex items-center justify-center text-4xl font-black text-white">
+                              {profile?.firstName?.charAt(0) || user?.givenName?.charAt(0) || "U"}
+                            </div>
+                          )}
                         </div>
                         <button className="absolute -bottom-2 -right-2 p-3 bg-emerald-600 text-white rounded-2xl shadow-xl hover:scale-110 transition-all border-4 border-white">
                           <Camera size={20} />
@@ -306,17 +384,59 @@ function SettingsContent() {
                       <div className="flex-1 space-y-4 w-full">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Họ và tên</label>
-                            <input type="text" defaultValue="Marcus Thorne" className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" />
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Họ</label>
+                            <input
+                              type="text"
+                              value={profile?.lastName || ""}
+                              onChange={(e) => setProfile(prev => prev ? { ...prev, lastName: e.target.value } : null)}
+                              className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tên</label>
+                            <input
+                              type="text"
+                              value={profile?.firstName || ""}
+                              onChange={(e) => setProfile(prev => prev ? { ...prev, firstName: e.target.value } : null)}
+                              className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Số điện thoại</label>
+                            <input
+                              type="text"
+                              value={profile?.phone || ""}
+                              onChange={(e) => setProfile(prev => prev ? { ...prev, phone: e.target.value } : null)}
+                              className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                            />
                           </div>
                           <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Chức vụ</label>
-                            <input type="text" defaultValue="Quản lý Trang trại" className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none" />
+                            <input
+                              type="text"
+                              value={profile?.position || ""}
+                              readOnly
+                              className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none opacity-70 cursor-not-allowed"
+                            />
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tiểu sử ngắn</label>
-                          <textarea rows={3} defaultValue="Chuyên gia quản lý nông nghiệp với hơn 10 năm kinh nghiệm." className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none resize-none" />
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Địa chỉ hiện tại</label>
+                          <input
+                            type="text"
+                            value={profile?.currentAddress || ""}
+                            onChange={(e) => setProfile(prev => prev ? { ...prev, currentAddress: e.target.value } : null)}
+                            className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Email quản trị</label>
+                          <input
+                            type="email"
+                            value={profile?.email || ""}
+                            readOnly
+                            className="w-full px-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none opacity-70 cursor-not-allowed"
+                          />
                         </div>
                       </div>
                     </div>
@@ -362,11 +482,11 @@ function SettingsContent() {
                           <p className="text-sm font-bold text-slate-900">{item.label}</p>
                           <p className="text-xs font-medium text-slate-400 mt-1">{item.desc}</p>
                         </div>
-                        <button 
+                        <button
                           onClick={() => setSettings({
-                            ...settings, 
+                            ...settings,
                             notifications: {
-                              ...settings.notifications, 
+                              ...settings.notifications,
                               [item.id as keyof typeof settings.notifications]: !settings.notifications[item.id as keyof typeof settings.notifications]
                             }
                           })}

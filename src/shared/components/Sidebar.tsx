@@ -54,7 +54,7 @@ const navItems = [
     href: "/staff",
     children: [
       { name: "Nhân viên", icon: User, href: "/staff" },
-      { name: "Lịch làm việc", icon: Calendar, href: "/staff/schedule" },
+      { name: "Lịch làm việc", icon: Calendar, href: "/work-schedules" },
     ]
   },
 ];
@@ -68,7 +68,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>(() => {
     const expanded = [];
-    if (pathname.startsWith("/staff")) expanded.push("Nhân sự");
+    if (pathname.startsWith("/staff") || pathname.startsWith("/work-schedules")) expanded.push("Nhân sự");
     if (pathname.startsWith("/trading")) expanded.push("Mua bán");
     return expanded;
   });
@@ -101,6 +101,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           const hasChildren = !!item.children;
           const isActive =
             pathname === item.href ||
+            (item.href !== "/" && pathname.startsWith(item.href)) ||
             (hasChildren && pathname.startsWith(item.href)) ||
             (item.name === 'Sức khỏe' && pathname.startsWith('/health'));
           

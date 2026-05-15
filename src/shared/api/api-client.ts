@@ -12,7 +12,8 @@ export class ApiClient {
   private refreshPromise: Promise<string> | null = null;
 
   private isAuthEndpoint(endpoint: string): boolean {
-    return /\/api\/v1\/auth\/(login|register|refresh-token)(?:\?|$)/i.test(
+    // Chấp nhận cả /auth/login và /api/v1/auth/login
+    return /(?:\/api\/v1)?\/auth\/(login|register|refresh-token)(?:\?|$)/i.test(
       endpoint
     );
   }
@@ -81,10 +82,19 @@ export class ApiClient {
     return `${url}${separator}${query}`;
   }
 
-  private getHeaders(): HeadersInit {
+  private getHeaders(endpoint: string): HeadersInit {
+    // Nếu là endpoint auth, tuyệt đối KHÔNG gửi Authorization header
+    if (this.isAuthEndpoint(endpoint)) {
+      return {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+    }
+
     const token = tokenStorage.getAccessToken();
     return {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   }
@@ -94,11 +104,12 @@ export class ApiClient {
     const refreshToken = tokenStorage.getRefreshToken();
 
     if (!refreshToken) {
-      console.error('Missing refresh token');
-      throw new Error('Missing refresh token');
+      // Thay vì throw error làm chết app, chúng ta trả về thông báo để đẩy người dùng về login
+      return Promise.reject('SESSION_EXPIRED');
     }
 
-    const res = await fetch(`/api/proxy/api/v1/auth/refresh-token`, {
+    const url = this.buildUrl('/auth/refresh-token');
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
@@ -129,13 +140,29 @@ export class ApiClient {
     let response = await fetch(url, {
       ...fetchOptions,
       headers: {
-        ...this.getHeaders(),
+        ...this.getHeaders(endpoint),
         ...fetchOptions.headers,
       },
     });
 
     // ===== HANDLE 401 =====
-    if (response.status === 401 && !options._retry && !this.isAuthEndpoint(endpoint)) {
+    if (response.status === 401 && !options._retry) {
+      // Nếu là endpoint login/register mà lỗi 401 thì là sai pass/user, trả về lỗi luôn
+      if (this.isAuthEndpoint(endpoint)) {
+        const data = await response.json().catch(() => ({}));
+        let errMsg = data.message || "Tài khoản hoặc mật khẩu không chính xác";
+        
+        // Xử lý lỗi tréo ngoe từ backend
+        if (errMsg.includes("Bạn cần đăng nhập")) {
+          errMsg = "Thông tin đăng nhập không chính xác hoặc tài khoản không tồn tại";
+        }
+
+        return {
+          success: false,
+          message: errMsg,
+        } as any;
+      }
+
       try {
         if (!this.refreshPromise) {
           this.refreshPromise = this.refreshToken().finally(() => {
@@ -144,7 +171,7 @@ export class ApiClient {
         }
 
         const newToken = await this.refreshPromise;
-
+        
         // ===== RETRY REQUEST =====
         response = await fetch(url, {
           ...fetchOptions,
@@ -155,11 +182,15 @@ export class ApiClient {
           },
         });
       } catch (err) {
-        console.error('REFRESH FAILED:', err);
+        if (err === 'SESSION_EXPIRED') {
+          console.warn('Session expired, clearing tokens...');
+        } else {
+          console.error('REFRESH FAILED:', err);
+        }
 
         tokenStorage.clear();
 
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
           window.location.href = '/login';
         }
 

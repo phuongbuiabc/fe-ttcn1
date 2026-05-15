@@ -83,52 +83,70 @@ export interface ReproductionStats {
 // types/employee.ts
 export interface Employee {
   id: string;
-  employeeCode: string;
+  userId?: string;
   firstName: string;
   lastName: string;
   fullName?: string;
-  gender: string;
-  dateOfBirth: string;
-  permanentAddress: string;
-  currentAddress: string;
-  phone: string;
   email: string;
+  phone: string;
+  dateOfBirth: string;
+  gender: string;
+  idCardNumber?: string;
+  currentAddress: string;
+  permanentAddress?: string;
   position: string;
+  joinDate?: string;
   employmentStatus?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
+
 export interface CreateEmployeeRequest {
-  employeeCode: string;
+  userId: string;
   firstName: string;
   lastName: string;
-  gender: string;
-  dateOfBirth: string;
-  permanentAddress: string;
-  currentAddress: string;
-  phone: string;
   email: string;
+  phone: string;
+  dateOfBirth: string;
+  gender: string;
+  idCardNumber?: string;
+  idCardIssuedDate?: string;
+  idCardIssuedPlace?: string;
+  permanentAddress?: string;
+  currentAddress: string;
   position: string;
+  joinDate: string;
+  bankAccountNumber?: string;
+  bankName?: string;
+  taxCode?: string;
+  socialInsuranceNumber?: string;
+  healthInsuranceNumber?: string;
 }
+
+
 
 export interface WorkSchedule {
   id: string;
-  employeeCode: string;
+  employeeId: string;
   employeeName?: string;
-  task: string;
-  sectionId: string;
-  sectionName?: string;
+  workName: string;
+  areaId: string;
+  areaName?: string;
   workDate: string;
-  shift: 'MORNING' | 'AFTERNOON' | 'NIGHT';
+  shift: string;
+  note?: string;
   status: string;
 }
 
 export interface CreateScheduleRequest {
-  employeeCode: string;
-  task: string;
-  sectionId: string;
-  workDate: string;
-  shift: 'MORNING' | 'AFTERNOON' | 'NIGHT';
+  employeeId: string;
+  workName: string;
+  areaId: string;
+  shift: string;
+  note?: string;
   status: string;
+  workDate: string;
 }
 
 export interface Supplier {
