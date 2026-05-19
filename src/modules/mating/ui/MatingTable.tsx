@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { cn } from '@/shared/utils/utils';
 import { MatingResponse } from '../model/mating.model';
 import useMating from '@/modules/mating/hook/useMating';
+import { MatingStatus } from '@/shared/enums/mating.enum';
 
 interface MatingTableProps {
   matings?: MatingResponse[];

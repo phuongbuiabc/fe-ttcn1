@@ -1,10 +1,14 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, Plus } from "lucide-react";
 import useSemen from "@/modules/semen/hooks/useSemen";
 
-export const SemenTable: React.FC = () => {
+interface SemenTableProps {
+  onAddClick?: () => void;
+}
+
+export const SemenTable: React.FC<SemenTableProps> = ({ onAddClick }) => {
   const { semens, loading, fetchSemens, deleteSemen } = useSemen();
 
   useEffect(() => {
@@ -43,7 +47,6 @@ export const SemenTable: React.FC = () => {
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50/50">
           <tr>
-            <th className="px-4 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900">Mã</th>
             <th className="px-4 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900">Lợn đực</th>
             <th className="px-4 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900">Giống</th>
             <th className="px-4 py-3 text-[9px] uppercase tracking-widest font-black text-slate-900">Ngày thu</th>
@@ -56,7 +59,6 @@ export const SemenTable: React.FC = () => {
         <tbody className="divide-y divide-slate-50">
           {semens.map((s) => (
             <tr key={s.id} className="hover:bg-slate-50 transition-all">
-              <td className="px-4 py-3 font-black text-emerald-600 text-[11px]">{s.id}</td>
               <td className="px-4 py-3 text-[11px]">{s.boarPigEarTag || s.boarPigId}</td>
               <td className="px-4 py-3 text-[11px]">{s.boarBreed}</td>
               <td className="px-4 py-3 text-[11px]">{s.collectionDate}</td>
@@ -80,6 +82,18 @@ export const SemenTable: React.FC = () => {
           ))}
         </tbody>
       </table>
+      {/* Footer */}
+      {onAddClick && (
+        <div className="px-4 py-3 border-t border-slate-50 bg-slate-50/30 flex justify-end">
+          <button
+            onClick={onAddClick}
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-600 hover:bg-emerald-100 transition"
+          >
+            <Plus size={16} />
+            Thêm mẫu nọc
+          </button>
+        </div>
+      )}
     </div>
   );
 };

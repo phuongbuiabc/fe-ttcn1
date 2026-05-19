@@ -29,6 +29,7 @@ import { MatingFormModal } from "@/modules/reproduction/ui/MatingFormModal";
 import { PregnancyFormModal } from "@/modules/reproduction/ui/PregnancyFormModal";
 import { FarrowingFormModal } from "@/modules/reproduction/ui/FarrowingFormModal";
 import { SemenTable } from "@/modules/semen/ui/semenTable";
+import { SemenForm } from "@/modules/semen/ui/semenForm";
 import {MatingTable} from "@/modules/mating/ui/MatingTable";
 
 const performanceData = [
@@ -46,6 +47,12 @@ export default function ReproductionManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPregnancyModalOpen, setIsPregnancyModalOpen] = useState(false);
   const [isFarrowingModalOpen, setIsFarrowingModalOpen] = useState(false);
+  const [isSemenFormOpen, setIsSemenFormOpen] = useState(false);
+  const [refreshSemenKey, setRefreshSemenKey] = useState(0);
+
+  const handleSemenFormSuccess = () => {
+    setRefreshSemenKey((prev) => prev + 1);
+  };
 
   const normalizedSearchTerm = searchTerm.toLowerCase();
 
@@ -147,7 +154,7 @@ export default function ReproductionManagementPage() {
             </div>
           ) : activeTab === "farrowing" ? (
             <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden min-h-[300px]">
-              <SemenTable />
+              <SemenTable key={refreshSemenKey} onAddClick={() => setIsSemenFormOpen(true)} />
             </div>
           ) : (
             <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden min-h-[300px]">
@@ -224,6 +231,7 @@ export default function ReproductionManagementPage() {
       <MatingFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       <PregnancyFormModal isOpen={isPregnancyModalOpen} onClose={() => setIsPregnancyModalOpen(false)} />
       <FarrowingFormModal isOpen={isFarrowingModalOpen} onClose={() => setIsFarrowingModalOpen(false)} />
+      <SemenForm isOpen={isSemenFormOpen} onClose={() => setIsSemenFormOpen(false)} onSuccess={handleSemenFormSuccess} />
     </div>
   );
 }
