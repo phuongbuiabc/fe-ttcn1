@@ -54,12 +54,30 @@ interface TopBarProps {
 
 export function TopBar({ onMenuClick }: TopBarProps) {
   const pathname = usePathname();
-
   const router = useRouter();
   const { user, logout } = useAuth();
 
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  
+  const [currentPath, setCurrentPath] = useState(pathname);
+
+  useEffect(() => {
+    setCurrentPath(pathname);
+  }, [pathname]);
+
+  useEffect(() => {
+    const handlePathUpdate = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener("popstate", handlePathUpdate);
+    window.addEventListener("inventory-tab-change", handlePathUpdate);
+    return () => {
+      window.removeEventListener("popstate", handlePathUpdate);
+      window.removeEventListener("inventory-tab-change", handlePathUpdate);
+    };
+  }, []);
+
 
   const notificationRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -103,12 +121,19 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         {tabs.length > 0 && (
           <div className="flex items-center gap-1 ml-2">
             {tabs.map((tab) => {
-              const active = pathname === tab.href;
+              const active = currentPath === tab.href;
 
               return (
                 <button
                   key={tab.href}
-                  onClick={() => router.push(tab.href)}
+                  onClick={() => {
+                    if (tab.href.startsWith('/inventory') && currentPath.startsWith('/inventory')) {
+                      window.history.pushState(null, "", tab.href);
+                      window.dispatchEvent(new CustomEvent("inventory-tab-change", { detail: tab.href }));
+                    } else {
+                      router.push(tab.href);
+                    }
+                  }}
                   className={cn(
                     "px-3 py-1 rounded-lg text-[11px] font-bold transition whitespace-nowrap",
                     active

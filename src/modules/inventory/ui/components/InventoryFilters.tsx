@@ -9,7 +9,7 @@ interface InventoryFiltersProps {
   activeType: string;
   setActiveType: (val: string) => void;
   dateRange: { start: string; end: string };
-  setDateRange: (val: any) => void;
+  setDateRange: (val: { start: string; end: string }) => void;
 }
 
 export function InventoryFilters({

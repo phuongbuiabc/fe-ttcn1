@@ -1,9 +1,10 @@
 import React from 'react';
 import { Package, Calendar, Truck, DollarSign } from 'lucide-react';
 import { motion } from 'motion/react';
+import { ReceiptHistoryItem } from '../../model/inventory.model';
 
 interface ReceiptTableProps {
-  receipts: any[];
+  receipts: ReceiptHistoryItem[];
   loading: boolean;
 }
 
