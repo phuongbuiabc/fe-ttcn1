@@ -10,19 +10,19 @@ import { useRouter } from "next/navigation";
 import { useInventory } from "@/modules/inventory/hooks/useInventory";
 
 // Components
-import { InventoryDashboard } from "@/modules/inventory/ui/InventoryDashboard";
-import { InventoryFilters } from "@/modules/inventory/ui/InventoryFilters";
-import { InventoryTable } from "@/modules/inventory/ui/InventoryTable";
-import { LossTable } from "@/modules/inventory/ui/LossTable";
-import { TableSkeleton } from "@/modules/inventory/ui/TableSkeleton";
+import { InventoryDashboard } from "@/modules/inventory/ui/components/InventoryDashboard";
+import { InventoryFilters } from "@/modules/inventory/ui/components/InventoryFilters";
+import { InventoryTable } from "@/modules/inventory/ui/components/InventoryTable";
+import { LossTable } from "@/modules/inventory/ui/components/LossTable";
+import { TableSkeleton } from "@/modules/inventory/ui/components/TableSkeleton";
 import { Pagination } from "@/shared/components/Pagination";
 
 // Modals
-import { SupplyFormModal } from "@/modules/inventory/ui/SupplyFormModal";
-import { SupplyDetailModal } from "@/modules/inventory/ui/SupplyDetailModal";
-import { LossModal } from "@/modules/inventory/ui/LossModal";
-import { LossDetailModal } from "@/modules/inventory/ui/LossDetailModal";
-import { AdjustmentModal } from "@/modules/inventory/ui/AdjustmentModal";
+import { SupplyFormModal } from "@/modules/inventory/ui/modals/SupplyFormModal";
+import { SupplyDetailModal } from "@/modules/inventory/ui/modals/SupplyDetailModal";
+import { LossModal } from "@/modules/inventory/ui/modals/LossModal";
+import { LossDetailModal } from "@/modules/inventory/ui/modals/LossDetailModal";
+import { AdjustmentModal } from "@/modules/inventory/ui/modals/AdjustmentModal";
 
 export default function InventoryPage() {
   const router = useRouter();

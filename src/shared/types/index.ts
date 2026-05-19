@@ -157,25 +157,4 @@ export interface Supplier {
   email: string;
 }
 
-
-export interface Supply {
-  id: string;
-  name: string;
-  unit: string;
-  materialType: string;
-  quantity: number;
-  description: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface SupplyLoss {
-  id: string;
-  loss_id: string;
-  supply_id: string;
-  employee_id: string;
-  date: string;
-  quantity: number;
-  reason: string;
-  note: string;
-}
+

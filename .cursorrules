@@ -1,0 +1,160 @@
+# .cursorrules - Project Map & Developer Guidelines
+
+Chào mừng bạn (AI Agent) đến với dự án **Hệ Thống Quản Lý Trang Trại Chăn Nuôi (Farm & Livestock Management)**! Đây là tài liệu quy định kiến trúc và tiêu chuẩn mã nguồn của dự án. Hãy đọc và ghi nhớ toàn bộ thông tin dưới đây trước khi thực hiện bất kỳ hành động code hay refactor nào.
+
+---
+
+## 🚀 1. TỔNG QUAN DỰ ÁN (PROJECT OVERVIEW)
+
+- **Loại dự án:** Ứng dụng Web Frontend hiện đại dành cho quản lý chăn nuôi trang trại thông minh (quản lý đàn heo, sức khỏe, phối giống, kho vật tư, hao hụt, lịch làm việc của nhân viên, giao dịch mua bán, đối tác...).
+- **Kiến trúc:** Next.js App Router (Client-side heavy rendering kết hợp API service tách biệt).
+- **Mục tiêu:** 
+  - Đảm bảo an toàn kiểu dữ liệu tuyệt đối (**Strict Type-Safe**).
+  - Trải nghiệm UI/UX cao cấp, mượt mà với hiệu ứng vi mô (**Micro-animations**).
+  - Phân tách rõ ràng giữa giao diện hiển thị (UI) và logic nghiệp vụ (Hooks/Services).
+  - Cấu trúc thư mục theo hướng Module/Domain thay vì gom nhóm kỹ thuật thuần túy.
+
+---
+
+## 🛠️ 2. TECH STACK & THƯ VIỆN CỐT LÕI (CORE TECH STACK)
+
+Dưới đây là danh sách công nghệ và phiên bản chính xác đang được sử dụng. **Tuyệt đối KHÔNG tự ý thay đổi hoặc nâng/hạ cấp phiên bản nếu không có yêu cầu đặc biệt:**
+
+*   **Core Framework:** `Next.js v15.4.9` (Sử dụng cấu trúc App Router).
+*   **UI Library:** `React v19.2.1` (Ưu tiên tuyệt đối **Functional Components** & **Custom Hooks**).
+*   **Language:** `TypeScript v5.9.3` (Bắt buộc thiết lập chế độ Strict Mode, không sử dụng `any`).
+*   **Styling System:** `Tailwind CSS v4.1.11` (Kết hợp với `@tailwindcss/postcss` và `@tailwindcss/typography`).
+*   **Animations:** `motion` (Framer Motion v12) - **LƯU Ý:** Import thông qua gói `"motion/react"` thay vì `"framer-motion"`.
+*   **Networking:** Native `fetch` API bọc trong `ApiClient` tự chế (`@/shared/api/api-client`), hỗ trợ cơ chế tự động làm mới Token (Refresh Token 401).
+*   **Form Management:** `@hookform/resolvers` kết hợp React Hook Form để tối ưu hóa render & validate.
+*   **Icons:** `lucide-react v0.553.0` (Đồng bộ font icon toàn dự án).
+*   **Utilities:** `clsx` và `tailwind-merge` ghép nối class thông qua hàm tiện ích `cn` tại `@/shared/utils/utils`.
+
+---
+
+## 🗺️ 3. BẢN ĐỒ CẤU TRÚC THƯ MỤC (FOLDER ARCHITECTURE)
+
+Dự án áp dụng mô hình lai giữa **App Router** và **Domain-Driven Design (DDD)**. Thư mục chính nằm trong `src/` và chia thành 3 phân vùng lớn:
+
+```
+src/
+├── app/                  # Next.js App Router (Chỉ chứa định tuyến, layout tổng và page entry)
+│   ├── inventory/        # Trang quản lý kho vật tư (/inventory)
+│   ├── staff/            # Trang quản lý nhân viên (/staff)
+│   ├── work-schedules/   # Trang lịch biểu làm việc (/work-schedules)
+│   ├── globals.css       # File CSS toàn cục của Tailwind CSS v4
+│   └── layout.tsx        # Cấu trúc layout bao bọc tổng thể
+│
+├── modules/              # Chứa các Module nghiệp vụ độc lập (Domain Modules)
+│   ├── inventory/        # Ví dụ module: Kho vật tư
+│   │   ├── api/          # Các Services gọi API của module (ví dụ: inventory.service.ts)
+│   │   ├── hooks/        # Các custom hooks xử lý State/Logic (ví dụ: useInventory.ts)
+│   │   ├── model/        # Các TypeScript Interfaces/Enums (ví dụ: inventory.model.ts)
+│   │   ├── ui/           # Các UI Components nhỏ, modals dành riêng cho module này
+│   │   └── index.ts      # Entry point xuất bản các thành phần ra ngoài module
+│   ├── breed/            # Module Phối giống / Con giống
+│   ├── staff/            # Module Nhân sự
+│   └── [các module khác] # area, customer, disease, pig, trading, warehouse...
+│
+└── shared/               # Chứa các tài nguyên dùng chung cho toàn bộ dự án
+    ├── api/              # Cấu hình API Client dùng chung (api-client.ts)
+    ├── components/       # Các UI Component toàn cục (Pagination, AuthProvider, TopBar...)
+    ├── config/           # Các thiết lập cấu hình chung (module-tabs.ts...)
+    ├── enums/            # Enums dùng chung
+    ├── hooks/            # Các Custom Hooks tiện ích dùng chung (useDebounce, useWindowSize...)
+    ├── store/            # Quản lý Global State (Zustand hoặc React Context)
+    ├── types/            # File index.ts chứa Types/Interfaces dùng chung toàn dự án
+    └── utils/            # Các hàm hỗ trợ tính toán, xử lý chuỗi, định dạng (utils.ts chứa hàm `cn`)
+```
+
+---
+
+## 🔄 4. LUỒNG HOẠT ĐỘNG CHÍNH (CORE WORKFLOWS & DATA FLOW)
+
+Mọi tính năng tương tác dữ liệu bắt buộc phải đi theo luồng khép kín 3 lớp dưới đây nhằm tránh chồng chéo trách nhiệm (Separation of Concerns):
+
+```
+[Page / UI Component (app/ hoặc modules/*/ui/)]
+               │
+               ▼ (1. Gọi hành động & Đọc State)
+  [Domain Custom Hook (modules/*/hooks/)]
+               │
+               ▼ (2. Yêu cầu dữ liệu)
+    [Domain Service (modules/*/api/)]
+               │
+               ▼ (3. Gửi HTTP Request)
+ [Shared ApiClient (shared/api/api-client.ts)]
+               │
+               ▼ (4. Gọi API thật)
+   [Backend Server / Next.js API Proxy]
+```
+
+### Quy trình Authentication & Token:
+1. Thông tin Access Token và Refresh Token được quản lý qua `tokenStorage` lưu trữ tại `localStorage`/`sessionStorage`.
+2. Khi gọi API bị lỗi `401 Unauthorized`, `ApiClient` sẽ tự động kích hoạt tiến trình làm mới token (`refreshToken`) ẩn với người dùng:
+   - Nếu thành công: Lưu token mới, tự động gửi lại (retry) API ban đầu bị lỗi.
+   - Nếu thất bại (Session hết hạn): Xóa sạch token và tự động chuyển hướng người dùng về trang `/login`.
+
+---
+
+## 📏 5. QUY TẮC CODE (CODING STANDARDS & RULES)
+
+### 🅰️ Quy ước đặt tên (Naming Conventions)
+
+*   **Components & Pages:** Đặt tên theo định dạng **PascalCase** (ví dụ: `TableSkeleton.tsx`, `InventoryTable.tsx`, `SupplyFormModal.tsx`, `InventoryPage.tsx`).
+*   **Hooks:** Luôn có tiền tố **`use`** đứng đầu và viết theo dạng **camelCase** (ví dụ: `useInventory.ts`, `useAuth.ts`, `useDebounce.ts`).
+*   **Hàm, Biến, Methods:** Viết theo dạng **camelCase** (ví dụ: `handleSubmit`, `recordLoss`, `isLoading`, `filteredSupplies`).
+*   **File Logic phi UI (Services, Types, Utils):** Viết thường, sử dụng dấu chấm ngăn cách hậu tố để chỉ rõ trách nhiệm (ví dụ: `inventory.service.ts`, `inventory.model.ts`, `api-client.ts`, `utils.ts`).
+
+### 🛡️ Quy tắc TypeScript (Strict Types Only)
+
+*   **NÓI KHÔNG VỚI `any`:** Tuyệt đối không dùng kiểu `any`. Nếu gặp biến không thể xác định kiểu, dùng `unknown` kết hợp với các hàm Type Guard / Type Assertion.
+*   **Định nghĩa kiểu dữ liệu tường minh:** Tất cả các Props của Component, tham số và kiểu trả về của Hàm, cấu trúc dữ liệu từ API Response bắt buộc phải khai báo rõ ràng.
+*   **Interface vs Type:** 
+    - Ưu tiên dùng `interface` cho cấu trúc dữ liệu Object (như `LivestockMaterial`, `SupplyLoss`) để dễ mở rộng và kế thừa.
+    - Dùng `type` cho các kiểu Alias, Union hoặc Tuple (ví dụ: `export type Supply = LivestockMaterial;`).
+*   **ApiResponse Wrapper:** Mọi API phản hồi phải tuân thủ schema chuẩn:
+    ```typescript
+    export interface ApiResponse<T> {
+      success: boolean;
+      data: T;
+      message?: string;
+      errorCode?: string;
+    }
+    ```
+
+### 🎨 Quy tắc viết Tailwind CSS v4
+
+*   **Sử dụng Utility Classes mới nhất:** Dự án chạy Tailwind v4. Hãy ưu tiên dùng các cú pháp hiện đại:
+    - Thay thế gradient cũ bằng cú pháp mới: Dùng `bg-linear-to-t` hoặc `bg-linear-to-r` thay thế cho `bg-gradient-to-t` / `bg-gradient-to-r`.
+*   **Nói không với Inline CSS:** Không viết `style={{ ... }}` trực tiếp trên thẻ HTML trừ khi bắt buộc phải xử lý các giá trị tính toán động bằng Javascript (như phần trăm thanh tiến trình, vị trí chuột...).
+*   **Dynamic Classnames:** Luôn sử dụng hàm tiện ích `cn(...)` từ `@/shared/utils/utils` (bọc `clsx` và `tailwind-merge`) khi cần nối class theo điều kiện để tránh xung đột thuộc tính Tailwind.
+*   **Premium Aesthetics:** Thiết kế UI mang tính hiện đại, mềm mại:
+    - Sử dụng góc bo tròn lớn: `rounded-[2.5rem]` cho khối nội dung chính, `rounded-2xl` cho nút bấm và inputs.
+    - Dùng màu chữ cao cấp: Tránh màu đen tuyền `#000`, thay vào đó hãy dùng hệ màu Slate hiện đại (`text-slate-800`, `text-slate-600`, `text-slate-400`).
+    - Nút bấm phải có phản hồi nhấn: Sử dụng kết hợp `transition-all active:scale-95 duration-200`.
+
+### 🎬 Quy tắc Framer Motion (v12)
+
+*   Bắt buộc import từ `"motion/react"` thay vì `"framer-motion"` (ví dụ: `import { motion, AnimatePresence } from "motion/react"`). Đây là quy chuẩn bắt buộc của React 19 để tương thích mượt mà.
+
+### 🚨 Xử lý lỗi (Error Handling)
+
+*   **Bắt buộc try-catch:** Tất cả các tác vụ bất đồng bộ (Async/Await) gọi API hoặc xử lý ghi/đọc file phải được bọc trong khối `try-catch`.
+*   **Thông báo thân thiện:** Lỗi bắt được phải được biến đổi thành ngôn từ thân thiện trước khi hiển thị cho người dùng qua Toast, Modal hoặc Alert thay vì in thô lỗi kỹ thuật ra màn hình hoặc chỉ gọi `console.error`.
+
+---
+
+## 🧠 6. CHỈ THỊ ÉP BUỘC CHO AI AGENT (INSTRUCTIONS FOR AI)
+
+Khi nhận nhiệm vụ trong không gian làm việc này, bạn **PHẢI TUÂN THỦ** các nguyên tắc vận hành sau:
+
+1.  **Kiểm tra Type trước khi code:** Luôn tìm kiếm trong `src/shared/types/index.ts` và `src/modules/[module_name]/model/` để xem đã có kiểu dữ liệu tương ứng chưa trước khi tạo mới. Tránh tuyệt đối việc trùng lặp Interface hoặc định nghĩa lại kiểu dữ liệu có sẵn.
+2.  **Không cài cắm thư viện tùy tiện:** Nghiêm cấm việc tự động chạy các câu lệnh cài đặt package (`npm i`, `yarn add`) hoặc sửa đổi `package.json` trừ khi được người dùng trực tiếp yêu cầu bằng chữ. Hãy tận dụng tối đa các thư viện cực kỳ mạnh mẽ đã có sẵn như `motion/react`, `lucide-react`, `date-fns`, `recharts`...
+3.  **Tôn trọng sự phân tách kiến trúc (Separation of Concerns):**
+    - **UI Component/Page** chỉ chứa JSX và gọi Hook. KHÔNG chứa logic gọi fetch/apiClient trực tiếp.
+    - **Hook** chứa State, các handler gọi Service, logic filter/search và quản lý modals.
+    - **Service** chứa khai báo kết nối `apiClient` và xử lý trung chuyển dữ liệu thô.
+    Nếu bạn phát hiện file code cũ vi phạm quy tắc này (ví dụ: Page gọi trực tiếp API), hãy thông báo cho người dùng và đề xuất cấu trúc lại theo luồng chuẩn: **UI Component ➔ Hook ➔ Service**.
+4.  **Giữ phản hồi súc tích, gãy gọn:** Khi giải thích code hoặc trả lời người dùng, hãy đi thẳng vào vấn đề. Chỉ hiển thị phần code thay đổi (diff) hoặc phân tích cốt lõi. Không giải thích các khái niệm lập trình React/TS cơ bản dông dài làm mất thời gian.
+5.  **Không xóa Comments có ích:** Giữ nguyên các comment giải thích nghiệp vụ, cảnh báo hoặc đánh dấu migration cũ để bảo tồn tính liền mạch của mã nguồn.
