@@ -26,7 +26,7 @@ export function BaseSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`px-3 py-1.5 border rounded text-sm bg-white ${className || ''}`}
+      className={`w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 outline-none ring-1 ring-transparent transition focus:border-emerald-500 focus:ring-emerald-500/20 ${className || ''}`}
     >
       {placeholder && (
         <option value="">

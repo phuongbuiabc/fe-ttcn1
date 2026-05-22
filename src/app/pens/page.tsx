@@ -1,44 +1,42 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Plus,
   Search,
-  ArrowRightLeft
-} from "lucide-react";
+  ArrowRightLeft,
+  Warehouse,
+  DoorOpen,
+  Wrench,
+} from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
-import { PenDetail } from "@/modules/pens/ui/PenDetail";
-import { usePathname } from "next/navigation";
-import { getPageTitle } from "@/shared/utils/getPageTitle";
+import { PenDetail } from '@/modules/pens/ui/PenDetail';
+import { getPageTitle } from '@/shared/utils/getPageTitle';
 
-// Components
-import { TransferPigModal } from "@/modules/pens/ui/TransferPigModal";
-import { PenTable } from "@/modules/pens/ui/PenTable";
-import { PenForm } from "@/modules/pens/ui/PenForm";
+import { TransferPigModal } from '@/modules/pens/ui/TransferPigModal';
+import { PenTable } from '@/modules/pens/ui/PenTable';
+import { PenForm } from '@/modules/pens/ui/PenForm';
+import KPICard from '@/shared/components/KPICard';
 
-// API Hook
-import { useArea } from "@/modules/area/hooks/useArea";
-import { usePen } from "@/modules/pens/hooks/usePen";
+import { useArea } from '@/modules/area/hooks/useArea';
+import { usePen } from '@/modules/pens/hooks/usePen';
 
-// ENUM
-import { PenStatus } from "@/shared/enums/pen.enum";
-
-// TYPE
-import { PenResponse } from "@/modules/pens/model/pen.model";
+import { PenStatus } from '@/shared/enums/pen.enum';
+import { PenResponse } from '@/modules/pens/model/pen.model';
 
 export default function PenPage() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
 
-  const [sectionFilter, setSectionFilter] = useState<string>("ALL");
-  const [typeFilter, setTypeFilter] = useState<string>("ALL");
+  const [sectionFilter, setSectionFilter] = useState<string>('ALL');
+  const [typeFilter, setTypeFilter] = useState<string>('ALL');
 
   const [openForm, setOpenForm] = useState(false);
   const [editingPen, setEditingPen] = useState<PenResponse | null>(null);
   const [selectedPenId, setSelectedPenId] = useState<string | null>(null);
   const [isDetailMode, setIsDetailMode] = useState(false);
 
-  // ✅ PEN API
   const {
     pens,
     penDetail,
@@ -48,10 +46,9 @@ export default function PenPage() {
     fetchPenDetail,
     deletePen,
     createPen,
-    updatePen
+    updatePen,
   } = usePen();
 
-  // ✅ AREA API
   const {
     areas,
     loading: areaLoading,
@@ -66,54 +63,58 @@ export default function PenPage() {
     fetchAreas();
   }, [fetchPens, fetchAreas]);
 
-  // 👉 map areaId → name
   const areaMap = useMemo(() => {
     const map: Record<string, string> = {};
-    areas.forEach(a => {
+    areas.forEach((a) => {
       map[a.id] = a.name;
     });
     return map;
   }, [areas]);
 
-  // 👉 filter options
   const sectionOptions = [
-    { label: "Tất cả", value: "ALL" },
-    ...areas.map(a => ({
+    { label: 'Tất cả', value: 'ALL' },
+    ...areas.map((a) => ({
       label: a.name,
       value: a.id,
     })),
   ];
 
   const typeOptions = [
-    { label: "Tất cả", value: "ALL" },
-    ...Array.from(new Set(pens.map(i => i.penType)))
+    { label: 'Tất cả', value: 'ALL' },
+    ...Array.from(new Set(pens.map((i) => i.penType)))
       .filter(Boolean)
-      .map(t => ({
+      .map((t) => ({
         label: t,
         value: t,
       })),
   ];
 
-  // 👉 filter logic
   const filteredItems = useMemo(() => {
-    return pens.filter(item => {
-      const areaName = areaMap[item.areaId] || "";
+    return pens.filter((item) => {
+      const areaName = areaMap[item.areaId] || '';
 
       const matchSearch =
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         areaName.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchSection =
-        sectionFilter === "ALL" || item.areaId === sectionFilter;
+        sectionFilter === 'ALL' || item.areaId === sectionFilter;
 
       const matchType =
-        typeFilter === "ALL" || item.penType === typeFilter;
+        typeFilter === 'ALL' || item.penType === typeFilter;
 
       return matchSearch && matchSection && matchType;
     });
   }, [pens, searchTerm, sectionFilter, typeFilter, areaMap]);
 
-  // 👉 handlers
+  const penKpis = useMemo(() => {
+    return {
+      inUse: pens.filter((item) => item.status === PenStatus.IN_USE).length,
+      empty: pens.filter((item) => item.status === PenStatus.EMPTY).length,
+      maintenance: pens.filter((item) => item.status === PenStatus.MAINTENANCE).length,
+    };
+  }, [pens]);
+
   const handleEdit = (pen: PenResponse) => {
     setEditingPen(pen);
     setOpenForm(true);
@@ -137,8 +138,6 @@ export default function PenPage() {
 
   return (
     <div className="space-y-4 pb-20 bg-[#fbfcfd] min-h-screen -m-4 p-4">
-
-      {/* HEADER */}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-extrabold uppercase">{title}</h1>
 
@@ -162,32 +161,28 @@ export default function PenPage() {
         </div>
       </div>
 
-      {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[
-          {
-            label: "Đang sử dụng",
-            value: pens.filter(i => i.status === PenStatus.IN_USE).length
-          },
-          {
-            label: "Trống",
-            value: pens.filter(i => i.status === PenStatus.EMPTY).length
-          },
-          {
-            label: "Bảo trì",
-            value: pens.filter(i => i.status === PenStatus.MAINTENANCE).length
-          }
-        ].map((stat, i) => (
-          <div key={i} className="bg-white p-4 rounded-xl border shadow-sm">
-            <p className="text-xs text-gray-400">{stat.label}</p>
-            <h3 className="text-xl font-bold">{stat.value}</h3>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <KPICard
+          label="Đang sử dụng"
+          value={penKpis.inUse}
+          icon={Warehouse}
+          tone="emerald"
+        />
+        <KPICard
+          label="Trống"
+          value={penKpis.empty}
+          icon={DoorOpen}
+          tone="blue"
+        />
+        <KPICard
+          label="Bảo trì"
+          value={penKpis.maintenance}
+          icon={Wrench}
+          tone="amber"
+        />
       </div>
 
-      {/* FILTER */}
       <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-xl">
-
         <div className="flex gap-2 items-center">
           Khu vực:
           <select
@@ -196,7 +191,7 @@ export default function PenPage() {
             disabled={areaLoading}
             className="px-2 py-1 border rounded text-sm"
           >
-            {sectionOptions.map(option => (
+            {sectionOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -209,7 +204,7 @@ export default function PenPage() {
             onChange={(e) => setTypeFilter(e.target.value)}
             className="px-2 py-1 border rounded text-sm"
           >
-            {typeOptions.map(option => (
+            {typeOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -228,7 +223,6 @@ export default function PenPage() {
         </div>
       </div>
 
-      {/* TABLE */}
       <div className={`grid gap-4 ${isDetailMode ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
         <div className="bg-white rounded-xl overflow-hidden">
           <PenTable
@@ -256,7 +250,6 @@ export default function PenPage() {
         )}
       </div>
 
-      {/* FORM CREATE / UPDATE */}
       <PenForm
         open={openForm}
         onClose={() => {
@@ -267,7 +260,6 @@ export default function PenPage() {
         initialData={editingPen}
       />
 
-      {/* MODAL TRANSFER */}
       <TransferPigModal
         isOpen={isTransferModalOpen}
         onClose={() => setIsTransferModalOpen(false)}

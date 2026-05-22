@@ -1,3 +1,5 @@
+import { MatingStatus } from '@/shared/enums/mating.enum';
+
 export interface MatingResponse {
     id: string;
     sowPigId: string;
@@ -9,7 +11,7 @@ export interface MatingResponse {
     matingRound: number;
     employeeId: string;
     matingDate: string;
-    status: string;
+    status: MatingStatus | string;
     createdAt: string;
     updatedAt: string;
 }
@@ -21,7 +23,7 @@ export interface CreateMatingRequest {
     matingRound: number;
     employeeId: string;
     matingDate: string;
-    status: string;
+    status: MatingStatus | string;
 }
 
 export interface UpdateMatingRequest {
@@ -32,4 +34,9 @@ export interface UpdateMatingRequest {
     employeeId?: string;
     matingDate?: string;
     status?: string;
+}
+
+export interface PregnancyCheck {
+    id: string;
+    status: MatingStatus;
 }

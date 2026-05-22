@@ -5,16 +5,30 @@ import {
   CreateMatingRequest,
   UpdateMatingRequest
 } from "../model/mating.model";
+import { MatingStatus } from "@/shared/enums/mating.enum";
 
 export function useMating() {
   const [matings, setMatings] = useState<MatingResponse[]>([]);
   const [loading, setLoading] = useState(false);
 
   // GET ALL
-  const fetchMatings = useCallback(async () => {
+  const fetchMatings = useCallback(async (status?: MatingStatus) => {
     setLoading(true);
     try {
-      const res = await matingService.getMatings();
+      const res = await matingService.getMatings(status);
+      if (res.success) {
+        setMatings(Array.isArray(res.data) ? res.data : []);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  //GET Tracking Matings
+  const fetchTrackingMatings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await matingService.getMatings(MatingStatus.TRACKING);
       if (res.success) {
         setMatings(Array.isArray(res.data) ? res.data : []);
       }
@@ -39,7 +53,7 @@ export function useMating() {
     try {
       const res = await matingService.createMating(data);
       if (res.success) {
-        await fetchMatings();
+        await fetchMatings(MatingStatus.TRACKING);
       }
       return res;
     } catch (err) {
@@ -53,7 +67,7 @@ export function useMating() {
     try {
       const res = await matingService.updateMating(id, data);
       if (res.success) {
-        await fetchMatings();
+        await fetchMatings(MatingStatus.TRACKING);
       }
       return res;
     } catch (err) {
@@ -76,6 +90,19 @@ export function useMating() {
     }
   };
 
+  const updatePregnancyStatus = async (ids: string[], status: MatingStatus) => {
+    try {
+      const results = await matingService.updatePregnancyStatus(ids, status);
+      if (results.length > 0 && results.every((result) => result.success)) {
+        await fetchMatings(MatingStatus.TRACKING);
+      }
+      return results;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
   return {
     matings,
     loading,
@@ -83,6 +110,7 @@ export function useMating() {
     getMatingById,
     createMating,
     updateMating,
+    updatePregnancyStatus,
     deleteMating,
   };
 }

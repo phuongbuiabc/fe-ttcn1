@@ -8,6 +8,8 @@ import { SowResponse } from '../model/pig.model';
 interface SowTableProps {
 	sows: SowResponse[];
 	loading: boolean;
+	selectedSowId?: string | null;
+	expandedContent?: React.ReactNode;
 	onView?: (sow: SowResponse) => void;
 	onEdit?: (sow: SowResponse) => void;
 	onDelete?: (id: string) => void;
@@ -16,6 +18,8 @@ interface SowTableProps {
 export function SowTable({
 	sows,
 	loading,
+	selectedSowId,
+	expandedContent,
 	onView,
 }: SowTableProps) {
 	const [earTagSearch, setEarTagSearch] = useState('');
@@ -109,65 +113,63 @@ export function SowTable({
 							<th className="px-6 py-3 text-center text-[9px] font-black uppercase text-slate-400">
 								Sẩy thai
 							</th>
-							<th className="px-6 py-3 text-center text-[9px] font-black uppercase text-slate-400">
-								Trạng thái
-							</th>
 						</tr>
 					</thead>
 
 					<tbody className="divide-y divide-slate-50">
-						{filteredSows.map((sow) => (
-							<tr
-								key={sow.id}
-								className="cursor-pointer bg-white transition-all hover:bg-slate-50"
-								onClick={() => onView?.(sow)}
-							>
-								<td className="px-6 py-3">
-									<p className="text-[13px] font-black text-slate-900">
-										{sow.earTag || '--'}
-									</p>
-								</td>
+						{filteredSows.map((sow) => {
+							const isSelected = selectedSowId === sow.id;
 
-								<td className="px-6 py-3">
-									<span className="text-xs font-bold text-slate-700">
-										{sow.type}
-									</span>
-								</td>
-
-								<td className="px-6 py-3">
-									<span className="text-xs text-slate-700">
-										{sow.species || '--'}
-									</span>
-								</td>
-
-								<td className="px-6 py-3 text-center">
-									<span className="text-sm font-bold text-slate-900">
-										{sow.totalPregnancies}
-									</span>
-								</td>
-
-								<td className="px-6 py-3 text-center">
-									<span className="text-sm font-bold text-slate-900">
-										{sow.miscarriageCount}
-									</span>
-								</td>
-
-								<td className="px-6 py-3 text-center">
-									<span
+							return (
+								<React.Fragment key={sow.id}>
+									<tr
 										className={cn(
-											'rounded-full px-2 py-0.5 text-[9px] font-bold uppercase',
-											sow.status === 'ACTIVE'
-												? 'bg-emerald-50 text-emerald-600'
-												: sow.status === 'SOLD'
-													? 'bg-blue-50 text-blue-600'
-													: 'bg-slate-100 text-slate-500'
+											'cursor-pointer bg-white transition-all hover:bg-slate-50',
+											isSelected && 'bg-emerald-50/30'
 										)}
+										onClick={() => onView?.(sow)}
 									>
-										{sow.status || '--'}
-									</span>
-								</td>
-							</tr>
-						))}
+										<td className="px-6 py-3">
+											<p className="text-[13px] font-black text-slate-900">
+												{sow.earTag || '--'}
+											</p>
+										</td>
+
+										<td className="px-6 py-3">
+											<span className="text-xs font-bold text-slate-700">
+												{sow.type}
+											</span>
+										</td>
+
+										<td className="px-6 py-3">
+											<span className="text-xs text-slate-700">
+												{sow.breedName || '--'}
+											</span>
+										</td>
+
+										<td className="px-6 py-3 text-center">
+											<span className="text-sm font-bold text-slate-900">
+												{sow.totalPregnancies}
+											</span>
+										</td>
+
+										<td className="px-6 py-3 text-center">
+											<span className="text-sm font-bold text-slate-900">
+												{sow.miscarriageCount}
+											</span>
+										</td>
+									</tr>
+
+									{isSelected && expandedContent && (
+										<tr className="bg-white">
+											<td colSpan={5} className="px-4 py-4">
+												{expandedContent}
+											</td>
+										</tr>
+									)}
+								</React.Fragment>
+							);
+						})}
 
 						{filteredSows.length === 0 && (
 							<tr>

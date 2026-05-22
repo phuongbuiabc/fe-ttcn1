@@ -6,7 +6,7 @@ import { Eye, Edit, Trash2, X } from 'lucide-react';
 import { cn } from '@/shared/utils/utils';
 import { PigType } from '@/shared/enums/pig.enum';
 import { BaseSearch } from '@/shared/components/search';
-import { BaseSelect, SelectOption } from '@/shared/components/filter';
+import { BaseSelect, SelectOption } from '@/shared/components/Filter';
 import { PIG_TYPE_OPTIONS, PIG_STATUS_OPTIONS } from '@/modules/pig/utils/pig.mapper';
 
 interface PigTableProps {

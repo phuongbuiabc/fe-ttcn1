@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { PlusCircle, RefreshCw, Search } from 'lucide-react';
+import { PlusCircle, RefreshCw, PawPrint, Venus, Mars } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import { useArea } from '@/modules/area/hooks/useArea';
@@ -11,10 +11,10 @@ import { usePenPig } from '@/modules/penpig/hooks/usePenpig';
 import { usePig } from '@/modules/pig/hooks/usePig';
 import { useBreed } from '@/modules/breed/hooks/useBreed';
 import { PigTable } from '@/modules/pig/ui/PigTable';
-import { PigStats } from '@/modules/pig/ui/PigStats';
 import { PigFormModal } from '@/modules/pig/ui/PigFormModal';
 import { ActionConfirmModal } from '@/modules/pig/ui/ActionConfirmModal';
 import { PigDetail } from '@/modules/pig/ui/PigDetail';
+import KPICard from '@/shared/components/KPICard';
 
 import { PigType, PigStatus } from '@/shared/enums/pig.enum';
 import { PigResponse, CreatePigRequest } from '@/modules/pig/model/pig.model';
@@ -107,6 +107,14 @@ export default function PigPage() {
     return pens.filter((pen) => (penPigCountMap[pen.id] ?? 0) === 0);
   }, [pens, penPigCountMap]);
 
+  const pigKpis = useMemo(() => {
+    return {
+      totalPigs: pigs.length,
+      totalSows: pigs.filter((pig) => pig.type === PigType.NAI).length,
+      totalBoars: pigs.filter((pig) => pig.type === PigType.NOC).length,
+    };
+  }, [pigs]);
+
   const openAddModal = () => {
     setEditingPig(null);
     setIsDetailMode(false);
@@ -174,7 +182,26 @@ export default function PigPage() {
         </div>
       </div>
 
-      <PigStats pigs={pigs} />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <KPICard
+          label="Tổng số lợn"
+          value={pigKpis.totalPigs}
+          icon={PawPrint}
+          tone="emerald"
+        />
+        <KPICard
+          label="Số nái"
+          value={pigKpis.totalSows}
+          icon={Venus}
+          tone="rose"
+        />
+        <KPICard
+          label="Số nọc"
+          value={pigKpis.totalBoars}
+          icon={Mars}
+          tone="blue"
+        />
+      </div>
 
       <div className={`grid gap-4 ${isDetailMode ? 'grid-cols-1 lg:grid-cols-10' : 'grid-cols-1'}`}>
         <div className={isDetailMode ? 'bg-white rounded-xl overflow-hidden lg:col-span-6' : 'bg-white rounded-xl overflow-hidden'}>

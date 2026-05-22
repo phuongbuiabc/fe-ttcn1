@@ -12,6 +12,7 @@ export interface SowRecord {
 
 export interface ReproductionStats {
   totalSows: number;
+  totalBoars: number;
   pregnantSows: number;
   farrowingSoon: number;
   monthlyLitters: number;
