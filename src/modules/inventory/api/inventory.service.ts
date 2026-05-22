@@ -1,5 +1,13 @@
 import { apiClient } from "@/shared/api/api-client";
-import { Supply, SupplyLoss } from "../model/inventory.model";
+import { 
+  Supply, 
+  SupplyLoss, 
+  MaterialIssue, 
+  MaterialIssueDetail, 
+  MaterialReceipt, 
+  MaterialReceiptDetail,
+  ReceiptHistoryItem 
+} from "../model/inventory.model";
 import { ApiResponse } from "@/shared/types";
 
 const ENDPOINT = '/api/v1/livestock-materials';
@@ -8,7 +16,7 @@ let inventoryCache: Supply[] | null = null;
 
 export const inventoryService = {
   // Lấy danh sách vật tư
-  getSupplies: async (params?: any): Promise<ApiResponse<Supply[]>> => {
+  getSupplies: async (params?: Record<string, string | number>): Promise<ApiResponse<Supply[]>> => {
     const response = await apiClient.get<ApiResponse<Supply[]>>(ENDPOINT);
     if (response.success) {
       inventoryCache = response.data;
@@ -16,7 +24,7 @@ export const inventoryService = {
     return response;
   },
 
-  getCachedSupplies: () => inventoryCache,
+  getCachedSupplies: (): Supply[] | null => inventoryCache,
 
   // Chi tiết vật tư
   getSupplyById: async (id: string): Promise<ApiResponse<Supply>> => {
@@ -34,15 +42,15 @@ export const inventoryService = {
   },
 
   // Xóa
-  deleteSupply: async (id: string): Promise<ApiResponse<any>> => {
-    return apiClient.delete<ApiResponse<any>>(`${ENDPOINT}/${id}`);
+  deleteSupply: async (id: string): Promise<ApiResponse<unknown>> => {
+    return apiClient.delete<ApiResponse<unknown>>(`${ENDPOINT}/${id}`);
   },
 
   // Ghi nhận hao hụt thực tế
-  recordLoss: async (data: Omit<SupplyLoss, 'id'>): Promise<ApiResponse<any>> => {
+  recordLoss: async (data: Omit<SupplyLoss, 'id'>): Promise<ApiResponse<MaterialIssueDetail | null>> => {
     try {
       // Bước 1: Tạo phiếu xuất kho (MaterialIssue)
-      const issueRes = await apiClient.post<ApiResponse<any>>('/api/v1/material-issues', {
+      const issueRes = await apiClient.post<ApiResponse<MaterialIssue>>('/api/v1/material-issues', {
         issueDate: data.date,
         employeeId: data.employee_id,
         reason: data.reason,
@@ -50,13 +58,17 @@ export const inventoryService = {
       });
 
       if (!issueRes.success || !issueRes.data) {
-        return issueRes;
+        return {
+          success: false,
+          data: null,
+          message: issueRes.message || "Không thể tạo phiếu xuất kho"
+        };
       }
 
       const issueId = issueRes.data.id;
 
       // Bước 2: Tạo chi tiết hao hụt (MaterialIssueDetail)
-      const detailRes = await apiClient.post<ApiResponse<any>>('/api/v1/material-issue-details', {
+      const detailRes = await apiClient.post<ApiResponse<MaterialIssueDetail>>('/api/v1/material-issue-details', {
         issueId: issueId,
         itemId: data.supply_id,
         quantity: data.quantity,
@@ -67,7 +79,7 @@ export const inventoryService = {
       const currentSupply = inventoryCache?.find(s => s.id === data.supply_id);
       if (currentSupply && detailRes.success) {
         const newQuantity = Math.max(0, currentSupply.quantity - data.quantity);
-        await apiClient.put(`${ENDPOINT}/${data.supply_id}`, {
+        await apiClient.put<ApiResponse<Supply>>(`${ENDPOINT}/${data.supply_id}`, {
           ...currentSupply,
           quantity: newQuantity
         });
@@ -88,8 +100,8 @@ export const inventoryService = {
     try {
       // 1. Chỉ lấy những thứ thực sự cần thiết (Details và Issues)
       const [detailsRes, issuesRes] = await Promise.all([
-        apiClient.get<ApiResponse<any[]>>('/api/v1/material-issue-details'),
-        apiClient.get<ApiResponse<any[]>>('/api/v1/material-issues')
+        apiClient.get<ApiResponse<MaterialIssueDetail[]>>('/api/v1/material-issue-details'),
+        apiClient.get<ApiResponse<MaterialIssue[]>>('/api/v1/material-issues')
       ]);
 
       if (!detailsRes.success || !issuesRes.success) {
@@ -131,15 +143,15 @@ export const inventoryService = {
       const issueId = lossDetail.loss_id;
       // 1. Xóa các bản ghi liên quan
       await Promise.all([
-        apiClient.delete(`/api/v1/material-issue-details/${lossDetail.id}`),
-        apiClient.delete(`/api/v1/material-issues/${issueId}`)
+        apiClient.delete<ApiResponse<unknown>>(`/api/v1/material-issue-details/${lossDetail.id}`),
+        apiClient.delete<ApiResponse<unknown>>(`/api/v1/material-issues/${issueId}`)
       ]);
 
       // 2. Hoàn kho: Cộng lại số lượng vật tư
       const supply = inventoryCache?.find(s => s.name === lossDetail.supply_id || s.id === lossDetail.supply_id);
       if (supply) {
         const newQty = (supply.quantity || 0) + (lossDetail.quantity || 0);
-        await apiClient.put(`${ENDPOINT}/${supply.id}`, {
+        await apiClient.put<ApiResponse<Supply>>(`${ENDPOINT}/${supply.id}`, {
           ...supply,
           quantity: newQty
         });
@@ -152,11 +164,11 @@ export const inventoryService = {
   },
 
   // Lấy lịch sử nhập kho
-  getReceiptHistory: async (): Promise<ApiResponse<any[]>> => {
+  getReceiptHistory: async (): Promise<ApiResponse<ReceiptHistoryItem[]>> => {
     try {
       const [detailsRes, receiptsRes] = await Promise.all([
-        apiClient.get<ApiResponse<any[]>>('/api/v1/material-receipt-details'),
-        apiClient.get<ApiResponse<any[]>>('/api/v1/material-receipts')
+        apiClient.get<ApiResponse<MaterialReceiptDetail[]>>('/api/v1/material-receipt-details'),
+        apiClient.get<ApiResponse<MaterialReceipt[]>>('/api/v1/material-receipts')
       ]);
 
       if (!detailsRes.success || !receiptsRes.success) {
@@ -166,7 +178,7 @@ export const inventoryService = {
       const details = detailsRes.data || [];
       const receipts = receiptsRes.data || [];
 
-      const mergedHistory = details.map(detail => {
+      const mergedHistory: ReceiptHistoryItem[] = details.map(detail => {
         const parent = receipts.find(r => r.id === detail.receiptId);
         const supplyInfo = inventoryCache?.find(s => s.id === detail.itemId);
         
@@ -192,7 +204,7 @@ export const inventoryService = {
   adjustStock: async (id: string, data: { quantity_change: number, reason: string, note?: string }): Promise<ApiResponse<Supply>> => {
     return {
       success: false,
-      data: null as any,
+      data: null as unknown as Supply,
       message: "Vui lòng sử dụng chức năng Cập nhật để điều chỉnh số lượng"
     };
   }

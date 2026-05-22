@@ -1,11 +1,12 @@
 import { AlertTriangle, User, Calendar, Tag, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { SupplyLoss } from '../model/inventory.model';
+import { SupplyLoss } from '../../model/inventory.model';
 import { useAuth } from '@/shared/components/AuthProvider';
+import { Employee } from '@/modules/staff/model/staff.model';
 
 interface LossTableProps {
   losses: SupplyLoss[];
-  employees: any[];
+  employees: Employee[];
   loading: boolean;
   onView: (loss: SupplyLoss) => void;
   onVoid: (loss: SupplyLoss) => void;

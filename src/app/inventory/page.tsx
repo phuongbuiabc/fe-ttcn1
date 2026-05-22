@@ -10,24 +10,24 @@ import { useRouter } from "next/navigation";
 import { useInventory } from "@/modules/inventory/hooks/useInventory";
 
 // Components
-import { InventoryDashboard } from "@/modules/inventory/ui/InventoryDashboard";
-import { InventoryFilters } from "@/modules/inventory/ui/InventoryFilters";
-import { InventoryTable } from "@/modules/inventory/ui/InventoryTable";
-import { LossTable } from "@/modules/inventory/ui/LossTable";
-import { TableSkeleton } from "@/modules/inventory/ui/TableSkeleton";
+import { InventoryDashboard } from "@/modules/inventory/ui/components/InventoryDashboard";
+import { InventoryFilters } from "@/modules/inventory/ui/components/InventoryFilters";
+import { InventoryTable } from "@/modules/inventory/ui/components/InventoryTable";
+import { LossTable } from "@/modules/inventory/ui/components/LossTable";
+import { TableSkeleton } from "@/modules/inventory/ui/components/TableSkeleton";
 import { Pagination } from "@/shared/components/Pagination";
 
 // Modals
-import { SupplyFormModal } from "@/modules/inventory/ui/SupplyFormModal";
-import { SupplyDetailModal } from "@/modules/inventory/ui/SupplyDetailModal";
-import { LossModal } from "@/modules/inventory/ui/LossModal";
-import { LossDetailModal } from "@/modules/inventory/ui/LossDetailModal";
-import { AdjustmentModal } from "@/modules/inventory/ui/AdjustmentModal";
+import { SupplyFormModal } from "@/modules/inventory/ui/modals/SupplyFormModal";
+import { SupplyDetailModal } from "@/modules/inventory/ui/modals/SupplyDetailModal";
+import { LossModal } from "@/modules/inventory/ui/modals/LossModal";
+import { LossDetailModal } from "@/modules/inventory/ui/modals/LossDetailModal";
+import { AdjustmentModal } from "@/modules/inventory/ui/modals/AdjustmentModal";
 
 export default function InventoryPage() {
   const router = useRouter();
   const {
-    supplies, lossHistory, employees, loading, activeTab,
+    supplies, lossHistory, employees, loading, activeTab, setActiveTab,
     searchTerm, setSearchTerm, activeType, setActiveType, dateRange, setDateRange,
     currentPage, setCurrentPage, itemsPerPage,
     modals, selected, forms, handlers, filtered
@@ -63,7 +63,7 @@ export default function InventoryPage() {
           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Hệ thống theo dõi & Điều phối tài sản nông trại</p>
         </div>
         <button 
-          onClick={() => { selected.setEditingSupply(null); modals.setIsModalOpen(true); }}
+          onClick={handlers.handleOpenCreateModal}
           className="flex items-center justify-center gap-2 px-6 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-slate-900/20 active:scale-95 transition-all"
         >
           <Plus size={16} /> Nhập kho mới
@@ -85,8 +85,8 @@ export default function InventoryPage() {
       <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden mb-20">
         <div className="p-8 border-b border-slate-50 flex items-center justify-between">
           <div className="flex gap-4">
-            <button onClick={() => router.push('/inventory')} className={cn("text-[10px] font-black uppercase tracking-widest px-2 py-1 transition-all", activeTab === "inventory" ? "text-emerald-600 border-b-2 border-emerald-500" : "text-slate-400")}>Kho hàng</button>
-            <button onClick={() => router.push('/inventory/losses')} className={cn("text-[10px] font-black uppercase tracking-widest px-2 py-1 transition-all", activeTab === "losses" ? "text-emerald-600 border-b-2 border-emerald-500" : "text-slate-400")}>Lịch sử hao hụt</button>
+            <button onClick={() => setActiveTab('inventory')} className={cn("text-[10px] font-black uppercase tracking-widest px-2 py-1 transition-all", activeTab === "inventory" ? "text-emerald-600 border-b-2 border-emerald-500" : "text-slate-400")}>Kho hàng</button>
+            <button onClick={() => setActiveTab('losses')} className={cn("text-[10px] font-black uppercase tracking-widest px-2 py-1 transition-all", activeTab === "losses" ? "text-emerald-600 border-b-2 border-emerald-500" : "text-slate-400")}>Lịch sử hao hụt</button>
           </div>
           {activeTab === "losses" && lossHistory.length > 0 && (
             <button onClick={exportLossHistory} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase transition-all">
@@ -124,7 +124,14 @@ export default function InventoryPage() {
       <SupplyFormModal isOpen={modals.isModalOpen} onClose={() => modals.setIsModalOpen(false)} onSave={handlers.handleSaveSupply} editingSupply={selected.editingSupply} supplyForm={forms.supplyForm} setSupplyForm={forms.setSupplyForm} />
       <SupplyDetailModal isOpen={modals.isDetailModalOpen} onClose={() => modals.setIsDetailModalOpen(false)} supply={selected.selectedSupplyForDetail} onEdit={(s) => { modals.setIsDetailModalOpen(false); selected.setEditingSupply(s); forms.setSupplyForm({...s}); modals.setIsModalOpen(true); }} />
       <LossModal isOpen={modals.isLossModalOpen} onClose={() => modals.setIsLossModalOpen(false)} onSave={handlers.handleRecordLoss} supply={selected.selectedSupplyForLoss} lossForm={forms.lossForm} setLossForm={forms.setLossForm} employees={employees} />
-      <AdjustmentModal isOpen={modals.isAdjustmentModalOpen} onClose={() => modals.setIsAdjustmentModalOpen(false)} onSave={() => {}} supply={null} adjForm={{}} setAdjForm={() => {}} />
+      <AdjustmentModal 
+        isOpen={modals.isAdjustmentModalOpen} 
+        onClose={() => modals.setIsAdjustmentModalOpen(false)} 
+        onSave={handlers.handleAdjustStock} 
+        supply={selected.selectedSupplyForAdjustment} 
+        adjForm={forms.adjForm} 
+        setAdjForm={forms.setAdjForm} 
+      />
       <LossDetailModal isOpen={modals.isLossDetailModalOpen} onClose={() => modals.setIsLossDetailModalOpen(false)} loss={selected.selectedLossForDetail} />
 
       <AnimatePresence>
