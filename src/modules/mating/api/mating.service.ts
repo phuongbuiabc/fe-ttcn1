@@ -5,6 +5,7 @@ import {
     UpdateMatingRequest,
     MatingResponse,
     PregnancyCheck,
+    PregnancyStatusUpdateRequest,
 } from '../model/mating.model';
 import { MatingStatus } from '@/shared/enums/mating.enum';
 
@@ -31,12 +32,8 @@ export const matingService = {
     updateMating: (id: string, data: UpdateMatingRequest) =>
         apiClient.put<ApiResponse<MatingResponse>>(`${endpoint}/${id}`, data),
 
-    updatePregnancyStatus: (ids: string[], status: MatingStatus) =>
-        Promise.all(
-            ids.map((id) =>
-                apiClient.post<ApiResponse<PregnancyCheck>>(`${endpoint}/${id}/pregnancy-status`, { status })
-            )
-        ),
+    updatePregnancyStatus: (records: PregnancyStatusUpdateRequest[]) =>
+        apiClient.post<ApiResponse<PregnancyCheck[]>>(`${endpoint}/pregnancy-status`, records),
 
     deleteMating: (id: string) =>
         apiClient.delete<ApiResponse<MatingResponse>>(`${endpoint}/${id}`),

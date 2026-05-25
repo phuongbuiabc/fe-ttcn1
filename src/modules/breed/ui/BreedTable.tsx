@@ -1,25 +1,44 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Edit3, Trash2 } from 'lucide-react';
 import { useBreed } from '../hooks/useBreed';
 import { BreedResponse } from '@/modules/breed/model/breed.model';
+import { BaseSearch } from '@/shared/components/search';
 
 const formatDate = (dateStr?: string) => {
   if (!dateStr) return '-';
   return new Date(dateStr).toLocaleDateString('vi-VN');
 };
 
-interface Props {
-  breeds: BreedResponse[];
-}
-
-export const BreedTable: React.FC<Props> = ({ breeds }) => {
-  const { fetchBreeds, loading, deleteBreed } = useBreed();
+export const BreedTable: React.FC = () => {
+  const { breeds, fetchBreeds, loading, deleteBreed } = useBreed();
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchBreeds();
   }, [fetchBreeds]);
 
+  const visibleBreeds = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return breeds;
+
+    return breeds.filter((breed) => {
+      const name = (breed.name || '').toLowerCase();
+      const characteristics = (breed.characteristics || '').toLowerCase();
+      return name.includes(term) || characteristics.includes(term);
+    });
+  }, [breeds, searchTerm]);
+
   return (
-    <div className="overflow-hidden rounded-xl border bg-white">
+    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
+      <div className="px-4 py-3 border-b border-slate-100">
+        <BaseSearch
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Tìm theo tên hoặc đặc điểm"
+          className="min-w-[280px] max-w-md"
+        />
+      </div>
+
       <table className="min-w-full">
         <thead className="bg-slate-50">
           <tr>
@@ -38,15 +57,15 @@ export const BreedTable: React.FC<Props> = ({ breeds }) => {
                 Đang tải dữ liệu...
               </td>
             </tr>
-          ) : breeds.length === 0 ? (
+          ) : visibleBreeds.length === 0 ? (
             <tr>
               <td colSpan={5} className="text-center py-10 text-slate-400">
                 Không có giống nào
               </td>
             </tr>
-          ) : (
-            breeds.map((breed) => (
-              <tr key={breed.id} className="border-t hover:bg-slate-50 transition">
+            ) : (
+            visibleBreeds.map((breed) => (
+              <tr key={breed.id} className="hover:bg-slate-50 transition">
                 <td className="px-4 py-3 font-semibold text-slate-800">
                   {breed.name}
                 </td>
@@ -67,19 +86,23 @@ export const BreedTable: React.FC<Props> = ({ breeds }) => {
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
                     <button
-                      className="text-xs px-3 py-1 rounded bg-blue-50 text-blue-600 hover:bg-blue-100"
+                      aria-label="Sửa"
+                      title="Sửa"
+                      className="p-2 rounded-full hover:bg-slate-50 text-blue-600"
                       onClick={() => {
-                        console.log("edit", breed);
+                        console.log('edit', breed);
                       }}
                     >
-                      Sửa
+                      <Edit3 size={16} />
                     </button>
 
                     <button
-                      className="text-xs px-3 py-1 rounded bg-rose-50 text-rose-600 hover:bg-rose-100"
+                      aria-label="Xóa"
+                      title="Xóa"
+                      className="p-2 rounded-full hover:bg-slate-50 text-rose-600"
                       onClick={() => deleteBreed(breed.id)}
                     >
-                      Xóa
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </td>

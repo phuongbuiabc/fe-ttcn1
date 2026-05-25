@@ -16,6 +16,7 @@ interface Props {
   onClose: () => void;
   initial?: Partial<CreateMatingRequest | UpdateMatingRequest>;
   onSubmit?: (data: CreateMatingRequest | UpdateMatingRequest) => Promise<any> | any;
+  onSuccess?: () => void;
   loading?: boolean;
 }
 
@@ -24,6 +25,7 @@ export const MatingForm: React.FC<Props> = ({
   onClose,
   initial = {},
   onSubmit,
+  onSuccess,
   loading,
 }) => {
   const { semens, fetchSemens } = useSemen();
@@ -118,6 +120,13 @@ export const MatingForm: React.FC<Props> = ({
       if (result?.success === false) {
         alert(result?.message || 'Tạo phối giống thất bại');
         return;
+      }
+
+      // notify parent that creation succeeded so it can refresh table
+      try {
+        onSuccess?.();
+      } catch (err) {
+        console.error('onSuccess handler error', err);
       }
 
       onClose();

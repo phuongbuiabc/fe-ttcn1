@@ -92,11 +92,12 @@ export function useMating() {
 
   const updatePregnancyStatus = async (ids: string[], status: MatingStatus) => {
     try {
-      const results = await matingService.updatePregnancyStatus(ids, status);
-      if (results.length > 0 && results.every((result) => result.success)) {
+      const records = ids.map((id) => ({ id, status }));
+      const res = await matingService.updatePregnancyStatus(records);
+      if (res.success) {
         await fetchMatings(MatingStatus.TRACKING);
       }
-      return results;
+      return res;
     } catch (err) {
       console.error(err);
       throw err;

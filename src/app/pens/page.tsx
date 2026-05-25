@@ -1,14 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import {
-  Plus,
-  Search,
-  ArrowRightLeft,
-  Warehouse,
-  DoorOpen,
-  Wrench,
-} from 'lucide-react';
+import { Plus, ArrowRightLeft, Warehouse, DoorOpen, Wrench } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import { PenDetail } from '@/modules/pens/ui/PenDetail';
@@ -26,11 +19,7 @@ import { PenStatus } from '@/shared/enums/pen.enum';
 import { PenResponse } from '@/modules/pens/model/pen.model';
 
 export default function PenPage() {
-  const [searchTerm, setSearchTerm] = useState('');
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
-
-  const [sectionFilter, setSectionFilter] = useState<string>('ALL');
-  const [typeFilter, setTypeFilter] = useState<string>('ALL');
 
   const [openForm, setOpenForm] = useState(false);
   const [editingPen, setEditingPen] = useState<PenResponse | null>(null);
@@ -62,50 +51,6 @@ export default function PenPage() {
     fetchPens();
     fetchAreas();
   }, [fetchPens, fetchAreas]);
-
-  const areaMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    areas.forEach((a) => {
-      map[a.id] = a.name;
-    });
-    return map;
-  }, [areas]);
-
-  const sectionOptions = [
-    { label: 'Tất cả', value: 'ALL' },
-    ...areas.map((a) => ({
-      label: a.name,
-      value: a.id,
-    })),
-  ];
-
-  const typeOptions = [
-    { label: 'Tất cả', value: 'ALL' },
-    ...Array.from(new Set(pens.map((i) => i.penType)))
-      .filter(Boolean)
-      .map((t) => ({
-        label: t,
-        value: t,
-      })),
-  ];
-
-  const filteredItems = useMemo(() => {
-    return pens.filter((item) => {
-      const areaName = areaMap[item.areaId] || '';
-
-      const matchSearch =
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        areaName.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchSection =
-        sectionFilter === 'ALL' || item.areaId === sectionFilter;
-
-      const matchType =
-        typeFilter === 'ALL' || item.penType === typeFilter;
-
-      return matchSearch && matchSection && matchType;
-    });
-  }, [pens, searchTerm, sectionFilter, typeFilter, areaMap]);
 
   const penKpis = useMemo(() => {
     return {
@@ -182,51 +127,11 @@ export default function PenPage() {
         />
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-xl">
-        <div className="flex gap-2 items-center">
-          Khu vực:
-          <select
-            value={sectionFilter}
-            onChange={(e) => setSectionFilter(e.target.value)}
-            disabled={areaLoading}
-            className="px-2 py-1 border rounded text-sm"
-          >
-            {sectionOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-
-          Chuồng:
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-2 py-1 border rounded text-sm"
-          >
-            {typeOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="relative ml-auto">
-          <Search className="absolute left-2 top-2" size={14} />
-          <input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm chuồng..."
-            className="pl-7 pr-3 py-1 bg-gray-50 rounded text-sm"
-          />
-        </div>
-      </div>
-
-      <div className={`grid gap-4 ${isDetailMode ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
-        <div className="bg-white rounded-xl overflow-hidden">
+      <div className={`grid gap-4 ${isDetailMode ? 'grid-cols-1 lg:grid-cols-10' : 'grid-cols-1'}`}>
+        <div className={isDetailMode ? 'bg-white rounded-xl overflow-hidden lg:col-span-6' : 'bg-white rounded-xl overflow-hidden'}>
           <PenTable
-            pens={filteredItems}
+            pens={pens}
+            areas={areas}
             loading={loadingList}
             onView={async (p) => {
               if (p.id === selectedPenId && isDetailMode) return;
@@ -240,7 +145,7 @@ export default function PenPage() {
         </div>
 
         {isDetailMode && (
-          <div className="bg-white rounded-xl p-4 overflow-y-auto max-h-[80vh]">
+          <div className="bg-white rounded-xl p-4 overflow-y-auto max-h-[80vh] lg:col-span-4">
             <PenDetail
               pen={penDetail}
               loading={loadingDetail}

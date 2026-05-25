@@ -14,11 +14,11 @@ export default function BreedPage() {
   const {
     breeds,
     loading,
-    fetchBreeds,
     createBreed,
   } = useBreed();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const pathname = usePathname();
   const title = getPageTitle(pathname);
@@ -29,13 +29,14 @@ export default function BreedPage() {
   });
 
   useEffect(() => {
-    fetchBreeds();
-  }, [fetchBreeds]);
+    // BreedTable will load breeds itself via hook
+  }, []);
 
   const handleCreate = async (data: CreateBreedRequest) => {
     await createBreed(data);
     setIsModalOpen(false);
     setFormData({ name: '', characteristics: '' });
+    setRefreshKey((current) => current + 1);
   };
 
   return (
@@ -50,7 +51,7 @@ export default function BreedPage() {
         <div className="flex gap-2">
 
           <button
-            onClick={fetchBreeds}
+            onClick={() => setRefreshKey((current) => current + 1)}
             className="px-4 py-2 bg-white rounded-xl text-xs flex items-center gap-2"
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -70,7 +71,7 @@ export default function BreedPage() {
 
       {/* TABLE */}
       <div className="bg-white rounded-xl overflow-hidden">
-        <BreedTable breeds={breeds} />
+        <BreedTable key={refreshKey} />
       </div>
 
       {/* MODAL */}

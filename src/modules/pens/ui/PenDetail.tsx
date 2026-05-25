@@ -19,10 +19,10 @@ export function PenDetail({ pen, loading, onClose }: Props) {
   }
 
   return (
-    <aside className="w-full min-w-0 bg-white border-l shadow-2xl overflow-y-auto flex flex-col h-full">
+    <aside className="w-full min-w-0 bg-white shadow-2xl overflow-y-auto flex flex-col h-full">
 
       {/* HEADER */}
-      <div className="p-6 sticky top-0 bg-white z-20 border-b flex justify-between items-center">
+      <div className="p-6 sticky top-0 bg-white z-20 flex justify-between items-center">
         <div>
           <span className="text-[10px] font-bold uppercase text-emerald-600 block">
             Hồ sơ chi tiết
@@ -61,7 +61,7 @@ export function PenDetail({ pen, loading, onClose }: Props) {
         <section>
           <h4 className="font-bold mb-4">Danh sách lợn</h4>
 
-          <div className="bg-white border rounded-xl overflow-hidden">
+          <div className="bg-white rounded-xl overflow-hidden">
             <table className="w-full text-xs">
               <thead className="bg-gray-50">
                 <tr>
@@ -74,7 +74,7 @@ export function PenDetail({ pen, loading, onClose }: Props) {
               <tbody>
                 {pen.pigs?.length ? (
                   pen.pigs.map((p: PenPigSummary) => (
-                    <tr key={p.pigId} className="border-t">
+                    <tr key={p.pigId}>
                       <td className="p-2 font-medium">{p.earTag}</td>
                       <td className="p-2">{p.type}</td>
                       <td className="p-2">{p.currentWeight} kg</td>

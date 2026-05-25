@@ -25,8 +25,7 @@ const reproductionTabs: ModuleTab[] = [
 
 const healthTabs: ModuleTab[] = [
   { name: "Tăng trưởng", href: "/health/growth-tracking", title: "Theo dõi tăng trưởng" },
-  { name: "Bệnh", href: "/health/diseases", title: "Danh mục bệnh" },
-  { name: "Điều trị", href: "/health/treatments", title: "Theo dõi điều trị" },
+  { name: "Bệnh", href: "/health/diseases", title: "Theo dõi bệnh" },
 ];
 
 const penTabs: ModuleTab[] = [

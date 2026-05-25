@@ -40,3 +40,8 @@ export interface PregnancyCheck {
     id: string;
     status: MatingStatus;
 }
+
+export interface PregnancyStatusUpdateRequest {
+    id: string;
+    status: MatingStatus;
+}

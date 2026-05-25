@@ -34,6 +34,7 @@ export default function ReproductionManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSemenFormOpen, setIsSemenFormOpen] = useState(false);
   const [refreshSemenKey, setRefreshSemenKey] = useState(0);
+  const [refreshMatingKey, setRefreshMatingKey] = useState(0);
 
   const handleSemenFormSuccess = () => {
     setRefreshSemenKey((prev) => prev + 1);
@@ -148,7 +149,7 @@ export default function ReproductionManagementPage() {
             </div>
           ) : (
             <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden min-h-[300px]">
-              <MatingTable />
+              <MatingTable key={refreshMatingKey} />
             </div>
           )}
         </div>
@@ -156,7 +157,11 @@ export default function ReproductionManagementPage() {
       </div>
 
       {/* Feature Modals */}
-      <MatingForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <MatingForm
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => setRefreshMatingKey((prev) => prev + 1)}
+      />
       <SemenForm isOpen={isSemenFormOpen} onClose={() => setIsSemenFormOpen(false)} onSuccess={handleSemenFormSuccess} />
     </div>
   );

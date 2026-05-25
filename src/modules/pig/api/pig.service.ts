@@ -10,7 +10,7 @@ import {
   PigHistoryFarrowingResponse
 } from '../model/pig.model';
 import { ApiResponse } from '@/shared/types';
-import { get } from 'http';
+import { ReproductionCycle } from '@/shared/enums/reproductioncycle.enum';
 
 const endpoint = '/api/v1/pigs';
 
@@ -42,8 +42,10 @@ export const pigService = {
   getSow: () =>
     apiClient.get<ApiResponse<SowResponse[]>>(`${endpoint}/sows`),
 
-  getPregnantPigs: () =>
-    apiClient.get<ApiResponse<PregnantResponse[]>>(`${endpoint}/pregnant`),
+  getPregnantPigs: (status: ReproductionCycle = ReproductionCycle.TRACKING) =>
+    apiClient.get<ApiResponse<PregnantResponse[]>>(
+      `/api/v1/reproduction-cycles?status=${encodeURIComponent(status)}`
+    ),
 
   getPigHistoryFarrowing: (id: string) =>
     apiClient.get<ApiResponse<PigHistoryFarrowingResponse[]>>(

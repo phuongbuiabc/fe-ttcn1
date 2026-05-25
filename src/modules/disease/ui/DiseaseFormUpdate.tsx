@@ -32,7 +32,7 @@ export const DiseaseFormUpdate: React.FC<Props> = ({
           onChange={(e) =>
             setFormData({ ...formData, name: e.target.value })
           }
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
         />
 
         <input
@@ -40,7 +40,7 @@ export const DiseaseFormUpdate: React.FC<Props> = ({
           onChange={(e) =>
             setFormData({ ...formData, diseaseType: e.target.value })
           }
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
         />
 
         <textarea
@@ -48,7 +48,7 @@ export const DiseaseFormUpdate: React.FC<Props> = ({
           onChange={(e) =>
             setFormData({ ...formData, symptoms: e.target.value })
           }
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
         />
 
         <div className="flex justify-end gap-2">

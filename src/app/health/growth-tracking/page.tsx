@@ -15,26 +15,39 @@ export default function GrowthTrackingPage() {
 	}, [fetchPigCurrent]);
 
 	return (
-		<div className="space-y-6 p-4 min-h-screen bg-[#fbfcfd]">
-			{/* PIG CURRENT TABLE */}
-			<section className="bg-white border rounded-xl shadow-sm overflow-hidden">
-				<div className="px-4 py-3 border-b flex items-center justify-between">
+		<div className="min-h-screen space-y-6 bg-[#fbfcfd] p-4">
+
+			<section className="overflow-hidden rounded-xl bg-white">
+
+				<div className="flex items-center justify-between px-4 py-3">
+
 					<div>
-						<h1 className="text-base font-bold text-slate-800">Tình trạng tăng trưởng hiện tại</h1>
-						<p className="text-xs text-slate-500">Theo dõi cân nặng, tăng trưởng và hiệu quả chuyển đổi của từng lợn.</p>
+						<h1 className="text-base font-bold text-slate-800">
+							Tình trạng tăng trưởng hiện tại
+						</h1>
+
+						<p className="text-xs text-slate-500">
+							Theo dõi cân nặng, tăng trưởng và hiệu quả chuyển đổi của từng lợn.
+						</p>
 					</div>
+
 					<button
 						onClick={() => setShowForm(true)}
-						className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-colors"
+						className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
 					>
 						<Plus size={16} />
 						Thêm bản ghi tăng trưởng
 					</button>
+
 				</div>
-				<PigCurrentTable pigs={pigCurrent} loading={loadingList} />
+
+				<PigCurrentTable
+					pigs={pigCurrent}
+					loading={loadingList}
+				/>
+
 			</section>
 
-			{/* GROWTH FORM MODAL */}
 			{showForm && (
 				<PiggrowthForm
 					onClose={() => setShowForm(false)}
@@ -44,6 +57,7 @@ export default function GrowthTrackingPage() {
 					}}
 				/>
 			)}
+
 		</div>
 	);
 }

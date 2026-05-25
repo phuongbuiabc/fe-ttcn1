@@ -22,7 +22,7 @@ export function PenForm({ open, onClose, onSubmit, initialData }: Props) {
     name: '',
     area: '0',
     areaId: '',
-    penType: '',
+    penType: PenType.GROWING,
     status: PenStatus.IN_USE
   });
 
@@ -72,7 +72,7 @@ export function PenForm({ open, onClose, onSubmit, initialData }: Props) {
           placeholder="Tên chuồng"
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
         />
 
         {/* AREA */}
@@ -84,14 +84,14 @@ export function PenForm({ open, onClose, onSubmit, initialData }: Props) {
           placeholder="Diện tích"
           value={form.area}
           onChange={e => setForm({ ...form, area: e.target.value })}
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
         />
 
         {/* AREA SELECT */}
         <select
           value={form.areaId}
           onChange={e => setForm({ ...form, areaId: e.target.value })}
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
         >
           <option value="">Chọn khu vực</option>
           {areas.map(a => (
@@ -101,24 +101,13 @@ export function PenForm({ open, onClose, onSubmit, initialData }: Props) {
           ))}
         </select>
 
-        {/* TYPE */}
-        <select
-          value={form.penType}
-          onChange={e => setForm({ ...form, penType: e.target.value })}
-          className="w-full border p-2 rounded"
-        >
-          <option value="">Chọn loại chuồng</option>
-          <option value={PenType.BREEDING}>Chuồng giống</option>
-          <option value={PenType.FARROWING}>Chuồng đẻ</option>
-          <option value={PenType.GROWING}>Chuồng nuôi</option>
-          <option value={PenType.FINISHING}>Chuồng xuất</option>
-        </select>
+        {/* TYPE: hidden - default to GROWING */}
 
         {/* STATUS */}
         <select
           value={form.status}
           onChange={e => setForm({ ...form, status: e.target.value as PenStatus })}
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
         >
           <option value={PenStatus.IN_USE}>Đang sử dụng</option>
           <option value={PenStatus.EMPTY}>Trống</option>

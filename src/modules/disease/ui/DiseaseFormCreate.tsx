@@ -29,7 +29,7 @@ export const DiseaseFormCreate: React.FC<Props> = ({
 
         <input
           placeholder="Tên bệnh"
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
           value={formData.name}
           onChange={(e) =>
             setFormData({ ...formData, name: e.target.value })
@@ -38,7 +38,7 @@ export const DiseaseFormCreate: React.FC<Props> = ({
 
         <input
           placeholder="Loại bệnh"
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
           value={formData.diseaseType}
           onChange={(e) =>
             setFormData({ ...formData, diseaseType: e.target.value })
@@ -47,7 +47,7 @@ export const DiseaseFormCreate: React.FC<Props> = ({
 
         <textarea
           placeholder="Triệu chứng"
-          className="w-full border p-2 rounded"
+          className="w-full bg-slate-100 p-2 rounded outline-none"
           value={formData.symptoms}
           onChange={(e) =>
             setFormData({ ...formData, symptoms: e.target.value })

@@ -7,6 +7,7 @@ import { cn } from '@/shared/utils/utils';
 import { PigType } from '@/shared/enums/pig.enum';
 import { BaseSearch } from '@/shared/components/search';
 import { BaseSelect, SelectOption } from '@/shared/components/Filter';
+import { useBreed } from '@/modules/breed/hooks/useBreed';
 import { PIG_TYPE_OPTIONS, PIG_STATUS_OPTIONS } from '@/modules/pig/utils/pig.mapper';
 
 interface PigTableProps {
@@ -28,24 +29,19 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
     return option?.label || type;
   };
 
-  // Get unique breeds from pigs
-  const uniqueBreeds = useMemo(() => {
-    const breeds = new Set(pigs.map((p) => p.breedName).filter(Boolean));
-    return Array.from(breeds).sort();
-  }, [pigs]);
-
   // Type options for filter
   const typeOptions: SelectOption[] = [
     { label: 'Nái', value: PigType.NAI },
     { label: 'Nọc', value: PigType.NOC },
     { label: 'Thịt', value: PigType.THIT },
   ];
+  // Breed options for filter (from breed API)
+  const { options: breedOptions, fetchBreeds: fetchBreedOptions } = useBreed();
 
-  // Breed options for filter
-  const breedOptions: SelectOption[] = uniqueBreeds.map((breed) => ({
-    label: breed,
-    value: breed,
-  }));
+  // ensure breed options are loaded
+  React.useEffect(() => {
+    fetchBreedOptions();
+  }, [fetchBreedOptions]);
 
   // Filter pigs based on search and filters
   const filteredPigs = useMemo(() => {
@@ -54,7 +50,8 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
         !searchTerm ||
         pig.earTag?.toLowerCase().includes(searchTerm.toLowerCase());
       const typeMatch = !filterType || pig.type === filterType;
-      const breedMatch = !filterBreed || pig.breedName === filterBreed;
+      const pigBreed = pig.breedName || pig.species || '';
+      const breedMatch = !filterBreed || pigBreed === filterBreed;
       return searchMatch && typeMatch && breedMatch;
     });
   }, [pigs, searchTerm, filterType, filterBreed]);

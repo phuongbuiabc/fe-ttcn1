@@ -38,6 +38,9 @@ export default function PigletHerdPage() {
   };
 
   const remove = async (id: string) => {
+    const confirmed = window.confirm('Bạn có chắc muốn xóa đàn con này không?');
+    if (!confirmed) return;
+
     await deleteHerd(id);
     fetchHerds();
   };
@@ -75,10 +78,14 @@ export default function PigletHerdPage() {
       {/* FORM MODAL SIMPLE */}
       {openForm && (
         <div className="fixed inset-0 bg-black/30 flex justify-center items-center">
-          <div className="bg-white rounded-xl w-[400px]">
+          <div className="bg-white rounded-xl w-[400px] shadow-xl overflow-hidden">
             <PigletHerdForm
               initialData={editing}
               onSubmit={editing ? handleUpdate : handleCreate}
+              onClose={() => {
+                setOpenForm(false);
+                setEditing(null);
+              }}
             />
           </div>
         </div>
