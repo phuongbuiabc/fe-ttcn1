@@ -1,29 +1,37 @@
 import React, { useMemo } from 'react';
-import { Package, Plus, AlertTriangle, History } from 'lucide-react';
+import { Package, Plus, Scale, AlertTriangle } from 'lucide-react';
 import { cn } from '@/shared/utils/utils';
 import { motion } from 'motion/react';
-import { Supply, SupplyLoss } from '../model/inventory.model';
+import { Supply } from '@/modules/inventory/model/inventory.model';
 
 interface InventoryDashboardProps {
   supplies: Supply[];
-  lossHistory: SupplyLoss[];
 }
 
-export function InventoryDashboard({ supplies, lossHistory }: InventoryDashboardProps) {
+export function InventoryDashboard({ supplies }: InventoryDashboardProps) {
   const stats = useMemo(() => {
-    const totalMaterials = supplies.length;
-    const totalStock = supplies.reduce((sum, item) => sum + (item.quantity || 0), 0);
-    const totalLossQty = lossHistory.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    const totalFeed = supplies
+      .filter(item => item.materialType === 'FEED')
+      .reduce((sum, item) => sum + (item.quantity || 0), 0);
+
+    const totalVaccine = supplies
+      .filter(item => item.materialType === 'VACCINE')
+      .reduce((sum, item) => sum + (item.quantity || 0), 0);
+
+    const totalMedicine = supplies
+      .filter(item => item.materialType === 'MEDICINE')
+      .reduce((sum, item) => sum + (item.quantity || 0), 0);
+
     const lowStockCount = supplies.filter(item => item.quantity < 10).length;
 
-    return { totalMaterials, totalStock, totalLossQty, lowStockCount };
-  }, [supplies, lossHistory]);
+    return { totalFeed, totalVaccine, totalMedicine, lowStockCount };
+  }, [supplies]);
 
   const cards = [
-    { label: "Tổng loại vật tư", value: stats.totalMaterials, icon: Package, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100/50" },
-    { label: "Tổng tồn kho", value: stats.totalStock, icon: Plus, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100/50" },
-    { label: "Tổng hao hụt", value: stats.totalLossQty, icon: AlertTriangle, color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-100/50" },
-    { label: "Cần nhập thêm", value: stats.lowStockCount, icon: History, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100/50" },
+    { label: "Thức ăn tồn kho", value: stats.totalFeed, unit: "Kg", icon: Package, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100/50" },
+    { label: "Vaccine tồn kho", value: stats.totalVaccine, unit: "Liều", icon: Plus, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100/50" },
+    { label: "Thuốc thú y tồn", value: stats.totalMedicine, unit: "Chai", icon: Scale, color: "text-violet-600", bg: "bg-violet-50", border: "border-violet-100/50" },
+    { label: "Cần nhập gấp", value: stats.lowStockCount, unit: "Loại", icon: AlertTriangle, color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-100/50" },
   ];
 
   return (
@@ -47,7 +55,8 @@ export function InventoryDashboard({ supplies, lossHistory }: InventoryDashboard
               <span className="text-3xl font-black text-slate-900 tracking-tight">
                 {s.value.toLocaleString()}
               </span>
-              <p className="mt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">{s.label}</p>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mt-1">{s.unit}</span>
+              <p className="mt-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest">{s.label}</p>
             </div>
           </div>
           <div className="mt-6 h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">

@@ -60,18 +60,24 @@ export function TopBar({ onMenuClick }: TopBarProps) {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   
-  const [currentPath, setCurrentPath] = useState(pathname);
+  const [currentPath, setCurrentPath] = useState("");
 
   useEffect(() => {
-    setCurrentPath(pathname);
+    setCurrentPath(window.location.pathname + window.location.search);
   }, [pathname]);
 
   useEffect(() => {
-    const handlePathUpdate = () => {
-      setCurrentPath(window.location.pathname);
+    const handlePathUpdate = (e: any) => {
+      if (e && e.detail) {
+        setCurrentPath(e.detail);
+      } else {
+        setCurrentPath(window.location.pathname + window.location.search);
+      }
     };
     window.addEventListener("popstate", handlePathUpdate);
     window.addEventListener("inventory-tab-change", handlePathUpdate);
+    // Set initial path + query string
+    setCurrentPath(window.location.pathname + window.location.search);
     return () => {
       window.removeEventListener("popstate", handlePathUpdate);
       window.removeEventListener("inventory-tab-change", handlePathUpdate);
@@ -121,7 +127,8 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         {tabs.length > 0 && (
           <div className="flex items-center gap-1 ml-2">
             {tabs.map((tab) => {
-              const active = currentPath === tab.href;
+              const active = currentPath === tab.href ||
+                (tab.href === '/inventory' && (currentPath === '/inventory' || currentPath === '/inventory/'));
 
               return (
                 <button

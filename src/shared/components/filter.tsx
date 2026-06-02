@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { CustomSelect } from './ui/CustomSelect';
 
 export interface SelectOption {
   label: string;
@@ -22,23 +23,18 @@ export function BaseSelect({
   placeholder,
   className,
 }: Props) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={`px-3 py-1.5 border rounded text-sm bg-white ${className || ''}`}
-    >
-      {placeholder && (
-        <option value="">
-          {placeholder}
-        </option>
-      )}
+  // Prepend placeholder option if it exists, mapping to empty string value
+  const combinedOptions = placeholder 
+    ? [{ value: "", label: placeholder }, ...options]
+    : options;
 
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
+  return (
+    <CustomSelect
+      value={value}
+      onChange={onChange}
+      options={combinedOptions}
+      placeholder={placeholder}
+      className={className}
+    />
   );
 }
