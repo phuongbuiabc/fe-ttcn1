@@ -10,7 +10,7 @@ import { cn } from "@/shared/utils/utils";
 import { staffService } from "@/modules/staff/api/staff.service";
 import { Employee } from "@/shared/types";
 import { motion } from "motion/react";
-import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { useAuth } from "@/shared/components/AuthProvider";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {

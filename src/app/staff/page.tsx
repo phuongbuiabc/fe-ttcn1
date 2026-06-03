@@ -10,7 +10,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { staffService } from "@/modules/staff/api/staff.service";
 import { authService } from "@/modules/auth/api/auth.service";
-import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { useAuth } from "@/shared/components/AuthProvider";
 
 import { Employee, CreateEmployeeRequest } from "@/shared/types";
 import { StaffFormModal } from "@/modules/staff/ui/StaffFormModal";
@@ -21,8 +21,9 @@ import { ConfirmModal } from "@/shared/components/ui/ConfirmModal";
 export default function StaffPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [members, setMembers] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedMembers = staffService.getCachedEmployees();
+  const [members, setMembers] = useState<Employee[]>(cachedMembers || []);
+  const [loading, setLoading] = useState(!cachedMembers);
 
   const { user } = useAuth();
   const [myProfile, setMyProfile] = useState<Employee | null>(null);
@@ -88,7 +89,7 @@ export default function StaffPage() {
         setMembers(employeeList);
       }
     } finally {
-      if (showLoading) setLoading(false);
+      setLoading(false);
     }
   };
 

@@ -24,7 +24,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/utils/utils";
 import Image from "next/image";
-import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { useAuth } from "@/shared/components/AuthProvider";
 import { staffService } from "@/modules/staff/api/staff.service";
 import { Employee } from "@/shared/types";
 

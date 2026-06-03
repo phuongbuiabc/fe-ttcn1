@@ -11,7 +11,7 @@ import { WorkScheduleTable } from "@/modules/schedule/ui/WorkScheduleTable";
 import { WorkScheduleFormModal } from "@/modules/schedule/ui/WorkScheduleFormModal";
 import { WorkScheduleDetailModal } from "@/modules/schedule/ui/WorkScheduleDetailModal";
 import { ConfirmModal } from "@/shared/components/ui/ConfirmModal";
-import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { useAuth } from "@/shared/components/AuthProvider";
 
 export default function WorkSchedulePage() {
   const [schedules, setSchedules] = React.useState<WorkSchedule[]>([]);
