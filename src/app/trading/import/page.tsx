@@ -28,6 +28,7 @@ import { supplierService } from "@/modules/supplier/api/supplier.service";
 import { breedService } from "@/modules/breed/api/breed.service";
 import { penService } from "@/modules/pens/api/pen.service";
 import { pigService } from "@/modules/pig/api/pig.service";
+import { growthTrackingService } from "@/modules/growth/api/growthtracking.service";
 
 // Shared components
 import { BaseModal } from "@/shared/components/ui/BaseModal";
@@ -62,6 +63,7 @@ interface PigInput {
   earTag: string;
   nippleCount: number;
   birthWeight: number;
+  currentWeight: number;
   birthDate: string;
   penId: string;
 }
@@ -76,6 +78,7 @@ interface PigError {
   earTag?: string;
   penId?: string;
   birthWeight?: string;
+  currentWeight?: string;
 }
 
 export default function ImportPage() {
@@ -398,6 +401,7 @@ export default function ImportPage() {
           earTag: nextTags[tagIndex] || "",
           nippleCount: 12,
           birthWeight: 1.5,
+          currentWeight: 1.5,
           birthDate: importDate,
           penId: ""
         });
@@ -452,6 +456,11 @@ export default function ImportPage() {
         hasRowErrors = true;
       }
 
+      if (p.currentWeight <= 0) {
+        rowErrors.currentWeight = "Cân nặng phải > 0";
+        hasRowErrors = true;
+      }
+
       if (hasRowErrors) {
         newErrors[idx] = rowErrors;
         hasErrors = true;
@@ -500,6 +509,43 @@ export default function ImportPage() {
     try {
       const res = await importService.createInvoice(payload);
       if (res.success) {
+        try {
+          const createdPigs: { pigId: string; earTag: string }[] = [];
+          res.data?.details?.forEach(d => {
+            d.pigs?.forEach(p => {
+              if (p.pigId && p.earTag) {
+                createdPigs.push({ pigId: p.pigId, earTag: p.earTag });
+              }
+            });
+          });
+
+          const growthRequests = pigInputs
+            .map(input => {
+              const matchedPig = createdPigs.find(cp => cp.earTag.trim() === input.earTag.trim());
+              if (matchedPig) {
+                return {
+                  pigId: matchedPig.pigId,
+                  trackingDate: importDate,
+                  litterLength: 0,
+                  chestGirth: 0,
+                  weight: Number(input.currentWeight),
+                  growthRate: 0,
+                  adg: 0,
+                  fcr: 0,
+                  note: "Cân nặng lúc nhập hóa đơn"
+                };
+              }
+              return null;
+            })
+            .filter((req): req is NonNullable<typeof req> => req !== null);
+
+          if (growthRequests.length > 0) {
+            await growthTrackingService.create(growthRequests);
+          }
+        } catch (growthErr) {
+          console.error("Failed to create growth tracking records on import:", growthErr);
+        }
+
         setIsModalOpen(false);
         fetchData();
       } else {
@@ -533,7 +579,7 @@ export default function ImportPage() {
   ];
 
   // Pen Options
-  const penOptions = pens.map(p => ({ value: p.id, label: `${p.name} (${p.penType})` }));
+  const penOptions = pens.map(p => ({ value: p.id, label: p.name }));
 
   return (
     <div className="space-y-8 pb-20">
@@ -935,27 +981,18 @@ export default function ImportPage() {
               {step === 2 && (
                 <form onSubmit={handleSaveInvoice} className="flex-1 overflow-hidden flex flex-col">
                   <div className="flex-1 overflow-y-auto p-8 pb-48 space-y-6">
-                    <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-3">
-                      <AlertCircle className="text-amber-600 shrink-0 mt-0.5" size={18} />
-                      <div className="space-y-0.5">
-                        <p className="text-xs font-bold text-amber-800">Thông tin chi tiết từng con lợn</p>
-                        <p className="text-[11px] text-amber-600 leading-relaxed font-medium">
-                          Vui lòng nhập mã số tai (earTag), số vú, cân nặng sơ sinh và phân chuồng cho từng con heo tương ứng với số lượng trong hóa đơn.
-                        </p>
-                      </div>
-                    </div>
-
                     <div className="border border-slate-100 rounded-2xl">
                       <table className="w-full text-left border-collapse">
                         <thead className="bg-slate-50">
                           <tr>
                             <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[50px]">STT</th>
-                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[140px]">Giống & Loại</th>
-                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[160px]">Mã số tai *</th>
-                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[80px] text-right">Số vú</th>
-                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[100px] text-right">Cân nặng (kg) *</th>
-                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[210px]">Chuồng chỉ định *</th>
-                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[125px]">Ngày sinh</th>
+                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[130px]">Giống & Loại</th>
+                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[140px]">Mã số tai *</th>
+                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[70px] text-right">Số vú</th>
+                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[100px] text-right">CN sơ sinh (kg) *</th>
+                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[100px] text-right">CN hiện tại (kg) *</th>
+                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[180px]">Chuồng chỉ định *</th>
+                            <th className="px-4 py-2.5 text-[9px] uppercase font-black text-slate-500 tracking-wider w-[110px]">Ngày sinh</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -1028,6 +1065,30 @@ export default function ImportPage() {
                                 />
                                 {step2Errors[idx]?.birthWeight && (
                                   <p className="text-[9px] font-bold text-rose-500 mt-1">{step2Errors[idx].birthWeight}</p>
+                                )}
+                              </td>
+                              <td className="px-3 py-1.5">
+                                <input 
+                                  type="number" 
+                                  step="0.1"
+                                  min="0.1"
+                                  required
+                                  value={pig.currentWeight}
+                                  onChange={(e) => {
+                                    handlePigInputChange(idx, 'currentWeight', parseFloat(e.target.value) || 0);
+                                    if (step2Errors[idx]?.currentWeight) {
+                                      const updatedPigErrors = { ...step2Errors };
+                                      delete updatedPigErrors[idx].currentWeight;
+                                      setStep2Errors(updatedPigErrors);
+                                    }
+                                  }}
+                                  className={cn(
+                                    "w-full px-3 py-1.5 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-right focus:ring-2 focus:ring-emerald-500/20 outline-none",
+                                    step2Errors[idx]?.currentWeight && "border-rose-500 bg-rose-50/20 focus:border-rose-500"
+                                  )}
+                                />
+                                {step2Errors[idx]?.currentWeight && (
+                                  <p className="text-[9px] font-bold text-rose-500 mt-1">{step2Errors[idx].currentWeight}</p>
                                 )}
                               </td>
                               <td className="px-3 py-1.5">
