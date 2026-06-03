@@ -10,50 +10,36 @@ import {
 
 import { useDashboard } from '@/modules/dashboard/hooks/useDashboard';
 
-export function SurvivalRateChart() {
-  const { survivalRate, fetchSurvivalRate } = useDashboard();
+export function MatingSuccessRateChart() {
+  const { matingSuccessRate, fetchMatingSuccessRate } = useDashboard();
 
   useEffect(() => {
-    fetchSurvivalRate();
-  }, [fetchSurvivalRate]);
+    fetchMatingSuccessRate();
+  }, [fetchMatingSuccessRate]);
 
-  const aliveRate = survivalRate?.aliveRate ?? 0;
-  const crushedRate = survivalRate?.crushedRate ?? 0;
-  const stillbornRate = survivalRate?.stillbornRate ?? 0;
-  const deformedRate = survivalRate?.deformedRate ?? 0;
+  const successRate =
+    typeof matingSuccessRate?.successRate === 'number'
+      ? matingSuccessRate.successRate
+      : 0;
 
-  const chartData = [
+  const matingData = [
     {
-      name: 'Sống',
-      value: aliveRate,
-      color: '#10b981',
-      count: survivalRate?.aliveCount ?? 0,
+      name: 'Thành công',
+      value: successRate,
+      color: '#3b82f6',
     },
     {
-      name: 'Đè chết',
-      value: crushedRate,
-      color: '#f59e0b',
-      count: survivalRate?.crushedCount ?? 0,
+      name: 'Thất bại',
+      value: Math.max(100 - successRate, 0),
+      color: '#cbd5e1',
     },
-    {
-      name: 'Thai gỗ',
-      value: stillbornRate,
-      color: '#ef4444',
-      count: survivalRate?.stillbornCount ?? 0,
-    },
-    {
-      name: 'Dị hình',
-      value: deformedRate,
-      color: '#6b7280',
-      count: survivalRate?.deformedCount ?? 0,
-    },
-  ].filter(item => item.value > 0);
+  ];
 
   return (
     <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
       <div className="mb-4">
         <h2 className="font-headline text-base font-bold tracking-tight text-slate-900">
-          Tỷ lệ sống sót khi sinh
+          Tỷ lệ thụ tinh thành công
         </h2>
       </div>
 
@@ -62,7 +48,7 @@ export function SurvivalRateChart() {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={chartData}
+                data={matingData}
                 dataKey="value"
                 cx="50%"
                 cy="50%"
@@ -71,7 +57,7 @@ export function SurvivalRateChart() {
                 paddingAngle={2}
                 strokeWidth={0}
               >
-                {chartData.map((entry) => (
+                {matingData.map((entry) => (
                   <Cell
                     key={entry.name}
                     fill={entry.color}
@@ -83,16 +69,16 @@ export function SurvivalRateChart() {
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-xl font-black text-slate-900">
-              {aliveRate.toFixed(1)}%
+              {successRate.toFixed(1)}%
             </span>
             <span className="text-[8px] font-bold uppercase text-slate-400">
-              Sống sót
+              Thành công
             </span>
           </div>
         </div>
 
-        <div className="space-y-2">
-          {chartData.map((item) => (
+        <div className="space-y-3">
+          {matingData.map((item) => (
             <div
               key={item.name}
               className="flex items-center gap-2"
@@ -112,10 +98,6 @@ export function SurvivalRateChart() {
                 <p className="text-xs font-extrabold text-slate-900">
                   {item.value.toFixed(1)}%
                 </p>
-
-                <p className="text-[8px] text-slate-400">
-                  {item.count} con
-                </p>
               </div>
             </div>
           ))}
@@ -125,4 +107,4 @@ export function SurvivalRateChart() {
   );
 }
 
-export default SurvivalRateChart;
+export default MatingSuccessRateChart;

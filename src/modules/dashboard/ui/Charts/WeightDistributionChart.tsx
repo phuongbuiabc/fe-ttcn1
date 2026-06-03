@@ -1,19 +1,17 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from 'recharts';
+
 import { useDashboard } from '@/modules/dashboard/hooks/useDashboard';
-
-const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
-const BarChart = dynamic(() => import('recharts').then(mod => mod.BarChart), { ssr: false });
-const Bar = dynamic(() => import('recharts').then(mod => mod.Bar), { ssr: false });
-const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false });
-const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false });
-const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
-const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
-const Cell = dynamic(() => import('recharts').then(mod => mod.Cell), { ssr: false });
-
-const COLORS = ['#e2e8f0', '#cbd5e1', '#94a3b8', '#64748b', '#475569', '#334155', '#10b981'];
 
 export function WeightDistributionChart() {
   const { weightDistribution, fetchWeightDistribution } = useDashboard();
@@ -23,48 +21,83 @@ export function WeightDistributionChart() {
   }, [fetchWeightDistribution]);
 
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+    <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
       <div className="mb-4">
-        <h2 className="text-base font-bold text-slate-900 tracking-tight leading-tight font-headline">Phân bố trọng lượng đàn</h2>
-        <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">Phân bổ trọng lượng đàn (kg)</p>
+        <h2 className="font-headline text-base font-bold tracking-tight text-slate-900">
+          Phân bố trọng lượng đàn (KG)
+        </h2>
       </div>
-      <div className="h-56 w-full">
+
+      <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={weightDistribution}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+          <BarChart
+            data={weightDistribution}
+            layout="vertical"
+            margin={{
+              top: 5,
+              right: 20,
+              left: 10,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="#f1f5f9"
+            />
+
             <XAxis
-              dataKey="label"
+              type="number"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 700 }}
+              tick={{
+                fill: '#94a3b8',
+                fontSize: 10,
+                fontWeight: 600,
+              }}
             />
+
             <YAxis
+              type="category"
+              dataKey="label"
+              width={80}
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 700 }}
-              tickFormatter={(value) => `${value}`}
+              tick={{
+                fill: '#64748b',
+                fontSize: 10,
+                fontWeight: 700,
+              }}
             />
+
             <Tooltip
+              cursor={{
+                fill: 'rgba(16,185,129,0.06)',
+              }}
               contentStyle={{
-                backgroundColor: '#fff',
+                backgroundColor: '#ffffff',
+                border: '1px solid #e2e8f0',
                 borderRadius: '12px',
-                border: 'none',
-                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                boxShadow:
+                  '0 10px 15px -3px rgb(0 0 0 / 0.1)',
               }}
-              formatter={(value: any) => {
-                if (value === undefined || value === null) return ['', ''];
-                const numValue = typeof value === 'number' ? value : Number(value);
-                return [`${numValue}`, 'Số lượng'];
-              }}
+              formatter={(value) => [
+                `${value}`,
+                'Số lượng',
+              ]}
             />
-            <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={40}>
-              {weightDistribution.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Bar>
+
+            <Bar
+              dataKey="count"
+              fill="#10b981"
+              radius={[0, 8, 8, 0]}
+              barSize={18}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
     </div>
   );
 }
+
+export default WeightDistributionChart;

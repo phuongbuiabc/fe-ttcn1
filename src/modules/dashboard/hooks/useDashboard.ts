@@ -7,11 +7,13 @@ import { MonthlyRevenue } from '../model/monthlyrevenue.model';
 import { MonthlyImportCost } from '../model/monthlyimportcost.model';
 import { MatingSuccessRate } from '../model/matingsuccessrate.model';
 import { FeedConsumption } from '../model/feedconsumption.model';
+import { MonthlyLiveBirths } from '../model/monthlylivebirths';
 
 export function useDashboard() {
   const [weightDistribution, setWeightDistribution] = useState<WeightDistribution[]>([]);
-  const [survivalRate, setSurvivalRate] = useState<SurvivalRate[]>([]);
+  const [survivalRate, setSurvivalRate] = useState<SurvivalRate | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [monthlyLiveBirths, setMonthlyLiveBirths] = useState<MonthlyLiveBirths[]>([]);
   const [monthlyRevenue, setMonthlyRevenue] = useState<MonthlyRevenue[]>([]);
   const [monthlyImportCost, setMonthlyImportCost] = useState<MonthlyImportCost[]>([]);
   const [matingSuccessRate, setMatingSuccessRate] = useState<MatingSuccessRate | null>(null);
@@ -20,6 +22,7 @@ export function useDashboard() {
   const [loadingWeightDistribution, setLoadingWeightDistribution] = useState(false);
   const [loadingSurvivalRate, setLoadingSurvivalRate] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
+  const [loadingMonthlyLiveBirths, setLoadingMonthlyLiveBirths] = useState(false);
   const [loadingMonthlyRevenue, setLoadingMonthlyRevenue] = useState(false);
   const [loadingMonthlyImportCost, setLoadingMonthlyImportCost] = useState(false);
   const [loadingMatingSuccessRate, setLoadingMatingSuccessRate] = useState(false);
@@ -42,7 +45,7 @@ export function useDashboard() {
     try {
       const res = await dashboardService.getSurvivalRate();
       if (res.success) {
-        setSurvivalRate(res.data || []);
+        setSurvivalRate(res.data || null);
       }
     } finally {
       setLoadingSurvivalRate(false);
@@ -58,6 +61,18 @@ export function useDashboard() {
       }
     } finally {
       setLoadingSummary(false);
+    }
+  }, []);
+
+  const fetchMonthlyLiveBirths = useCallback(async (year: number) => {
+    setLoadingMonthlyLiveBirths(true);
+    try {
+      const res = await dashboardService.getMonthlyLiveBirths(year);
+      if (res.success) {
+        setMonthlyLiveBirths(res.data || []);
+      }
+    } finally {
+      setLoadingMonthlyLiveBirths(false);
     }
   }, []);
 
@@ -113,6 +128,7 @@ export function useDashboard() {
     weightDistribution,
     survivalRate,
     summary,
+    monthlyLiveBirths,
     monthlyRevenue,
     monthlyImportCost,
     matingSuccessRate,
@@ -120,6 +136,7 @@ export function useDashboard() {
     loadingWeightDistribution,
     loadingSurvivalRate,
     loadingSummary,
+    loadingMonthlyLiveBirths,
     loadingMonthlyRevenue,
     loadingMonthlyImportCost,
     loadingMatingSuccessRate,
@@ -127,6 +144,7 @@ export function useDashboard() {
     fetchWeightDistribution,
     fetchSurvivalRate,
     fetchSummary,
+    fetchMonthlyLiveBirths,
     fetchMonthlyRevenue,
     fetchMonthlyImportCost,
     fetchMatingSuccessRate,

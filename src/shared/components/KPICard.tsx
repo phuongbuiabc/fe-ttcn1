@@ -70,59 +70,63 @@ export function KPICard({
 	return (
 		<div
 			className={cn(
-				'relative overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm transition-shadow',
+				'relative overflow-hidden rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-shadow',
 				onClick && 'cursor-pointer hover:shadow-md',
 				className
 			)}
-			onClick={onClick}
-			role={onClick ? 'button' : undefined}
-			tabIndex={onClick ? 0 : undefined}
-			onKeyDown={
-				onClick
-					? (event) => {
-							if (event.key === 'Enter' || event.key === ' ') {
-								event.preventDefault();
-								onClick();
-							}
-						}
-					: undefined
-			}
-		>
+			>
 			{Icon ? (
-				<div className={cn('absolute -right-2 -top-2 h-8 w-8 opacity-10', styles.icon)}>
-					<Icon size={32} />
+				<div className={cn('absolute right-3 top-3', styles.icon)}>
+				<Icon size={18} />
 				</div>
 			) : null}
 
-			<div className="mb-1 flex items-center gap-2">
-				<p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
+			<div className="flex h-full flex-col items-start justify-center text-left">
+				<div className="mb-1 flex items-left gap-2">
+				<p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+					{label}
+				</p>
+
 				{badge ? (
-					<span className={cn('rounded-full px-2 py-0.5 text-[9px] font-bold uppercase', styles.badge)}>
-						{badge}
+					<span
+					className={cn(
+						'rounded-full px-2 py-0.5 text-[9px] font-bold uppercase',
+						styles.badge
+					)}
+					>
+					{badge}
 					</span>
 				) : null}
-			</div>
+				</div>
 
-			{loading ? (
-				<div className="h-7 w-24 animate-pulse rounded bg-slate-100" />
-			) : (
-				<div className="flex items-end gap-2">
-					<h3 className={cn('text-lg font-black', styles.value)}>{value}</h3>
+				{loading ? (
+				<div className="h-8 w-24 animate-pulse rounded bg-slate-100" />
+				) : (
+				<div className="flex flex-col items-start">
+					<h3 className={cn('text-3xl font-black leading-none', styles.value)}>
+					{value}
+					</h3>
+
 					{trend && trendLabel ? (
-						<span
-							className={cn(
-								'mb-0.5 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold',
-								trendStyles[trend]
-							)}
-						>
-							{trendLabel}
-						</span>
+					<span
+						className={cn(
+						'mt-2 inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold',
+						trendStyles[trend]
+						)}
+					>
+						{trendLabel}
+					</span>
 					) : null}
 				</div>
-			)}
+				)}
 
-			{subtitle ? <p className="mt-1 text-[11px] font-semibold text-slate-500">{subtitle}</p> : null}
-		</div>
+				{subtitle ? (
+				<p className="mt-2 text-xs font-medium text-slate-500">
+					{subtitle}
+				</p>
+				) : null}
+			</div>
+			</div>
 	);
 }
 
