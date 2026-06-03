@@ -13,8 +13,6 @@ const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: fa
 const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
 const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
 
-const monthLabels = ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'];
-
 export function MonthlyImportCostChart() {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
@@ -24,20 +22,25 @@ export function MonthlyImportCostChart() {
     fetchMonthlyImportCost(selectedYear);
   }, [selectedYear, fetchMonthlyImportCost]);
 
-  const getMonthLabel = (monthStr: string): string => {
-    const parts = monthStr.split(/[\/\-]/);
-    const monthNum = parseInt(parts[0], 10);
+  const getMonthLabel = (monthStr: string | number): string => {
+    const str = String(monthStr).trim();
+    const monthNum = parseInt(str, 10);
     if (!isNaN(monthNum) && monthNum >= 1 && monthNum <= 12) {
-      return monthLabels[monthNum - 1];
+      return `Tháng ${monthNum}`;
     }
-    const match = monthStr.match(/(?:tháng|thang|month)[\s]*(\d+)/i);
+    const parts = str.split(/[-\/]/);
+    const firstNum = parseInt(parts[0], 10);
+    if (!isNaN(firstNum) && firstNum >= 1 && firstNum <= 12) {
+      return `Tháng ${firstNum}`;
+    }
+    const match = str.match(/(?:tháng|thang|month)[\s]*(\d+)/i);
     if (match) {
-      const monthNum = parseInt(match[1], 10);
-      if (!isNaN(monthNum) && monthNum >= 1 && monthNum <= 12) {
-        return monthLabels[monthNum - 1];
+      const m = parseInt(match[1], 10);
+      if (!isNaN(m) && m >= 1 && m <= 12) {
+        return `Tháng ${m}`;
       }
     }
-    return monthStr;
+    return str;
   };
 
   const chartData = monthlyImportCost.map((item: MonthlyImportCost) => ({
@@ -49,17 +52,16 @@ export function MonthlyImportCostChart() {
     <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
       <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h2 className="text-base font-bold text-slate-900 tracking-tight leading-tight font-headline">Chi phí nhập theo tháng</h2>
-          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">Chi phí nhập nguyên liệu hàng tháng (triệu đồng)</p>
+          <h2 className="text-base font-bold text-slate-900 tracking-tight leading-tight font-headline">Chi phí nhập theo tháng (Triệu đồng)</h2>
         </div>
         <div className="flex items-center gap-2">
           <label className="text-[10px] font-bold text-slate-600">Năm:</label>
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="text-[10px] px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="rounded-md border border-slate-300 px-2 py-1 text-[10px] focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
-            {[currentYear - 1, currentYear, currentYear + 1].map((year) => (
+            {Array.from({ length: 6 }, (_, index) => currentYear - index).map((year) => (
               <option key={year} value={year}>
                 {year}
               </option>
@@ -80,20 +82,40 @@ export function MonthlyImportCostChart() {
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 700 }}
-              tickFormatter={(value) => `${value / 1000000}`}
+              width={65}
+              tick={{
+                fill: '#94a3b8',
+                fontSize: 10,
+                fontWeight: 600,
+              }}
+              tickFormatter={(value) => {
+                if (value >= 1_000_000_000) {
+                  return `${(value / 1_000_000_000).toFixed(1)} tỷ`;
+                }
+
+                return `${Math.round(value / 1_000_000)} tr`;
+              }}
             />
+
             <Tooltip
               contentStyle={{
                 backgroundColor: '#fff',
                 borderRadius: '12px',
-                border: 'none',
+                border: '1px solid #e2e8f0',
                 boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
               }}
               formatter={(value: any) => {
                 if (value === undefined || value === null) return ['', ''];
-                const numValue = typeof value === 'number' ? value : Number(value);
-                return [`${numValue / 1000000} triệu`, 'Chi phí'];
+
+                const numValue =
+                  typeof value === 'number'
+                    ? value
+                    : Number(value);
+
+                return [
+                  `${numValue.toLocaleString('vi-VN')} đ`,
+                  'Chi phí nhập',
+                ];
               }}
             />
             <Bar dataKey="totalCost" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />

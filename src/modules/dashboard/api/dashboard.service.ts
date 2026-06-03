@@ -7,6 +7,7 @@ import { MonthlyRevenue } from '@/modules/dashboard/model/monthlyrevenue.model';
 import { SurvivalRate } from '@/modules/dashboard/model/survivalrate.model';
 import { apiClient } from '@/shared/api/api-client';
 import { ApiResponse } from '@/shared/types';
+import { MonthlyLiveBirths } from '../model/monthlylivebirths';
 
 const BASE_URL = '/api/v1/dashboard';
 
@@ -15,10 +16,13 @@ export const dashboardService = {
     apiClient.get<ApiResponse<WeightDistribution[]>>(`${BASE_URL}/weight-distribution`),
 
   getSurvivalRate: () =>
-    apiClient.get<ApiResponse<SurvivalRate[]>>(`${BASE_URL}/survival-rate`),
+    apiClient.get<ApiResponse<SurvivalRate>>(`${BASE_URL}/survival-rate`),
 
   getSummary: () =>
     apiClient.get<ApiResponse<Summary>>(`${BASE_URL}/summary`),
+
+  getMonthlyLiveBirths: (year: number) =>
+    apiClient.get<ApiResponse<MonthlyLiveBirths[]>>(`${BASE_URL}/monthly-live-births`, { params: { year } }),
 
   getMonthlyRevenue: (year: number) =>
     apiClient.get<ApiResponse<MonthlyRevenue[]>>(`${BASE_URL}/monthly-revenue`, { params: { year } }),
