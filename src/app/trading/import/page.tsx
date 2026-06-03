@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Plus, 
-  Search, 
-  Trash2, 
+import {
+  Plus,
+  Search,
+  Trash2,
   Calendar,
   Truck,
   Package,
@@ -37,8 +37,8 @@ import { CustomSelect } from "@/shared/components/ui/CustomSelect";
 
 // Models & Enums
 import { PigType } from "@/shared/enums/pig.enum";
-import { 
-  PigImportInvoiceResponse, 
+import {
+  PigImportInvoiceResponse,
   CreatePigImportInvoiceRequest,
   CreatePigImportInvoiceDetailRequest
 } from "@/modules/trading/model/import.model";
@@ -85,17 +85,17 @@ export default function ImportPage() {
   const [invoices, setInvoices] = useState<PigImportInvoiceResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Catalogs
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [breeds, setBreeds] = useState<BreedResponse[]>([]);
   const [pens, setPens] = useState<PenResponse[]>([]);
-  
+
   // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  
+
   // Selections
   const [selectedInvoice, setSelectedInvoice] = useState<PigImportInvoiceResponse | null>(null);
   const [invoiceToDelete, setInvoiceToDelete] = useState<PigImportInvoiceResponse | null>(null);
@@ -179,8 +179,8 @@ export default function ImportPage() {
 
   // Filtered invoices
   const filteredInvoices = invoices.filter(inv => {
-    const matchesSearch = 
-      inv.invoiceCode.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch =
+      inv.invoiceCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
       inv.supplierName.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
@@ -276,7 +276,7 @@ export default function ImportPage() {
   // Step 1 Inline Validation
   const validateStep1 = (): boolean => {
     const newErrors: Step1Errors = {};
-    
+
     // Validate Supplier
     const supplierName = supplierSelection === "manual" ? manualSupplierName.trim() : suppliers.find(s => s.id === supplierSelection)?.name;
     if (!supplierSelection) {
@@ -587,10 +587,10 @@ export default function ImportPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Hóa đơn nhập lợn</h1>
-          <p className="text-slate-500 text-sm mt-1">Quản lý hóa đơn nhập heo giống, heo đực và heo thịt từ các nhà cung cấp.</p>
+          <p className="text-slate-500 text-sm mt-1"></p>
         </div>
         <div className="flex gap-2">
-          <button 
+          <button
             onClick={handleOpenAddModal}
             className="px-6 py-2.5 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/20 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all"
           >
@@ -632,9 +632,9 @@ export default function ImportPage() {
         <div className="p-6 border-b border-slate-50 flex flex-wrap items-center justify-between gap-4">
           <div className="relative flex-1 min-w-[280px] max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Tìm theo mã hóa đơn, nhà cung cấp..." 
+            <input
+              type="text"
+              placeholder="Tìm theo mã hóa đơn, nhà cung cấp..."
               className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -685,14 +685,14 @@ export default function ImportPage() {
                     <td className="px-6 py-4 text-sm font-black text-emerald-700 text-right">{formatCurrency(record.totalAmount)}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button 
+                        <button
                           onClick={() => handleOpenDetailModal(record.id)}
                           className="p-2 text-slate-400 hover:text-[#006c49] transition-colors"
                           title="Xem chi tiết"
                         >
                           <Eye size={18} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleOpenDeleteModal(record)}
                           className="p-2 text-slate-400 hover:text-rose-600 transition-colors"
                           title="Xóa hóa đơn"
@@ -713,7 +713,7 @@ export default function ImportPage() {
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -740,7 +740,7 @@ export default function ImportPage() {
                     </span>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsModalOpen(false)}
                   className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors"
                 >
@@ -754,8 +754,8 @@ export default function ImportPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mã hóa đơn nhập (Mã tự sinh)</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         readOnly
                         value={invoiceCode}
                         className="w-full px-4 py-2.5 bg-slate-100 border-none rounded-xl text-sm font-bold text-slate-500 outline-none cursor-not-allowed opacity-75"
@@ -763,7 +763,7 @@ export default function ImportPage() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Đơn vị cung cấp (Nguồn gốc) *</label>
-                      <CustomSelect 
+                      <CustomSelect
                         value={supplierSelection}
                         onChange={(v) => {
                           setSupplierSelection(v);
@@ -781,8 +781,8 @@ export default function ImportPage() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ngày nhập *</label>
-                      <input 
-                        type="date" 
+                      <input
+                        type="date"
                         required
                         value={importDate}
                         onChange={(e) => {
@@ -805,8 +805,8 @@ export default function ImportPage() {
                   {supplierSelection === "manual" && (
                     <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/50 space-y-2 max-w-md">
                       <label className="text-[10px] font-black uppercase tracking-widest text-emerald-800">Nhập tên nhà cung cấp thủ công *</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
                         placeholder="Nhập tên đơn vị cung cấp..."
                         value={manualSupplierName}
@@ -883,8 +883,8 @@ export default function ImportPage() {
                                 />
                               </td>
                               <td className="px-3 py-2">
-                                <input 
-                                  type="number" 
+                                <input
+                                  type="number"
                                   min="1"
                                   required
                                   value={detail.quantity}
@@ -908,8 +908,8 @@ export default function ImportPage() {
                                 )}
                               </td>
                               <td className="px-3 py-2">
-                                <input 
-                                  type="number" 
+                                <input
+                                  type="number"
                                   min="0"
                                   required
                                   value={detail.unitPrice}
@@ -960,14 +960,14 @@ export default function ImportPage() {
                   </div>
 
                   <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 shrink-0">
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setIsModalOpen(false)}
                       className="px-8 py-2.5 bg-white text-slate-600 text-sm font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
                     >
                       Hủy
                     </button>
-                    <button 
+                    <button
                       type="button"
                       onClick={handleProceedToStep2}
                       className="px-8 py-2.5 bg-emerald-600 text-white text-sm font-bold rounded-full shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all"
@@ -1010,8 +1010,8 @@ export default function ImportPage() {
                                 </div>
                               </td>
                               <td className="px-3 py-1.5">
-                                <input 
-                                  type="text" 
+                                <input
+                                  type="text"
                                   required
                                   placeholder="Ví dụ: LT-001"
                                   value={pig.earTag}
@@ -1033,8 +1033,8 @@ export default function ImportPage() {
                                 )}
                               </td>
                               <td className="px-3 py-1.5">
-                                <input 
-                                  type="number" 
+                                <input
+                                  type="number"
                                   min="0"
                                   max="24"
                                   required
@@ -1044,8 +1044,8 @@ export default function ImportPage() {
                                 />
                               </td>
                               <td className="px-3 py-1.5">
-                                <input 
-                                  type="number" 
+                                <input
+                                  type="number"
                                   step="0.1"
                                   min="0.1"
                                   required
@@ -1068,8 +1068,8 @@ export default function ImportPage() {
                                 )}
                               </td>
                               <td className="px-3 py-1.5">
-                                <input 
-                                  type="number" 
+                                <input
+                                  type="number"
                                   step="0.1"
                                   min="0.1"
                                   required
@@ -1112,8 +1112,8 @@ export default function ImportPage() {
                                 )}
                               </td>
                               <td className="px-3 py-1.5">
-                                <input 
-                                  type="date" 
+                                <input
+                                  type="date"
                                   required
                                   value={pig.birthDate}
                                   onChange={(e) => handlePigInputChange(idx, 'birthDate', e.target.value)}
@@ -1128,14 +1128,14 @@ export default function ImportPage() {
                   </div>
 
                   <div className="p-6 border-t border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setStep(1)}
                       className="px-8 py-2.5 bg-white text-slate-600 text-sm font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
                     >
                       Quay lại
                     </button>
-                    <button 
+                    <button
                       type="submit"
                       disabled={loading}
                       className={cn(
@@ -1157,7 +1157,7 @@ export default function ImportPage() {
       <AnimatePresence>
         {isDetailModalOpen && selectedInvoice && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -1170,7 +1170,7 @@ export default function ImportPage() {
                   </h3>
                   <p className="text-xs text-slate-400 font-bold mt-0.5">Ngày lập hóa đơn: {formatDate(selectedInvoice.importDate)}</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsDetailModalOpen(false)}
                   className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors"
                 >
@@ -1255,7 +1255,7 @@ export default function ImportPage() {
               </div>
 
               <div className="p-6 border-t border-slate-100 flex justify-end bg-slate-50 shrink-0">
-                <button 
+                <button
                   onClick={() => setIsDetailModalOpen(false)}
                   className="px-8 py-2.5 bg-[#006c49] text-white text-sm font-bold rounded-full shadow-lg shadow-emerald-900/10 hover:brightness-110 active:scale-95 transition-all"
                 >
