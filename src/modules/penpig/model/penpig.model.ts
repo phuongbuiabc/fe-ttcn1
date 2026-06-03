@@ -26,7 +26,7 @@ export interface UpdatePenPigRequest {
 }
 
 export interface TransferPenPigRequest {
-  pigId?: string;
-  herdId?: string;
-  targetPenCode: string;
+   pigIds?: string[];
+   herdId?: string;
+   targetPenCode: string;
 }

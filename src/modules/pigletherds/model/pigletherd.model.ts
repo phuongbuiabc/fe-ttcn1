@@ -1,4 +1,5 @@
 import { PigletHerdStatus } from "@/shared/enums/pigletherd.enum";
+
 export interface PigletHerdResponse {
   id: string;
   herdName: string;
@@ -87,4 +88,12 @@ export interface PigletHerdDetailResponse {
   herd: PigletHerdResponse;
   growthHistory: PigletHerdGrowthHistoryItemResponse[];
   movementHistory: PigletHerdMovementHistoryItemResponse[];
+}
+
+export interface Split {
+  sourceHerdId: string;
+  litterNumber: number;
+  quantity: number;
+  movementDate: string;
+  reason: string;
 }

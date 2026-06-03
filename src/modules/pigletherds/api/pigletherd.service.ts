@@ -14,8 +14,12 @@ export const pigletHerdService = {
 
   getById: (id: string) =>
     apiClient.get<{ data: PigletHerdResponse }>(`${BASE_URL}/${id}`),
+
   getDetail: (id: string) =>
     apiClient.get<ApiResponse<any>>(`${BASE_URL}/${id}/detail`),
+
+  split: (id: string, data: any) =>
+    apiClient.post(`${BASE_URL}/${id}/split`, data),
 
   create: (data: CreatePigletHerdRequest) =>
     apiClient.post<{ data: PigletHerdResponse }>(BASE_URL, data),

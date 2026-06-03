@@ -180,8 +180,8 @@ const BucketTable = ({
 			</div>
 
 			{/* Table */}
-			<div className="responsive-table max-h-[65vh] overflow-x-auto overflow-y-auto rounded-lg border border-slate-200">
-				<table className="w-full text-left">
+			<div className="responsive-table max-h-[360px] overflow-x-auto overflow-y-auto rounded-lg border border-slate-200">
+				<table className="min-w-[1000px] table-fixed text-left">
 					<thead className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur">
 						<tr>
 							<th className="w-12 px-4 py-3">

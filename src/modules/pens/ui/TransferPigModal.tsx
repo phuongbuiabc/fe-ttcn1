@@ -73,19 +73,12 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
   }, [areas]);
 
   const sourcePens = useMemo(() => {
-    return pens.filter((pen) => {
-      if (!sourceAreaId) return true;
-      return pen.areaId === sourceAreaId;
-    });
-  }, [pens, sourceAreaId]);
+    return pens.filter((pen) => pen.areaId);
+  }, [pens]);
 
   const filteredPens = useMemo(() => {
-    return pens.filter((pen) => {
-      if (pen.id === sourcePenId) return false;
-      if (!targetAreaId) return true;
-      return pen.areaId === targetAreaId;
-    });
-  }, [pens, sourcePenId, targetAreaId]);
+    return pens.filter((pen) => pen.id !== sourcePenId);
+  }, [pens, sourcePenId]);
 
   const sourcePigs = useMemo(() => sourcePenDetail?.pigs || [], [sourcePenDetail]);
   const sourceHerds = useMemo(() => sourcePenDetail?.pigletHerds || [], [sourcePenDetail]);
@@ -107,8 +100,7 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
     return sourceHerds.filter((herd) => {
       if (!term) return true;
       return (
-        includesText(herd.id, term) ||
-        includesText(herd.herdCode, term) ||
+        includesText(herd.herdId, term) ||
         includesText(herd.herdName, term)
       );
     });
@@ -118,7 +110,7 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
   const filteredDisplayedHerds = useMemo(() => filteredHerds.slice(0, HERDS_PAGE_SIZE), [filteredHerds]);
 
   const allVisiblePigIds = useMemo(() => filteredDisplayedPigs.map((pig) => pig.pigId), [filteredDisplayedPigs]);
-  const allVisibleHerdIds = useMemo(() => filteredDisplayedHerds.map((herd) => herd.id), [filteredDisplayedHerds]);
+  const allVisibleHerdIds = useMemo(() => filteredDisplayedHerds.map((herd) => herd.herdId), [filteredDisplayedHerds]);
 
   const selectedPigItems = Object.values(selectedPigs);
   const selectedHerdItems = Object.values(selectedHerds);
@@ -203,13 +195,13 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
 
   const toggleHerd = (herd: PenPigletHerdSummary) => {
     setSelectedHerds((prev) => {
-      if (prev[herd.id]) {
+      if (prev[herd.herdId]) {
         const next = { ...prev };
-        delete next[herd.id];
+        delete next[herd.herdId];
         return next;
       }
 
-      return { ...prev, [herd.id]: herd };
+      return { ...prev, [herd.herdId]: herd };
     });
   };
 
@@ -249,7 +241,7 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
     setSelectedHerds((prev) => {
       const next = { ...prev };
       filteredDisplayedHerds.forEach((herd) => {
-        next[herd.id] = herd;
+        next[herd.herdId] = herd;
       });
       return next;
     });
@@ -265,29 +257,35 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
     setSelectedHerds({});
   };
 
-  const handleConfirm = async () => {
-    if (!targetPenCode || isSubmitting || allSelectedCount === 0) return;
+   const handleConfirm = async () => {
+     if (!targetPenCode || isSubmitting || allSelectedCount === 0) return;
 
-    const payloads: TransferPenPigRequest[] = [
-      ...selectedPigItems.map((pig) => ({ pigId: pig.pigId, targetPenCode })),
-      ...selectedHerdItems.map((herd) => ({ herdId: herd.id, targetPenCode })),
-    ];
+     const payloads: TransferPenPigRequest[] = [];
 
-    setIsSubmitting(true);
-    try {
-      for (const payload of payloads) {
-        await penPigService.transfer(payload);
-      }
+     if (selectedPigItems.length > 0) {
+       const pigIds = selectedPigItems.map(pig => pig.pigId);
+       payloads.push({ pigIds, targetPenCode });
+     }
 
-      await onTransferred?.(sourcePenId);
-      clearSelections();
-      onClose();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+     selectedHerdItems.forEach(herd => {
+       payloads.push({ herdId: herd.herdId, targetPenCode });
+     });
+
+     setIsSubmitting(true);
+     try {
+       for (const payload of payloads) {
+         await penPigService.transfer(payload);
+       }
+
+       await onTransferred?.(sourcePenId);
+       clearSelections();
+       onClose();
+     } catch (error) {
+       console.error(error);
+     } finally {
+       setIsSubmitting(false);
+     }
+   };
 
   return (
     <AnimatePresence>
@@ -315,7 +313,7 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
             <div className="flex min-h-0 flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
               <div className="border-b border-slate-200 bg-slate-50 px-4 py-4">
                 <div className="grid gap-3 lg:grid-cols-3">
-                  <div className="rounded-2xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
+                  {/* <div className="rounded-2xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
                     <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Khu vực</label>
                     <div className="relative">
                       <select
@@ -332,7 +330,7 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
                       </select>
                       <ChevronDown size={14} className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-slate-400" />
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="rounded-2xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
                     <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Chuồng hiện tại</label>
@@ -398,7 +396,7 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
                     onToggleItem={(pig) => togglePig(pig)}
                     isSelected={(pig) => Boolean(selectedPigs[pig.pigId])}
                     emptyText="Chuồng này chưa có lợn phù hợp với bộ lọc"
-                    columns={["Mã tai", "Loại", "Cân nặng"]}
+                    columns={["Số tai", "Loại", "Cân nặng"]}
                     renderRow={(pig) => [pig.earTag || "--", pig.type || "--", formatWeight(pig.currentWeight)]}
                   />
                 ) : (
@@ -412,7 +410,7 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
                     indeterminate={isHerdIndeterminate}
                     onToggleAll={toggleSelectAllHerds}
                     onToggleItem={(herd) => toggleHerd(herd)}
-                    isSelected={(herd) => Boolean(selectedHerds[herd.id])}
+                    isSelected={(herd) => Boolean(selectedHerds[herd.herdId])}
                     emptyText="Chuồng này chưa có đàn con phù hợp với bộ lọc"
                     columns={["Tên đàn", "Số lượng", "Cân nặng TB"]}
                     renderRow={(herd) => [herd.herdName || "--", String(herd.quantity ?? "--"), formatWeight(herd.averageWeight)]}
@@ -431,7 +429,7 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
                 </div>
 
                 <div className="space-y-3">
-                  <div>
+                  {/* <div>
                     <label className="mb-1.5 block text-xs font-semibold text-slate-500">Khu vực</label>
                     <div className="relative">
                       <select
@@ -451,7 +449,7 @@ export function TransferPigModal({ isOpen, onClose, pens, areas: propAreas, onTr
                       </select>
                       <ChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     </div>
-                  </div>
+                  </div> */}
 
                   <div>
                     <label className="mb-1.5 block text-xs font-semibold text-slate-500">Chuồng đích</label>
@@ -595,7 +593,7 @@ function BulkTransferTable<T extends { [key: string]: any }>({
                 const cells = renderRow(item);
 
                 return (
-                  <tr key={index} className={`transition ${isSelected(item) ? 'bg-emerald-50/70' : 'hover:bg-slate-50'}`}>
+                  <tr key={item.pigId || item.id || index} className={`transition ${isSelected(item) ? 'bg-emerald-50/70' : 'hover:bg-slate-50'}`}>
                     <td className="border-b border-slate-100 px-4 py-3 align-top">
                       <input
                         type="checkbox"

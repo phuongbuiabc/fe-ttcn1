@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { BaseSearch } from '@/shared/components/search';
-import { Eye, Edit, Trash2, Home } from 'lucide-react';
+import { Eye, Edit, Trash2, Home, Warehouse, UtensilsCrossed } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/shared/utils/utils';
 
@@ -16,9 +16,10 @@ interface Props {
   onView: (pen: PenResponse) => void;
   onEdit: (pen: PenResponse) => void;
   onDelete: (id: string) => void;
+  onFeed: (pen: PenResponse) => void;
 }
 
-export function PenTable({ pens, areas: propAreas, loading, onView, onEdit, onDelete }: Props) {
+export function PenTable({ pens, areas: propAreas, loading, onView, onEdit, onDelete, onFeed }: Props) {
   if (loading) {
     return (
       <div className="p-6 text-center text-sm text-gray-400">
@@ -182,6 +183,17 @@ export function PenTable({ pens, areas: propAreas, loading, onView, onEdit, onDe
                     className="p-1.5 text-slate-400 hover:text-emerald-600"
                   >
                     <Eye size={14} />
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onFeed?.(item);
+                    }}
+                    className="p-1.5 text-slate-400 hover:text-emerald-600"
+                    title="Cho ăn"
+                  >
+                    <UtensilsCrossed size={14} />
                   </button>
 
                   <button

@@ -12,19 +12,25 @@ import { PenTable } from '@/modules/pens/ui/PenTable';
 import { PenForm } from '@/modules/pens/ui/PenForm';
 import KPICard from '@/shared/components/KPICard';
 
+import { FeedPenForm } from '@/modules/feedration/ui/FeedPenForm';
+
 import { useArea } from '@/modules/area/hooks/useArea';
 import { usePen } from '@/modules/pens/hooks/usePen';
 
 import { PenStatus } from '@/shared/enums/pen.enum';
 import { PenResponse } from '@/modules/pens/model/pen.model';
+import { useInventory } from '@/modules/inventory/hooks/useInventory';
 
 export default function PenPage() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [openForm, setOpenForm] = useState(false);
   const [editingPen, setEditingPen] = useState<PenResponse | null>(null);
   const [selectedPenId, setSelectedPenId] = useState<string | null>(null);
   const [isDetailMode, setIsDetailMode] = useState(false);
+  const [feedPenOpen, setFeedPenOpen] = useState(false);
+  const [feedingPen, setFeedingPen] = useState<PenResponse | null>(null);
 
   const {
     pens,
@@ -46,6 +52,7 @@ export default function PenPage() {
 
   const pathname = usePathname();
   const title = getPageTitle(pathname);
+  const { feedOptions } = useInventory();
 
   useEffect(() => {
     fetchPens();
@@ -59,6 +66,11 @@ export default function PenPage() {
       maintenance: pens.filter((item) => item.status === PenStatus.MAINTENANCE).length,
     };
   }, [pens]);
+
+  const handleFeedPen = (pen: PenResponse) => {
+    setFeedingPen(pen);
+    setFeedPenOpen(true);
+  };
 
   const handleEdit = (pen: PenResponse) => {
     setEditingPen(pen);
@@ -83,6 +95,13 @@ export default function PenPage() {
 
   return (
     <div className="space-y-4 pb-20 bg-[#fbfcfd] min-h-screen -m-4 p-4">
+      {successMsg && (
+        <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-50">
+          <div className="bg-emerald-600 text-white px-4 py-2 rounded-xl shadow-lg">
+            {successMsg}
+          </div>
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-extrabold uppercase">{title}</h1>
 
@@ -106,27 +125,6 @@ export default function PenPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <KPICard
-          label="Đang sử dụng"
-          value={penKpis.inUse}
-          icon={Warehouse}
-          tone="emerald"
-        />
-        <KPICard
-          label="Trống"
-          value={penKpis.empty}
-          icon={DoorOpen}
-          tone="blue"
-        />
-        <KPICard
-          label="Bảo trì"
-          value={penKpis.maintenance}
-          icon={Wrench}
-          tone="amber"
-        />
-      </div>
-
       <div className={`grid gap-4 ${isDetailMode ? 'grid-cols-1 lg:grid-cols-10' : 'grid-cols-1'}`}>
         <div className={isDetailMode ? 'bg-white rounded-xl overflow-hidden lg:col-span-6' : 'bg-white rounded-xl overflow-hidden'}>
           <PenTable
@@ -141,6 +139,7 @@ export default function PenPage() {
             }}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onFeed={handleFeedPen}
           />
         </div>
 
@@ -163,6 +162,21 @@ export default function PenPage() {
         }}
         onSubmit={editingPen ? handleUpdate : handleCreate}
         initialData={editingPen}
+      />
+
+      <FeedPenForm
+        open={feedPenOpen}
+        penId={feedingPen?.id ?? ''}
+        penName={feedingPen?.name ?? ''}
+        feedOptions={feedOptions}
+        onClose={() => {
+          setFeedPenOpen(false);
+          setFeedingPen(null);
+        }}
+        onSuccess={() => {
+          setSuccessMsg('Ghi nhận cho ăn thành công');
+          setTimeout(() => setSuccessMsg(null), 2000);
+        }}
       />
 
       <TransferPigModal

@@ -1,5 +1,5 @@
 export enum DiseaseHistoryStatus {
-    ACTIVE = 'ACTIVE',
+    FOLLOWING = 'FOLLOWING',
     RECOVERED = 'RECOVERED',
     DECEASED = 'DECEASED',
 }

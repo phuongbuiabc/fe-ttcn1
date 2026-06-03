@@ -1,132 +1,174 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { Edit3, Trash2 } from 'lucide-react';
-import { BaseSearch } from '@/shared/components/search';
-import { DiseaseResponse } from '@/modules/disease/model/disease.model';
+import React, { useMemo, useState, useEffect } from 'react';
+import { Edit, Search, Trash2, X } from 'lucide-react';
 
-interface Props {
+import { DiseaseResponse } from '../model/disease.model';
+import { cn } from '@/shared/utils/utils';
+
+import { BaseSearch } from '@/shared/components/search';
+
+interface DiseaseTableProps {
   diseases: DiseaseResponse[];
   loading: boolean;
-  onEdit: (disease: DiseaseResponse) => void;
-  onDelete: (id: string) => void;
+  onEdit?: (disease: DiseaseResponse) => void;
+  onDelete?: (id: string) => void;
+  onCreate?: () => void;
 }
 
-const formatDate = (date?: string) => {
-  if (!date) return '';
-  return new Date(date).toLocaleDateString('vi-VN');
-};
-
-export const DiseaseTable: React.FC<Props> = ({
+export function DiseaseTable({
   diseases,
   loading,
   onEdit,
   onDelete,
-}) => {
+  onCreate,
+}: DiseaseTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState('');
 
-  const types = useMemo(() => {
-    const s = new Set<string>();
-    diseases.forEach((d) => d.diseaseType && s.add(d.diseaseType));
-    return Array.from(s);
-  }, [diseases]);
+  const filtered = useMemo(() => {
+    const key = searchTerm.toLowerCase().trim();
 
-  const visible = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    return diseases.filter((d) => {
-      if (selectedType && d.diseaseType !== selectedType) return false;
-      if (!term) return true;
-      const name = (d.name || '').toLowerCase();
-      const symptoms = (d.symptoms || '').toLowerCase();
-      return name.includes(term) || symptoms.includes(term);
-    });
-  }, [diseases, searchTerm, selectedType]);
+    return diseases.filter((d) =>
+      !key || d.name?.toLowerCase().includes(key)
+    );
+  }, [diseases, searchTerm]);
+
+  const hasActions = Boolean(onEdit || onDelete);
+
+  if (loading && diseases.length === 0) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-emerald-600" />
+      </div>
+    );
+  }
+
   return (
-    <div className="overflow-x-auto bg-white rounded-2xl border border-slate-100">
+    <div>
 
-      <div className="border-b border-slate-100 px-4 py-3">
-        <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
+      {/* SEARCH + ACTION BAR */}
+      <div className="px-6 py-4 bg-white border-b border-slate-100 flex items-center justify-between gap-3">
+
+        {/* SEARCH */}
+        <div className="flex-1 max-w-xs">
           <BaseSearch
             value={searchTerm}
             onChange={setSearchTerm}
-            placeholder="Tìm tên hoặc triệu chứng"
-            className="min-w-[240px] shrink-0"
+            placeholder="Tìm theo tên bệnh..."
           />
+        </div>
 
-          <label className="flex min-w-[180px] items-center gap-2">
-            <span className="text-[10px] font-bold uppercase text-slate-500">Loại</span>
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+        {/* ACTIONS */}
+        <div className="flex items-center gap-2">
+
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1"
             >
-              <option value="">Tất cả</option>
-              {types.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
-          </label>
+              <X size={14} />
+              Xóa
+            </button>
+          )}
+
+          {onCreate && (
+            <button
+              onClick={onCreate}
+              className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-semibold"
+            >
+              + Thêm bệnh
+            </button>
+          )}
         </div>
       </div>
 
-      <table className="w-full border-separate border-spacing-0 text-left [&_th]:border-0 [&_td]:border-0">
-        <thead className="sticky top-0 z-10 bg-slate-50">
-          <tr>
-            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">Tên bệnh</th>
-            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">Loại</th>
-            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">Triệu chứng</th>
-            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">Ngày tạo</th>
-            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">Hành động</th>
-          </tr>
-        </thead>
+      {/* TABLE */}
+      <div className="responsive-table max-h-[65vh] overflow-y-auto">
+        <table className="w-full text-left border-collapse">
 
-        <tbody>
-          {loading ? (
+          <thead className="sticky top-0 bg-slate-50 z-10">
             <tr>
-              <td className="py-10 text-center text-slate-500" colSpan={5}>
-                Đang tải...
-              </td>
-            </tr>
-          ) : visible.length === 0 ? (
-            <tr>
-              <td className="py-10 text-center text-slate-500" colSpan={5}>
-                Không có dữ liệu
-              </td>
-            </tr>
-          ) : (
-            visible.map((d) => (
-              <tr key={d.id} className="transition hover:bg-slate-50">
-                <td className="px-6 py-4 font-medium text-sm">{d.name}</td>
-                <td className="px-6 py-4 text-sm">{d.diseaseType}</td>
-                <td className="px-6 py-4 text-sm">{d.symptoms}</td>
-                <td className="px-6 py-4 text-sm">{formatDate(d.createdAt)}</td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex justify-end gap-2">
-                    <button
-                      aria-label="Sửa"
-                      title="Sửa"
-                      className="p-2 rounded-full hover:bg-slate-50 text-blue-600"
-                      onClick={() => onEdit(d)}
-                    >
-                      <Edit3 size={16} />
-                    </button>
+              <th className="px-6 py-3 text-[10px] font-black uppercase text-slate-700">
+                Tên bệnh
+              </th>
+              <th className="px-6 py-3 text-[10px] font-black uppercase text-slate-700">
+                Loại bệnh
+              </th>
+              <th className="px-6 py-3 text-[10px] font-black uppercase text-slate-700">
+                Triệu chứng
+              </th>
 
-                    <button
-                      aria-label="Xóa"
-                      title="Xóa"
-                      className="p-2 rounded-full hover:bg-slate-50 text-rose-600"
-                      onClick={() => onDelete(d.id)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+              {hasActions && (
+                <th className="px-6 py-3 text-right text-[10px] font-black uppercase text-slate-700">
+                  Thao tác
+                </th>
+              )}
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-slate-50">
+            {filtered.map((disease) => (
+              <tr
+                key={disease.id}
+                className="hover:bg-slate-50 transition"
+              >
+                <td className="px-6 py-3 text-sm font-semibold text-slate-900">
+                  {disease.name}
+                </td>
+
+                <td className="px-6 py-3 text-sm text-slate-700">
+                  {disease.diseaseType || '--'}
+                </td>
+
+                <td className="px-6 py-3 text-sm text-slate-600">
+                  {disease.symptoms || '--'}
+                </td>
+
+                {hasActions && (
+                  <td className="px-6 py-3 text-right">
+                    <div className="flex justify-end gap-2">
+
+                      {onEdit && (
+                        <button
+                          onClick={() => onEdit(disease)}
+                          className="text-xs font-semibold text-blue-600"
+                        >
+                          <Edit size={16} />
+                        </button>
+                      )}
+
+                      {onDelete && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(disease.id);
+                          }}
+                          className="text-slate-400 hover:text-rose-600"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))}
+
+            {filtered.length === 0 && (
+              <tr>
+                <td
+                  colSpan={hasActions ? 4 : 3}
+                  className="text-center py-10 text-xs text-slate-400 font-semibold"
+                >
+                  Không có dữ liệu bệnh
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+
+        </table>
+      </div>
     </div>
   );
-};
+}

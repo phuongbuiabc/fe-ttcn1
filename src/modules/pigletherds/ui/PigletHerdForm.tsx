@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { usePig } from '@/modules/pig/hooks/usePig';
+import { usePen } from '@/modules/pens/hooks/usePen';
 import { PigResponse } from '@/modules/pig/model/pig.model';
 import {
   CreatePigletHerdRequest,
@@ -40,20 +41,30 @@ const emptyForm: HerdFormState = {
 };
 
 const statusOptions = [
-  { label: 'Chưa cai sữa', value: PigletHerdStatus.UNWEANED },
+  { label: 'Theo mẹ', value: PigletHerdStatus.UNWEANED },
   { label: 'Cai sữa', value: PigletHerdStatus.WEANED },
 ];
 
-export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Props) {
+export function PigletHerdForm({
+  initialData,
+  onSubmit,
+  onClose,
+  loading,
+}: Props) {
   const { pigs, fetchPigs } = usePig();
+  const { pens, fetchPens } = usePen();
+
   const [form, setForm] = useState<HerdFormState>(emptyForm);
   const [motherEarTagInput, setMotherEarTagInput] = useState('');
   const [fatherEarTagInput, setFatherEarTagInput] = useState('');
-  const [activeSuggestionField, setActiveSuggestionField] = useState<'mother' | 'father' | null>(null);
+  const [activeSuggestionField, setActiveSuggestionField] = useState<
+    'mother' | 'father' | null
+  >(null);
 
   useEffect(() => {
     fetchPigs();
-  }, [fetchPigs]);
+    fetchPens();
+  }, [fetchPigs, fetchPens]);
 
   const pigById = useMemo(() => {
     const map: Record<string, PigResponse> = {};
@@ -67,7 +78,11 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
     const normalized = earTag.trim().toLowerCase();
     if (!normalized) return null;
 
-    return pigs.find((pig) => (pig.earTag || '').trim().toLowerCase() === normalized) || null;
+    return (
+      pigs.find(
+        (pig) => (pig.earTag || '').trim().toLowerCase() === normalized
+      ) || null
+    );
   };
 
   const getSuggestions = (keyword: string) => {
@@ -76,7 +91,9 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
     if (!normalized) return source.slice(0, 8);
 
     return source
-      .filter((pig) => (pig.earTag || '').toLowerCase().includes(normalized))
+      .filter((pig) =>
+        (pig.earTag || '').toLowerCase().includes(normalized)
+      )
       .slice(0, 8);
   };
 
@@ -107,11 +124,19 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
       isSold: initialData.isSold ?? false,
     });
 
-    const motherPig = initialData.motherId ? pigById[initialData.motherId] : null;
-    const fatherPig = initialData.fatherId ? pigById[initialData.fatherId] : null;
+    const motherPig = initialData.motherId
+      ? pigById[initialData.motherId]
+      : null;
+    const fatherPig = initialData.fatherId
+      ? pigById[initialData.fatherId]
+      : null;
 
-    setMotherEarTagInput(initialData.motherEarTag || motherPig?.earTag || '');
-    setFatherEarTagInput(initialData.fatherEarTag || fatherPig?.earTag || '');
+    setMotherEarTagInput(
+      initialData.motherEarTag || motherPig?.earTag || ''
+    );
+    setFatherEarTagInput(
+      initialData.fatherEarTag || fatherPig?.earTag || ''
+    );
   }, [initialData, pigById]);
 
   const handleChange = (key: keyof HerdFormState, value: any) => {
@@ -143,6 +168,7 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
   const handleMotherChange = (value: string) => {
     setMotherEarTagInput(value);
     const matched = resolvePigByEarTag(value);
+
     setForm((prev) => ({
       ...prev,
       motherId: matched?.id || '',
@@ -154,6 +180,7 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
   const handleFatherChange = (value: string) => {
     setFatherEarTagInput(value);
     const matched = resolvePigByEarTag(value);
+
     setForm((prev) => ({
       ...prev,
       fatherId: matched?.id || '',
@@ -169,11 +196,15 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
     onSubmit({
       ...form,
       motherId: mother?.id || form.motherId || undefined,
-      motherEarTag: mother?.earTag || form.motherEarTag || motherEarTagInput || undefined,
-      motherBreed: mother?.breedName || mother?.species || form.motherBreed || undefined,
+      motherEarTag:
+        mother?.earTag || form.motherEarTag || motherEarTagInput || undefined,
+      motherBreed:
+        mother?.breedName || mother?.species || form.motherBreed || undefined,
       fatherId: father?.id || form.fatherId || undefined,
-      fatherEarTag: father?.earTag || form.fatherEarTag || fatherEarTagInput || undefined,
-      fatherBreed: father?.breedName || father?.species || form.fatherBreed || undefined,
+      fatherEarTag:
+        father?.earTag || form.fatherEarTag || fatherEarTagInput || undefined,
+      fatherBreed:
+        father?.breedName || father?.species || form.fatherBreed || undefined,
     });
   };
 
@@ -185,14 +216,20 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
     children: React.ReactNode;
   }) => (
     <div className="space-y-1">
-      <label className="text-xs font-semibold text-gray-500 uppercase">{label}</label>
+      <label className="text-xs font-semibold text-gray-500 uppercase">
+        {label}
+      </label>
       {children}
     </div>
   );
 
-  const renderPigSuggestions = (field: 'mother' | 'father', keyword: string) => {
+  const renderPigSuggestions = (
+    field: 'mother' | 'father',
+    keyword: string
+  ) => {
     const suggestions = getSuggestions(keyword);
-    if (activeSuggestionField !== field || suggestions.length === 0) return null;
+    if (activeSuggestionField !== field || suggestions.length === 0)
+      return null;
 
     return (
       <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto rounded-xl border border-slate-100 bg-white shadow-lg">
@@ -202,16 +239,18 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
             type="button"
             onMouseDown={(e) => {
               e.preventDefault();
-              if (field === 'mother') {
-                applyMotherSelection(pig);
-              } else {
-                applyFatherSelection(pig);
-              }
+              field === 'mother'
+                ? applyMotherSelection(pig)
+                : applyFatherSelection(pig);
             }}
             className="block w-full px-3 py-2 text-left text-sm hover:bg-slate-50"
           >
-            <span className="font-semibold text-slate-800">{pig.earTag}</span>
-            <span className="ml-2 text-xs text-slate-400">({pig.id})</span>
+            <span className="font-semibold text-slate-800">
+              {pig.earTag}
+            </span>
+            <span className="ml-2 text-xs text-slate-400">
+              ({pig.id})
+            </span>
           </button>
         ))}
       </div>
@@ -229,8 +268,6 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
           type="button"
           onClick={onClose}
           className="p-2 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-          aria-label="Đóng"
-          title="Đóng"
         >
           <X size={16} />
         </button>
@@ -239,9 +276,10 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
       <Field label="Tên đàn">
         <input
           value={form.herdName}
-          onChange={(e) => handleChange('herdName', e.target.value)}
+          onChange={(e) =>
+            handleChange('herdName', e.target.value)
+          }
           className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
-          placeholder="Nhập tên đàn"
         />
       </Field>
 
@@ -249,18 +287,29 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
         <input
           type="number"
           value={form.litterNumber}
-          onChange={(e) => handleChange('litterNumber', Number(e.target.value))}
+          onChange={(e) =>
+            handleChange('litterNumber', Number(e.target.value))
+          }
           className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
         />
       </Field>
 
+      {/* PEN SELECT */}
       <Field label="Chuồng nuôi">
-        <input
+        <select
           value={form.penId || ''}
-          onChange={(e) => handleChange('penId', e.target.value)}
+          onChange={(e) =>
+            handleChange('penId', e.target.value)
+          }
           className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
-          placeholder="Nhập mã chuồng"
-        />
+        >
+          <option value="">-- Chọn chuồng --</option>
+          {pens.map((pen) => (
+            <option key={pen.id} value={pen.id}>
+              {pen.name}
+            </option>
+          ))}
+        </select>
       </Field>
 
       <Field label="Số tai lợn mẹ">
@@ -272,8 +321,9 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
               setActiveSuggestionField('mother');
             }}
             onFocus={() => setActiveSuggestionField('mother')}
-            onBlur={() => setTimeout(() => setActiveSuggestionField(null), 120)}
-            placeholder="Nhập số tai lợn mẹ"
+            onBlur={() =>
+              setTimeout(() => setActiveSuggestionField(null), 120)
+            }
             className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
           />
           {renderPigSuggestions('mother', motherEarTagInput)}
@@ -289,8 +339,9 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
               setActiveSuggestionField('father');
             }}
             onFocus={() => setActiveSuggestionField('father')}
-            onBlur={() => setTimeout(() => setActiveSuggestionField(null), 120)}
-            placeholder="Nhập số tai lợn bố"
+            onBlur={() =>
+              setTimeout(() => setActiveSuggestionField(null), 120)
+            }
             className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
           />
           {renderPigSuggestions('father', fatherEarTagInput)}
@@ -302,7 +353,6 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
           value={form.motherBreed || ''}
           readOnly
           className="w-full bg-slate-50 px-3 py-2 rounded outline-none text-slate-500"
-          placeholder="Tự lấy theo số tai mẹ"
         />
       </Field>
 
@@ -311,7 +361,6 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
           value={form.fatherBreed || ''}
           readOnly
           className="w-full bg-slate-50 px-3 py-2 rounded outline-none text-slate-500"
-          placeholder="Tự lấy theo số tai bố"
         />
       </Field>
 
@@ -319,7 +368,9 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
         <input
           type="number"
           value={form.quantity}
-          onChange={(e) => handleChange('quantity', Number(e.target.value))}
+          onChange={(e) =>
+            handleChange('quantity', Number(e.target.value))
+          }
           className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
         />
       </Field>
@@ -327,7 +378,9 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
       <Field label="Ghi chú giới tính">
         <input
           value={form.genderNote || ''}
-          onChange={(e) => handleChange('genderNote', e.target.value)}
+          onChange={(e) =>
+            handleChange('genderNote', e.target.value)
+          }
           className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
         />
       </Field>
@@ -336,7 +389,9 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
         <input
           type="number"
           value={form.averageBirthWeight}
-          onChange={(e) => handleChange('averageBirthWeight', Number(e.target.value))}
+          onChange={(e) =>
+            handleChange('averageBirthWeight', Number(e.target.value))
+          }
           className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
         />
       </Field>
@@ -345,24 +400,22 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
         <input
           type="date"
           value={form.birthDate || ''}
-          onChange={(e) => handleChange('birthDate', e.target.value)}
+          onChange={(e) =>
+            handleChange('birthDate', e.target.value)
+          }
           className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
-        />
-      </Field>
-
-      <Field label="Tinh dịch / Mã phối giống">
-        <input
-          value={form.semenId || ''}
-          onChange={(e) => handleChange('semenId', e.target.value)}
-          className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
-          placeholder="Nhập semenId"
         />
       </Field>
 
       <Field label="Trạng thái">
         <select
           value={form.status || PigletHerdStatus.UNWEANED}
-          onChange={(e) => handleChange('status', e.target.value as HerdFormState['status'])}
+          onChange={(e) =>
+            handleChange(
+              'status',
+              e.target.value as HerdFormState['status']
+            )
+          }
           className="w-full bg-slate-100 px-3 py-2 rounded outline-none"
         >
           {statusOptions.map((option) => (
@@ -377,8 +430,9 @@ export function PigletHerdForm({ initialData, onSubmit, onClose, loading }: Prop
         <input
           type="checkbox"
           checked={!!form.isSold}
-          onChange={(e) => handleChange('isSold', e.target.checked)}
-          className="h-4 w-4 rounded border-slate-300"
+          onChange={(e) =>
+            handleChange('isSold', e.target.checked)
+          }
         />
         Đã bán
       </label>
