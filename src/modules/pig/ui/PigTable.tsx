@@ -33,7 +33,8 @@ export function PigTable({ pigs, loading, onEdit, onDelete, onView }: PigTablePr
   const typeOptions: SelectOption[] = [
     { label: 'Nái', value: PigType.NAI },
     { label: 'Nọc', value: PigType.NOC },
-    { label: 'Thịt', value: PigType.THIT },
+    { label: 'Nái thịt', value: PigType.NAI_THIT },
+    { label: 'Nọc thịt', value: PigType.NOC_THIT },
   ];
   // Breed options for filter (from breed API)
   const { options: breedOptions, fetchBreeds: fetchBreedOptions } = useBreed();
