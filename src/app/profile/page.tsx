@@ -12,6 +12,7 @@ import { Employee } from "@/shared/types";
 import { motion } from "motion/react";
 import { useAuth } from "@/shared/components/AuthProvider";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -107,20 +108,40 @@ export default function ProfilePage() {
         )} />
         
         <div className="relative flex flex-col md:flex-row items-center gap-8">
-          <div className="relative">
+          <div 
+            className="relative cursor-pointer group"
+            onClick={() => router.push("/settings?tab=account")}
+            title="Đổi ảnh đại diện"
+          >
             <div className={cn(
-              "w-32 h-32 rounded-[1.5rem] overflow-hidden p-1 border shadow-xl transition-all",
+              "w-32 h-32 rounded-[1.5rem] overflow-hidden p-1 border shadow-xl transition-all group-hover:scale-98 relative bg-white/5",
               isAdmin ? "bg-amber-500/10 border-amber-500/30 rotate-1" : "bg-white/10 border-white/20"
             )}>
-              <div className={cn(
-                "w-full h-full rounded-[1.25rem] flex items-center justify-center text-5xl font-black text-white shadow-inner",
-                isAdmin ? "bg-gradient-to-br from-amber-500 to-orange-600" : "bg-emerald-500"
-              )}>
-                {profile.firstName.charAt(0)}
+              {user?.avatarUrl ? (
+                <div className="w-full h-full rounded-[1.25rem] overflow-hidden relative">
+                  <Image
+                    src={user.avatarUrl}
+                    alt="Avatar"
+                    fill
+                    className="object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              ) : (
+                <div className={cn(
+                  "w-full h-full rounded-[1.25rem] flex items-center justify-center text-5xl font-black text-white shadow-inner",
+                  isAdmin ? "bg-gradient-to-br from-amber-500 to-orange-600" : "bg-emerald-500"
+                )}>
+                  {profile.firstName.charAt(0)}
+                </div>
+              )}
+              {/* Hover overlay */}
+              <div className="absolute inset-1 rounded-[1.25rem] bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center text-white">
+                <span className="text-[10px] font-black uppercase tracking-widest bg-slate-900/60 px-2.5 py-1.5 rounded-lg backdrop-blur-sm">Sửa</span>
               </div>
             </div>
             <button className={cn(
-              "absolute -bottom-1 -right-1 w-10 h-10 rounded-xl flex items-center justify-center shadow-xl transition-all border-[3px]",
+              "absolute -bottom-1 -right-1 w-10 h-10 rounded-xl flex items-center justify-center shadow-xl transition-all border-[3px] z-10",
               isAdmin ? "bg-white text-indigo-900 border-slate-950" : "bg-white text-slate-900 border-slate-900"
             )}>
               <Camera size={16} />

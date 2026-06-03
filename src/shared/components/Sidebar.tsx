@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
+import {
+  LayoutDashboard,
   Plus,
-  Settings, 
+  Settings,
   HelpCircle,
   ChevronRight,
   ChevronDown,
@@ -62,9 +62,9 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
     { name: "Sức khỏe", icon: Stethoscope, href: "/health/growth-tracking" },
     { name: "Chuồng nuôi", icon: Warehouse, href: "/pens" },
     { name: "Vật tư", icon: Database, href: "/inventory" },
-    { 
-      name: "Mua bán", 
-      icon: ShoppingCart, 
+    {
+      name: "Mua bán lợn",
+      icon: ShoppingCart,
       href: "/trading",
       children: [
         { name: "Nhập lợn", icon: ArrowDownLeft, href: "/trading/import" },
@@ -73,9 +73,9 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
     },
     { name: "Nhà cung cấp", icon: Truck, href: "/suppliers" },
     ...(isFarmManager ? [
-      { 
-        name: "Nhân sự", 
-        icon: Users, 
+      {
+        name: "Nhân sự",
+        icon: Users,
         href: "/staff",
         children: [
           { name: "Nhân viên", icon: User, href: "/staff" },
@@ -109,7 +109,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           </div>
           <h1 className="text-lg font-black tracking-tighter text-white font-headline">MDFARM</h1>
         </Link>
-        <button 
+        <button
           onClick={onClose}
           className="lg:hidden p-2 text-slate-400 hover:text-white transition-colors"
         >
@@ -125,7 +125,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
             (item.href !== "/" && pathname.startsWith(item.href)) ||
             (hasChildren && pathname.startsWith(item.href)) ||
             (item.name === 'Sức khỏe' && pathname.startsWith('/health'));
-          
+
           if (hasChildren) {
             const isExpanded = expandedItems.includes(item.name);
             return (
@@ -135,7 +135,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
                   className={cn(
                     "w-full group flex items-center justify-between px-4 py-2 rounded-lg transition-all duration-200 relative overflow-hidden",
                     isActive && !isExpanded
-                      ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-900/40" 
+                      ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-900/40"
                       : "text-slate-400 hover:bg-white/5 hover:text-white"
                   )}
                 >
@@ -151,7 +151,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
                     <ChevronRight size={14} className={cn(isActive && !isExpanded ? "text-white" : "text-slate-600")} />
                   </motion.div>
                 </button>
-                
+
                 <AnimatePresence initial={false}>
                   {isExpanded && (
                     <motion.div
@@ -169,8 +169,8 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
                             href={child.href}
                             className={cn(
                               "flex items-center gap-3 px-4 py-1.5 rounded-lg transition-all group/child relative",
-                              isChildActive 
-                                ? "text-white font-bold bg-white/5 border border-white/5" 
+                              isChildActive
+                                ? "text-white font-bold bg-white/5 border border-white/5"
                                 : "text-slate-500 hover:text-emerald-400 hover:bg-white/5"
                             )}
                           >
@@ -192,7 +192,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
               href={item.href}
               className={cn(
                 "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 relative overflow-hidden",
-                isActive 
+                isActive
                   ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-900/40"
                   : "text-slate-400 hover:bg-white/5 hover:text-white"
               )}

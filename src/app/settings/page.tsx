@@ -19,7 +19,8 @@ import {
   Camera,
   Check,
   X,
-  Clock
+  Clock,
+  Upload
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/utils/utils";
@@ -27,6 +28,7 @@ import Image from "next/image";
 import { useAuth } from "@/shared/components/AuthProvider";
 import { staffService } from "@/modules/staff/api/staff.service";
 import { Employee } from "@/shared/types";
+import { BaseModal } from "@/shared/components/ui/BaseModal";
 
 // --- Types ---
 interface FarmSettings {
@@ -45,17 +47,79 @@ interface FarmSettings {
   };
 }
 
+const PRESET_AVATARS = [
+  // Cute Piggy
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100%" height="100%" rx="30" fill="%23FFE4E6"/><circle cx="50" cy="50" r="30" fill="%23FDA4AF"/><circle cx="40" cy="45" r="4" fill="%23475569"/><circle cx="60" cy="45" r="4" fill="%23475569"/><ellipse cx="50" cy="56" rx="12" ry="8" fill="%23F43F5E"/><circle cx="46" cy="56" r="2.5" fill="%23BE123C"/><circle cx="54" cy="56" r="2.5" fill="%23BE123C"/><path d="M26 34 C 22 20 34 22 36 28" stroke="%23FDA4AF" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M74 34 C 78 20 66 22 64 28" stroke="%23FDA4AF" stroke-width="5" stroke-linecap="round" fill="none"/></svg>`,
+  // Farmer Man
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100%" height="100%" rx="30" fill="%23ECFDF5"/><circle cx="50" cy="48" r="20" fill="%23FDBA74"/><path d="M30 68 C 30 55 40 55 50 55 C 60 55 70 55 70 68 Z" fill="%23059669"/><ellipse cx="50" cy="38" rx="24" ry="6" fill="%23EAB308"/><path d="M35 38 C 35 24 65 24 65 38" fill="%23CA8A04"/><circle cx="44" cy="48" r="2.5" fill="%231E293B"/><circle cx="56" cy="48" r="2.5" fill="%231E293B"/><path d="M46 56 Q 50 59 54 56" stroke="%231E293B" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`,
+  // Vet Woman
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100%" height="100%" rx="30" fill="%23F0FDF4"/><circle cx="50" cy="46" r="20" fill="%23FFD8A8"/><path d="M30 72 C 30 58 40 58 50 58 C 60 58 70 72 70 72 Z" fill="%230D9488"/><path d="M34 32 C 34 22 66 22 66 32 C 66 38 34 38 34 32 Z" fill="%23115E59"/><circle cx="43" cy="46" r="2" fill="%231E293B"/><circle cx="57" cy="46" r="2" fill="%231E293B"/><path d="M46 54 Q 50 57 54 54" stroke="%231E293B" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M38 58 C 38 68 62 68 62 58" stroke="%23E2E8F0" stroke-width="3.5" fill="none"/></svg>`,
+  // Vet Man
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100%" height="100%" rx="30" fill="%23EEF2F6"/><circle cx="50" cy="46" r="20" fill="%23FED7AA"/><path d="M30 72 C 30 60 40 60 50 60 C 60 60 70 72 70 72 Z" fill="%234F46E5"/><path d="M35 35 C 35 24 65 24 65 35 Z" fill="%23312E81"/><circle cx="44" cy="46" r="2" fill="%231E293B"/><circle cx="56" cy="46" r="2" fill="%231E293B"/><path d="M46 54 Q 50 57 54 54" stroke="%231E293B" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>`,
+  // Manager Woman
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100%" height="100%" rx="30" fill="%23FDF4FF"/><circle cx="50" cy="48" r="20" fill="%23FDBA74"/><path d="M30 72 C 30 60 40 60 50 60 C 60 60 70 72 70 72 Z" fill="%237C3AED"/><path d="M32 32 C 32 18 68 18 68 32 Z" fill="%234C1D95"/><circle cx="44" cy="48" r="2" fill="%231E293B"/><circle cx="56" cy="48" r="2" fill="%231E293B"/><path d="M46 56 Q 50 59 54 56" stroke="%231E293B" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>`,
+  // Tech Farmer
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100%" height="100%" rx="30" fill="%23F0F9FF"/><circle cx="50" cy="46" r="20" fill="%23FDBA74"/><path d="M30 70 C 30 58 40 58 50 58 C 60 58 70 70 70 70 Z" fill="%230284C7"/><path d="M26 40 C 26 26 74 26 74 40" stroke="%230F172A" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="23" y="38" width="6" height="12" rx="2" fill="%230F172A"/><rect x="71" y="38" width="6" height="12" rx="2" fill="%230F172A"/><circle cx="44" cy="46" r="2" fill="%231E293B"/><circle cx="56" cy="46" r="2" fill="%231E293B"/><path d="M47 54 Q 50 57 53 54" stroke="%231E293B" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>`,
+  // Cute Cow
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100%" height="100%" rx="30" fill="%23FEF3C7"/><ellipse cx="50" cy="52" rx="25" ry="22" fill="%23FFFFFF"/><ellipse cx="50" cy="62" rx="16" ry="10" fill="%23F3F4F6"/><circle cx="40" cy="48" r="3" fill="%231E293B"/><circle cx="60" cy="48" r="3" fill="%231E293B"/><circle cx="44" cy="62" r="2" fill="%239CA3AF"/><circle cx="56" cy="62" r="2" fill="%239CA3AF"/><ellipse cx="25" cy="38" rx="8" ry="12" fill="%23F3F4F6" transform="rotate(-30, 25, 38)"/><ellipse cx="75" cy="38" rx="8" ry="12" fill="%23F3F4F6" transform="rotate(30, 75, 38)"/></svg>`,
+  // Cute Rooster
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100%" height="100%" rx="30" fill="%23FFF7ED"/><circle cx="50" cy="54" r="26" fill="%23FDBA74"/><path d="M50 20 Q 50 32 40 32 Q 50 32 60 32 Z" fill="%23EF4444"/><polygon points="44,56 56,56 50,68" fill="%23F97316"/><circle cx="42" cy="48" r="3.5" fill="%231E293B"/><circle cx="58" cy="48" r="3.5" fill="%231E293B"/></svg>`
+];
+
 function SettingsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout, updateLocalAvatar } = useAuth();
   const tabParam = searchParams.get("tab");
 
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [profile, setProfile] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Avatar Modal State
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [tempSelectedAvatar, setTempSelectedAvatar] = useState<string>("");
+  const [uploadError, setUploadError] = useState<string>("");
+
+  const handleOpenAvatarModal = () => {
+    setTempSelectedAvatar(user?.avatarUrl || "");
+    setUploadError("");
+    setIsAvatarModalOpen(true);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setUploadError("Kích thước ảnh không được vượt quá 2MB. Vui lòng chọn ảnh nhỏ hơn.");
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Vui lòng tải lên một tệp tin hình ảnh hợp lệ (PNG, JPG, JPEG, v.v.)");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        setTempSelectedAvatar(reader.result);
+        setUploadError("");
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveAvatar = () => {
+    if (tempSelectedAvatar) {
+      updateLocalAvatar(tempSelectedAvatar);
+      addActivityLog("Thay đổi ảnh đại diện cá nhân");
+    }
+    setIsAvatarModalOpen(false);
+  };
 
   const [activityLogs, setActivityLogs] = useState<any[]>([]);
   const [systemNotifications, setSystemNotifications] = useState<any[]>([]);
@@ -419,8 +483,12 @@ function SettingsContent() {
                   <div>
                     <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Thông tin Cá nhân</h3>
                     <div className="flex flex-col md:flex-row items-center gap-10 mb-10">
-                      <div className="relative group">
-                        <div className="w-40 h-40 rounded-[2.5rem] overflow-hidden border-4 border-slate-100 shadow-xl relative bg-white flex items-center justify-center">
+                      <div 
+                        className="relative group cursor-pointer"
+                        onClick={handleOpenAvatarModal}
+                        title="Click để đổi ảnh đại diện"
+                      >
+                        <div className="w-40 h-40 rounded-[2.5rem] overflow-hidden border-4 border-slate-100 shadow-xl relative bg-white flex items-center justify-center transition-all group-hover:scale-98">
                           {user?.avatarUrl ? (
                             <Image
                               src={user.avatarUrl}
@@ -434,8 +502,17 @@ function SettingsContent() {
                               {profile?.firstName?.charAt(0) || user?.givenName?.charAt(0) || "U"}
                             </div>
                           )}
+                          <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center text-white">
+                            <span className="text-xs font-black uppercase tracking-widest bg-slate-900/60 px-3 py-1.5 rounded-xl backdrop-blur-sm">Thay đổi</span>
+                          </div>
                         </div>
-                        <button className="absolute -bottom-2 -right-2 p-3 bg-emerald-600 text-white rounded-2xl shadow-xl hover:scale-110 transition-all border-4 border-white">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenAvatarModal();
+                          }}
+                          className="absolute -bottom-2 -right-2 p-3 bg-emerald-600 text-white rounded-2xl shadow-xl hover:scale-110 transition-all border-4 border-white"
+                        >
                           <Camera size={20} />
                         </button>
                       </div>
@@ -500,23 +577,7 @@ function SettingsContent() {
                     </div>
                   </div>
 
-                  <div className="pt-10 border-t border-slate-50">
-                    <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Liên kết Tài khoản</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm">
-                            <Globe size={24} className="text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-slate-900">Google Account</p>
-                            <p className="text-xs text-slate-400 font-medium">marcus.thorne@gmail.com</p>
-                          </div>
-                        </div>
-                        <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest rounded-full">Đã kết nối</span>
-                      </div>
-                    </div>
-                  </div>
+
                 </motion.div>
               )}
 
@@ -591,45 +652,7 @@ function SettingsContent() {
                     </div>
                   </div>
 
-                  <div className="pt-10 border-t border-slate-50">
-                    <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Bảo mật nâng cao</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 flex flex-col justify-between">
-                        <div className="space-y-4">
-                          <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-sm">
-                            <Shield size={28} />
-                          </div>
-                          <div>
-                            <p className="text-base font-black text-slate-900">Xác thực 2 yếu tố (2FA)</p>
-                            <p className="text-xs text-slate-400 font-bold mt-1 leading-relaxed">Tăng cường bảo mật bằng cách yêu cầu mã xác thực từ điện thoại.</p>
-                          </div>
-                        </div>
-                        <div className="mt-8 flex items-center justify-between">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Đang bật</span>
-                          <button className="px-4 py-2 bg-white text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                            Cấu hình
-                          </button>
-                        </div>
-                      </div>
-                      <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 flex flex-col justify-between">
-                        <div className="space-y-4">
-                          <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-sm">
-                            <Database size={28} />
-                          </div>
-                          <div>
-                            <p className="text-base font-black text-slate-900">Sao lưu dữ liệu</p>
-                            <p className="text-xs text-slate-400 font-bold mt-1 leading-relaxed">Tự động sao lưu dữ liệu trang trại hàng ngày vào đám mây.</p>
-                          </div>
-                        </div>
-                        <div className="mt-8 flex items-center justify-between">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lần cuối: 2h trước</span>
-                          <button className="px-4 py-2 bg-white text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                            Tải về
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+
                 </motion.div>
               )}
 
@@ -731,6 +754,108 @@ function SettingsContent() {
           </div>
         </main>
       </div>
+
+      <BaseModal
+        isOpen={isAvatarModalOpen}
+        onClose={() => setIsAvatarModalOpen(false)}
+        title="Thay đổi ảnh đại diện"
+        subtitle="Chọn mẫu có sẵn hoặc tải ảnh lên từ máy tính của bạn"
+        className="max-w-lg"
+      >
+        <div className="space-y-8">
+          {/* Preview section */}
+          <div className="flex flex-col items-center gap-3">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Xem trước</label>
+            <div className="w-32 h-32 rounded-[2rem] overflow-hidden border-4 border-slate-100 shadow-xl relative bg-white flex items-center justify-center transition-all">
+              {tempSelectedAvatar ? (
+                <Image
+                  src={tempSelectedAvatar}
+                  alt="Avatar Preview"
+                  fill
+                  className="object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-full h-full bg-emerald-500 flex items-center justify-center text-3xl font-black text-white">
+                  {profile?.firstName?.charAt(0) || user?.givenName?.charAt(0) || "U"}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Preset list */}
+          <div className="space-y-3">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Chọn mẫu có sẵn</label>
+            <div className="grid grid-cols-4 gap-4 p-4 bg-slate-50 rounded-3xl border border-slate-100/50">
+              {PRESET_AVATARS.map((avatar, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setTempSelectedAvatar(avatar);
+                    setUploadError("");
+                  }}
+                  className={cn(
+                    "w-full aspect-square rounded-2xl overflow-hidden border-2 transition-all relative cursor-pointer hover:scale-105 active:scale-95",
+                    tempSelectedAvatar === avatar
+                      ? "border-emerald-600 ring-4 ring-emerald-500/10 scale-102"
+                      : "border-transparent hover:border-slate-300"
+                  )}
+                >
+                  <Image
+                    src={avatar}
+                    alt={`Preset ${idx + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  {tempSelectedAvatar === avatar && (
+                    <div className="absolute right-1.5 bottom-1.5 bg-emerald-600 text-white rounded-full p-0.5 shadow-sm z-10">
+                      <Check size={10} className="stroke-[3]" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Upload Custom Image */}
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hoặc tải lên ảnh từ thiết bị</label>
+            <input
+              type="file"
+              id="avatar-file-input"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+            <button
+              onClick={() => document.getElementById("avatar-file-input")?.click()}
+              className="flex items-center justify-center gap-2 w-full py-3 bg-white border-2 border-dashed border-slate-200 rounded-2xl text-slate-600 font-bold hover:bg-slate-50 hover:border-emerald-500/50 hover:text-emerald-700 transition-all cursor-pointer shadow-sm active:scale-98"
+            >
+              <Upload size={18} />
+              <span>Tải ảnh lên từ máy</span>
+            </button>
+            {uploadError && (
+              <p className="text-xs text-rose-500 font-medium text-center mt-1">{uploadError}</p>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-4 pt-4 border-t border-slate-100">
+            <button
+              onClick={() => setIsAvatarModalOpen(false)}
+              className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl font-black uppercase tracking-widest text-xs transition-all active:scale-95"
+            >
+              Hủy
+            </button>
+            <button
+              onClick={handleSaveAvatar}
+              className="flex-1 py-3 bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/25 active:scale-95 flex items-center justify-center gap-2"
+            >
+              Lưu thay đổi
+            </button>
+          </div>
+        </div>
+      </BaseModal>
     </div>
   );
 }

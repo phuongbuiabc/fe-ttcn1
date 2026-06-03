@@ -46,8 +46,8 @@ const staffTabs: ModuleTab[] = [
 
 const inventoryTabs: ModuleTab[] = [
   { name: "Kho vật tư", href: "/inventory", title: "Kho vật tư" },
-  { name: "Lịch sử nhập", href: "/inventory?tab=import", title: "Lịch sử nhập kho" },
-  { name: "Lịch sử xuất", href: "/inventory?tab=export", title: "Lịch sử xuất kho" },
+  { name: "Nhập kho", href: "/inventory?tab=import", title: "Lịch sử nhập kho" },
+  { name: "Xuất kho", href: "/inventory?tab=export", title: "Lịch sử xuất kho" },
 ];
 
 
