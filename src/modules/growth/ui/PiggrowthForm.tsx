@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Trash2 } from 'lucide-react';
 import { usePig } from '@/modules/pig/hooks/usePig';
 import { PigResponse } from '@/modules/pig/model/pig.model';
 import { useGrowthtracking } from '@/modules/growth/hooks/useGrowthtracking';
@@ -24,6 +24,12 @@ const toNumberOrUndefined = (value: string) => {
 	if (!trimmed) return undefined;
 	const num = Number(trimmed);
 	return Number.isNaN(num) ? undefined : num;
+};
+
+const isNonNegativeNumber = (value: string) => {
+	if (!value || value.trim() === '') return true;
+	const n = Number(value);
+	return !Number.isNaN(n) && n >= 0;
 };
 
 const isNotNull = <T,>(value: T | null): value is T => value !== null;
@@ -203,10 +209,29 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 		}
 	};
 
+	const hasValidRows = rows.some((row) => {
+		if (!row.pigId) return false;
+		const litter = toNumberOrUndefined(row.litterLength);
+		const chest = toNumberOrUndefined(row.chestGirth);
+		const weight = toNumberOrUndefined(row.weight);
+		return (
+			(litter !== undefined && litter !== 0) ||
+			(chest !== undefined && chest !== 0) ||
+			(weight !== undefined && weight !== 0) ||
+			row.note.trim() !== ''
+		);
+	});
+
+	const fieldInvalid = (value: string) => {
+		if (!value) return false;
+		const n = Number(value);
+		return Number.isNaN(n) || n < 0;
+	};
+
 	const content = (
 		<>
-			<div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-				<div className="px-4 py-3 border-b flex items-start justify-between gap-3">
+			<div className="bg-white rounded-xl shadow-sm overflow-hidden">
+				<div className="px-4 py-3 flex items-start justify-between gap-3">
 					<div>
 						<h2 className="font-bold text-slate-800">Bảng theo dõi tăng trưởng</h2>
 					</div>
@@ -214,16 +239,16 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 						type="date"
 						value={trackingDate}
 						onChange={(e) => setTrackingDate(e.target.value)}
-						className="w-[220px] border rounded-lg px-3 py-2 bg-white text-sm"
+						className="w-[160px] rounded-lg px-2 py-1.5 bg-slate-100 text-sm"
 					/>
 				</div>
 
 			<div className="overflow-x-auto">
-				<table className="w-full min-w-[980px] text-sm">
+				<table className="w-full min-w-[860px] text-sm">
 						<thead className="bg-slate-50 text-xs uppercase text-slate-500">
 							<tr>
 								<th className="p-3 text-left">STT</th>
-								<th className="p-3 text-left w-[190px]">Số tai</th>
+								<th className="p-3 text-left w-[150px]">Số tai</th>
 								<th className="p-3 text-left">Dài lưng (cm)</th>
 								<th className="p-3 text-left">Vòng ngực (cm)</th>
 								<th className="p-3 text-left">Cân nặng (kg)</th>
@@ -237,9 +262,9 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 								const suggestions = getSuggestions(row.earTagInput);
 
 								return (
-									<tr key={row.rowId} className="border-t">
+									<tr key={row.rowId}>
 										<td className="p-2">{index + 1}</td>
-										<td className="p-2 w-[190px] min-w-[170px]">
+										<td className="p-2 w-[150px] min-w-[120px]">
 										<div className="relative">
 									<input
 										type="text"
@@ -260,10 +285,10 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 											setActiveSuggestionRowId(row.rowId);
 											handleEarTagInputChange(row.rowId, e.target.value);
 										}}
-										className="w-full border rounded px-2 py-1 bg-white"
+										className="w-full rounded px-2 py-1 bg-slate-100"
 									/>
 									{activeSuggestionRowId === row.rowId && suggestions.length > 0 && suggestionPos && (
-										<div className="fixed z-50 w-64 max-h-48 overflow-y-auto rounded-md border bg-white shadow-lg" style={{ top: suggestionPos.top, left: suggestionPos.left, width: suggestionPos.width, maxHeight: "200px" }}>
+										<div className="fixed z-50 w-64 max-h-56 overflow-y-auto rounded-md bg-white shadow-lg" style={{ top: suggestionPos.top, left: suggestionPos.left, width: suggestionPos.width }}>
 											{suggestions.map((pig) => (
 												<button
 													type="button"
@@ -282,6 +307,7 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 									</div>
 										</td>
 										<td className="p-2">
+											<div>
 											<input
 												type="number"
 												placeholder="Nhập"
@@ -289,10 +315,15 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 												onChange={(e) =>
 													handleChangeCell(row.rowId, 'litterLength', e.target.value)
 												}
-												className="w-full border rounded px-2 py-1"
+												className={`w-full rounded px-2 py-1 bg-slate-100 ${fieldInvalid(row.litterLength) ? 'ring-2 ring-rose-500' : ''}`}
 											/>
+											{fieldInvalid(row.litterLength) && (
+												<p className="text-rose-600 text-xs mt-1">Giá trị không hợp lệ</p>
+											)}
+											</div>
 										</td>
 										<td className="p-2">
+											<div>
 											<input
 												type="number"
 												placeholder="Nhập"
@@ -300,10 +331,15 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 												onChange={(e) =>
 													handleChangeCell(row.rowId, 'chestGirth', e.target.value)
 												}
-												className="w-full border rounded px-2 py-1"
+												className={`w-full rounded px-2 py-1 bg-slate-100 ${fieldInvalid(row.chestGirth) ? 'ring-2 ring-rose-500' : ''}`}
 											/>
+											{fieldInvalid(row.chestGirth) && (
+												<p className="text-rose-600 text-xs mt-1">Giá trị không hợp lệ</p>
+											)}
+											</div>
 										</td>
 										<td className="p-2">
+											<div>
 											<input
 												type="number"
 												placeholder="Nhập"
@@ -311,8 +347,12 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 												onChange={(e) =>
 													handleChangeCell(row.rowId, 'weight', e.target.value)
 												}
-												className="w-full border rounded px-2 py-1"
+												className={`w-full rounded px-2 py-1 bg-slate-100 ${fieldInvalid(row.weight) ? 'ring-2 ring-rose-500' : ''}`}
 											/>
+											{fieldInvalid(row.weight) && (
+												<p className="text-rose-600 text-xs mt-1">Giá trị không hợp lệ</p>
+											)}
+											</div>
 										</td>
 										<td className="p-2">
 											<input
@@ -322,16 +362,17 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 												onChange={(e) =>
 													handleChangeCell(row.rowId, 'note', e.target.value)
 												}
-												className="w-full border rounded px-2 py-1"
+												className="w-full rounded px-2 py-1 bg-slate-100"
 											/>
 										</td>
 										<td className="p-2 text-center">
 											<button
 												onClick={() => handleDeleteRow(row.rowId)}
 												disabled={rows.length === 1}
-												className="px-2 py-1 border rounded text-xs disabled:opacity-40"
+												className="text-red-500 hover:text-red-700 p-1 rounded transition-colors disabled:opacity-40"
+												title="Xóa dòng"
 											>
-												X
+												<Trash2 size={16} />
 											</button>
 										</td>
 									</tr>
@@ -342,11 +383,11 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 				</div>
 
 				{loadingList && (
-					<p className="px-4 py-2 text-xs text-slate-500 border-t">
+					<p className="px-4 py-2 text-xs text-slate-500">
 						Đang tải danh sách lợn...
 					</p>
 				)}
-				<div className="px-4 py-3 border-t">
+				<div className="px-4 py-3">
 					<button
 						onClick={handleAddRow}
 						className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold disabled:opacity-60"
@@ -354,7 +395,7 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 						+ Thêm dòng
 					</button>
 				</div>
-				<div className="px-4 py-3 border-t flex items-center justify-end gap-2">
+				<div className="px-4 py-3 flex items-center justify-end gap-2">
 					<button
 						onClick={handleCancel}
 						disabled={submitting || loading}
@@ -364,8 +405,9 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 					</button>
 					<button
 						onClick={handleConfirm}
-						disabled={submitting || loading}
-						className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold disabled:opacity-60"
+						disabled={submitting || loading || !hasValidRows}
+						className={`px-4 py-2 text-white rounded-lg text-sm font-semibold transition-colors ${submitting || loading || !hasValidRows ? 'bg-slate-300 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+						title={!hasValidRows ? 'Cần ít nhất 1 dòng hợp lệ' : ''}
 					>
 						{submitting ? 'Đang lưu...' : 'Xác nhận'}
 					</button>
@@ -378,7 +420,7 @@ export default function PiggrowthForm({ onClose, onSuccess }: PiggrowthFormProps
 		return (
 			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
 				<div className="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-					<div className="px-6 py-4 border-b flex items-center justify-between">
+					<div className="px-6 py-4 flex items-center justify-between">
 						<div>
 							<h2 className="font-bold text-lg text-slate-900">Thêm bản ghi tăng trưởng</h2>
 						</div>

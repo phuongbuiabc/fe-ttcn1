@@ -24,3 +24,9 @@ export interface UpdatePenPigRequest {
   exitDate?: string;
   status?: string;
 }
+
+export interface TransferPenPigRequest {
+  pigId?: string;
+  herdId?: string;
+  targetPenCode: string;
+}

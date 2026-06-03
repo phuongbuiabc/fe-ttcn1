@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { areaService } from '../api/area.service';
+import { tokenStorage } from '@/modules/auth/utils/tokenStorage';
 import {
   AreaResponse,
   CreateAreaRequest,
@@ -11,6 +12,11 @@ export function useArea() {
   const [loading, setLoading] = useState(false);
 
   const fetchAreas = useCallback(async () => {
+    if (!tokenStorage.getAccessToken()) {
+      setAreas([]);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await areaService.getAll();

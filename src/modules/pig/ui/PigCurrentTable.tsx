@@ -1,101 +1,219 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { PigCurrentResponse } from '@/modules/pig/model/pig.model';
-import { cn } from '@/shared/utils/utils';
+import React, { useMemo, useState } from "react";
+import { PigCurrentResponse } from "@/modules/pig/model/pig.model";
+import { BaseSearch } from "@/shared/components/search";
 
 interface PigCurrentTableProps {
   pigs: PigCurrentResponse[];
   loading: boolean;
 }
 
-export function PigCurrentTable({ pigs, loading }: PigCurrentTableProps) {
+export function PigCurrentTable({
+  pigs,
+  loading,
+}: PigCurrentTableProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedBreed, setSelectedBreed] = useState("");
+
+  const types = useMemo(() => {
+    const set = new Set<string>();
+    pigs.forEach((p) => p.type && set.add(p.type));
+    return Array.from(set);
+  }, [pigs]);
+
+  const breeds = useMemo(() => {
+    const set = new Set<string>();
+    pigs.forEach((p) => p.breedName && set.add(p.breedName));
+    return Array.from(set);
+  }, [pigs]);
+
+  const visiblePigs = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+
+    return pigs.filter((pig) => {
+      if (selectedType && pig.type !== selectedType) return false;
+      if (selectedBreed && pig.breedName !== selectedBreed) return false;
+
+      if (!term) return true;
+
+      return (pig.earTag || "")
+        .toLowerCase()
+        .includes(term);
+    });
+  }, [pigs, searchTerm, selectedType, selectedBreed]);
+
   if (loading && pigs.length === 0) {
     return (
-      <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      <div className="flex items-center justify-center py-20">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-emerald-600" />
       </div>
     );
   }
 
   return (
-    <div className="responsive-table">
-      <table className="w-full text-left border-collapse">
-        <thead className="bg-slate-50/50">
-          <tr>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Số tai</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Loại</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase">Giống</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Cân nặng</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Dài lưng</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Vòng ngực</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">Ngày đo</th>
-            <th className="px-6 py-3 text-[9px] font-black text-slate-400 uppercase text-center">ADG/FCR</th>
-          </tr>
-        </thead>
+    <div className="flex h-[72vh] min-h-[420px] flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white">
 
-        <tbody className="divide-y divide-slate-50">
-          {pigs.length === 0 ? (
+      {/* Filter */}
+      <div className="border-b border-slate-100 px-4 py-3">
+        <div className="flex flex-nowrap items-end gap-2 overflow-x-auto">
+
+          <BaseSearch
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Nhập số tai"
+            className="min-w-[300px] shrink-0"
+          />
+
+          <label className="flex min-w-[180px] items-center gap-2">
+            <span className="text-[10px] font-bold uppercase text-slate-500">
+              Loại
+            </span>
+
+            <select
+              value={selectedType}
+              onChange={(e) =>
+                setSelectedType(e.target.value)
+              }
+              className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+            >
+              <option value="">Tất cả</option>
+
+              {types.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex min-w-[180px] items-center gap-2">
+            <span className="text-[10px] font-bold uppercase text-slate-500">
+              Giống
+            </span>
+
+            <select
+              value={selectedBreed}
+              onChange={(e) =>
+                setSelectedBreed(e.target.value)
+              }
+              className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+            >
+              <option value="">Tất cả</option>
+
+              {breeds.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="flex-1 overflow-auto">
+
+        <table className="w-full border-separate border-spacing-0 text-left [&_th]:border-0 [&_td]:border-0">
+
+          <thead className="sticky top-0 z-10 bg-slate-50">
             <tr>
-              <td colSpan={10} className="px-6 py-6 text-center text-slate-500">
-                Không có dữ liệu
-              </td>
+              {
+                // define headers with alignment so numbers center under headers
+                [
+                  { key: 'earTag', label: 'Số tai', align: 'left' },
+                  { key: 'type', label: 'Loại', align: 'left' },
+                  { key: 'breed', label: 'Giống', align: 'left' },
+                  { key: 'weight', label: 'Cân nặng', align: 'center' },
+                  { key: 'litterLength', label: 'Dài lưng', align: 'center' },
+                  { key: 'chestGirth', label: 'Vòng ngực', align: 'center' },
+                  { key: 'date', label: 'Ngày đo', align: 'center' },
+                  { key: 'adg', label: 'ADG/FCR', align: 'center' },
+                ].map((h) => (
+                  <th
+                    key={h.key}
+                    className={`px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-400 ${
+                      h.align === 'center' ? 'text-center' : ''
+                    }`}
+                  >
+                    {h.label}
+                  </th>
+                ))
+              }
             </tr>
-          ) : (
-            pigs.map((pig) => (
-              <tr key={pig.id} className="bg-white hover:bg-slate-50 transition-all">
-                {/* EAR TAG */}
-                <td className="px-6 py-3">
-                  <p className="font-black text-slate-900 text-[13px]">{pig.earTag || '--'}</p>
-                </td>
+          </thead>
 
-                {/* TYPE */}
-                <td className="px-6 py-3">
-                  <span className="font-bold text-xs text-slate-700">{pig.type}</span>
-                </td>
+          <tbody>
 
-                {/* SPECIES */}
-                <td className="px-6 py-3">
-                  <span className="text-xs text-slate-700">{pig.breedName || '--'}</span>
-                </td>
-
-                {/* WEIGHT */}
-                <td className="px-6 py-3 text-center">
-                  <span className="font-bold text-sm">{pig.weight ?? '--'}</span>
-                  <span className="ml-1 text-[10px] text-slate-400">kg</span>
-                </td>
-
-                {/* LITTER LENGTH */}
-                <td className="px-6 py-3 text-center">
-                  <span className="text-xs">{pig.litterLength ?? '--'}</span>
-                  <span className="ml-1 text-[10px] text-slate-400">cm</span>
-                </td>
-
-                {/* CHEST GIRTH */}
-                <td className="px-6 py-3 text-center">
-                  <span className="text-xs">{pig.chestGirth ?? '--'}</span>
-                  <span className="ml-1 text-[10px] text-slate-400">cm</span>
-                </td>
-
-                {/* LATEST TRACKING DATE */}
-                <td className="px-6 py-3 text-center text-xs text-slate-600">
-                  {pig.latestTrackingDate
-                    ? new Date(pig.latestTrackingDate).toLocaleDateString('vi-VN')
-                    : '--'}
-                </td>
-
-                {/* ADG/FCR */}
-                <td className="px-6 py-3 text-center">
-                  <span className="text-xs font-semibold text-emerald-600">
-                    {pig.adg ? `${pig.adg.toFixed(2)}` : '--'}/{pig.fcr ? pig.fcr.toFixed(2) : '--'}
-                  </span>
-
+            {visiblePigs.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={8}
+                  className="py-10 text-center text-slate-500"
+                >
+                  Không có dữ liệu
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              visiblePigs.map((pig) => (
+                <tr
+                  key={pig.id}
+                  className="transition hover:bg-slate-50"
+                >
+
+                  <td className="px-6 py-4">
+                    <p className="text-sm font-bold text-slate-900">
+                      {pig.earTag || "--"}
+                    </p>
+                  </td>
+
+                  <td className="px-6 py-4 text-sm">
+                    {pig.type || "--"}
+                  </td>
+
+                  <td className="px-6 py-4 text-sm">
+                    {pig.breedName || "--"}
+                  </td>
+
+                  <td className="px-6 py-4 text-center">
+                    {pig.weight ?? "--"} kg
+                  </td>
+
+                  <td className="px-6 py-4 text-center">
+                    {pig.litterLength ?? "--"} cm
+                  </td>
+
+                  <td className="px-6 py-4 text-center">
+                    {pig.chestGirth ?? "--"} cm
+                  </td>
+
+                  <td className="px-6 py-4 text-center text-sm">
+                    {pig.latestTrackingDate
+                      ? new Date(
+                          pig.latestTrackingDate
+                        ).toLocaleDateString("vi-VN")
+                      : "--"}
+                  </td>
+
+                  <td className="px-6 py-4 text-center font-semibold text-emerald-600">
+                    {pig.adg
+                      ? pig.adg.toFixed(2)
+                      : "--"}
+                    /
+                    {pig.fcr
+                      ? pig.fcr.toFixed(2)
+                      : "--"}
+                  </td>
+
+                </tr>
+              ))
+            )}
+
+          </tbody>
+
+        </table>
+      </div>
     </div>
   );
 }

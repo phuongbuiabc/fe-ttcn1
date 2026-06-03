@@ -6,6 +6,7 @@ import {
   UpdateCullingProposalRequest,
   CullingProposalReview
 } from "@/modules/cullingproposal/model/CullingProposal.model";
+import { CullingProposalStatus, CullingProposalType } from "@/shared/enums/cullingproposal.enum";
 
 const BASE_URL = '/api/v1/culling-proposals';
 
@@ -19,7 +20,7 @@ export const cullingProposalService = {
   getProcessed: () =>
     apiClient.get<ApiResponse<CullingProposalResponse[]>>(`${BASE_URL}/processed`),
 
-  getByType: (proposalType: string) =>
+  getByType: (proposalType: CullingProposalType) =>
     apiClient.get<ApiResponse<CullingProposalResponse[]>>(`${BASE_URL}/by-type/${proposalType}`),
 
   create: (data: CreateCullingProposalRequest) =>
@@ -31,7 +32,7 @@ export const cullingProposalService = {
   update: (id: string, data: UpdateCullingProposalRequest) =>
     apiClient.put<ApiResponse<CullingProposalResponse>>(`${BASE_URL}/${id}`, data),
 
-  review: (id: string, status: string) =>
+  review: (id: string, status: CullingProposalStatus) =>
     apiClient.put<ApiResponse<CullingProposalReview[]>>(`${BASE_URL}/review`, { status }),
 
   delete: (id: string) =>

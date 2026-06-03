@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { cullingProposalService } from "@/modules/cullingproposal/api/CullingProposal.service";
 import { CullingProposalResponse } from "@/modules/cullingproposal/model/CullingProposal.model";
-import { CullingProposalStatus } from "@/shared/enums/cullingproposal.enum";
+import { CullingProposalStatus, CullingProposalType } from "@/shared/enums/cullingproposal.enum";
 
 export const useCullingProposal = () => {
   const [data, setData] = useState<CullingProposalResponse[]>([]);
@@ -10,12 +10,17 @@ export const useCullingProposal = () => {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const [allRes, processedRes] = await Promise.all([
-        cullingProposalService.getAll(),
+      const [cullingRes, sellOffRes, processedRes] = await Promise.all([
+        cullingProposalService.getByType(CullingProposalType.CULLING),
+        cullingProposalService.getByType(CullingProposalType.SELL_OFF),
         cullingProposalService.getProcessed(),
       ]);
 
-      const merged = [...(allRes.data ?? []), ...(processedRes.data ?? [])];
+      const merged = [
+        ...(cullingRes.data ?? []),
+        ...(sellOffRes.data ?? []),
+        ...(processedRes.data ?? []),
+      ];
       const uniqueById = Array.from(new Map(merged.map((item) => [item.id, item])).values());
 
       setData(uniqueById);
@@ -34,7 +39,7 @@ export const useCullingProposal = () => {
     }
   };
 
-  const fetchByType = async (proposalType: string) => {
+  const fetchByType = async (proposalType: CullingProposalType) => {
     setLoading(true);
     try {
       const res = await cullingProposalService.getByType(proposalType);
@@ -74,12 +79,12 @@ export const useCullingProposal = () => {
   }, []);
 
   const disposeList = useMemo(
-    () => data.filter(i => i.proposalType === "CULLING" && i.status === CullingProposalStatus.PENDING),
+    () => data.filter(i => i.proposalType === CullingProposalType.CULLING && i.status === CullingProposalStatus.PENDING),
     [data]
   );
 
   const sellOffList = useMemo(
-    () => data.filter(i => i.proposalType === "SELL_OFF" && i.status === CullingProposalStatus.PENDING),
+    () => data.filter(i => i.proposalType === CullingProposalType.SELL_OFF && i.status === CullingProposalStatus.PENDING),
     [data]
   );
 

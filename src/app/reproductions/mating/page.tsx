@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { usePig } from '@/modules/pig/hooks/usePig';
-import { PregnantPigTable } from '@/modules/pig/ui/PregnantPigTable';
+import { ReproductionCycleTable } from '@/modules/reproduction/ui/ReproductionCycleTable';
 
 export default function MatingPage() {
 	const { pregnantPigs, loadingList, fetchPregnantPigs } = usePig();
@@ -19,9 +19,10 @@ export default function MatingPage() {
 			</div>
 
 			<div className="rounded-lg bg-white p-6 shadow-sm">
-				<PregnantPigTable
+				<ReproductionCycleTable
 					pregnantPigs={pregnantPigs}
 					loading={loadingList}
+					onRefresh={fetchPregnantPigs}
 					onView={(pig) => {
 						console.log('View:', pig);
 					}}

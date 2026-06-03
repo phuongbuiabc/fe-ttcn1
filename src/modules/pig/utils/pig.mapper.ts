@@ -3,11 +3,12 @@ import { PigType, PigStatus } from '@/shared/enums/pig.enum';
 export const PIG_TYPE_OPTIONS = [
   { value: PigType.NAI, label: 'Nái' },
   { value: PigType.NOC, label: 'Nọc' },
-  { value: PigType.THIT, label: 'Thịt' },
+  { value: PigType.NOC_THIT, label: 'Nọc Thịt' },
+  { value: PigType.NAI_THIT, label: 'Nái Thịt' },
 ];
 
 export const PIG_STATUS_OPTIONS = [
-  { value: PigStatus.ACTIVE, label: 'Khỏe mạnh' },
+  { value: PigStatus.ACTIVE, label: 'Hoạt động' },
   { value: PigStatus.SOLD, label: 'Đã bán' },
   { value: PigStatus.DEAD, label: 'Tiêu hủy' },
 ];

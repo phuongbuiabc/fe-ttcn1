@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PenDetailResponse, PenPigSummary } from '../model/pen.model';
+import { PenDetailResponse, PenPigSummary, PenPigletHerdSummary } from '../model/pen.model';
 
 interface Props {
   pen: PenDetailResponse | null;
@@ -10,6 +10,10 @@ interface Props {
 }
 
 export function PenDetail({ pen, loading, onClose }: Props) {
+  const getAverageWeight = (herd: PenPigletHerdSummary) => {
+    return herd.averageWeight ?? (herd as PenPigletHerdSummary & { averageBirthWeight?: number }).averageBirthWeight;
+  };
+
   if (loading) {
     return <div className="p-6">Đang tải...</div>;
   }
@@ -19,10 +23,10 @@ export function PenDetail({ pen, loading, onClose }: Props) {
   }
 
   return (
-    <aside className="w-full min-w-0 bg-white border-l shadow-2xl overflow-y-auto flex flex-col h-full">
+    <aside className="w-full min-w-0 bg-white shadow-2xl overflow-y-auto flex flex-col h-full">
 
       {/* HEADER */}
-      <div className="p-6 sticky top-0 bg-white z-20 border-b flex justify-between items-center">
+      <div className="p-6 sticky top-0 bg-white z-20 flex justify-between items-center">
         <div>
           <span className="text-[10px] font-bold uppercase text-emerald-600 block">
             Hồ sơ chi tiết
@@ -61,7 +65,7 @@ export function PenDetail({ pen, loading, onClose }: Props) {
         <section>
           <h4 className="font-bold mb-4">Danh sách lợn</h4>
 
-          <div className="bg-white border rounded-xl overflow-hidden">
+          <div className="bg-white rounded-xl overflow-hidden">
             <table className="w-full text-xs">
               <thead className="bg-gray-50">
                 <tr>
@@ -73,11 +77,48 @@ export function PenDetail({ pen, loading, onClose }: Props) {
 
               <tbody>
                 {pen.pigs?.length ? (
-                  pen.pigs.map((p: PenPigSummary) => (
-                    <tr key={p.pigId} className="border-t">
+                  pen.pigs.map((p: PenPigSummary, index: number) => (
+                    <tr key={`${p.pigId || p.earTag || 'pig'}-${index}`}>
                       <td className="p-2 font-medium">{p.earTag}</td>
                       <td className="p-2">{p.type}</td>
                       <td className="p-2">{p.currentWeight} kg</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={3} className="p-2 text-center text-gray-400">
+                      Không có dữ liệu
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ===== PIGLET HERD TABLE ===== */}
+        <section>
+          <h4 className="font-bold mb-4">Bảng thông tin đàn con</h4>
+
+          <div className="bg-white rounded-xl overflow-hidden border border-gray-100">
+            <table className="w-full text-xs">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="p-2 text-left">Tên đàn</th>
+                  <th className="p-2 text-left">Số lượng</th>
+                  <th className="p-2 text-left">Cân nặng TB</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {pen.pigletHerds?.length ? (
+                  pen.pigletHerds.map((herd: PenPigletHerdSummary, index: number) => (
+                    <tr key={`${herd.id || herd.herdCode || herd.herdName || 'herd'}-${index}`} className="border-t border-gray-100">
+                      <td className="p-2 font-medium text-slate-800">{herd.herdName}</td>
+                      <td className="p-2 text-slate-600">{herd.quantity}</td>
+                      <td className="p-2 text-slate-600">
+                        {getAverageWeight(herd) ?? '--'}
+                      </td>
                     </tr>
                   ))
                 ) : (

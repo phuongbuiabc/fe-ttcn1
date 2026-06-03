@@ -1,3 +1,4 @@
+import { PenType } from '@/shared/enums/pen.enum';
 import { PigType, PigStatus } from '@/shared/enums/pig.enum';
 
 export interface PenResponse {
@@ -5,7 +6,7 @@ export interface PenResponse {
   name: string;
   area: number;
   areaId: string;
-  penType: string;
+  penType: PenType;
   status: string;
   createdAt: string;
   updatedAt: string;

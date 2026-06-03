@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { pigService } from '../api/pig.service';
+import { ReproductionCycle } from '@/shared/enums/reproductioncycle.enum';
 import {
   PigResponse,
   PigDetailResponse,
@@ -67,30 +68,33 @@ export function usePig() {
     setLoadingList(true);
     try {
       const res = await pigService.getPigCurrent(type);
-      if (res.success) {
-        const normalized = (res.data || []).map((item: any): PigCurrentResponse => {
-          const latestGrowth = item.latestGrowth || {};
-
-          return {
-            id: item.id || item.pigId || item.pig?.id || '',
-            earTag: item.earTag || item.pigEarTag || item.pig?.earTag || '',
-            type: item.type || item.pig?.type,
-            species: item.species || item.pig?.species,
-            breedName: item.breedName || item.pig?.breedName || item.breed || '',
-            status: item.status || item.pig?.status,
-            latestTrackingDate:
-              item.latestTrackingDate || item.trackingDate || latestGrowth.trackingDate,
-            weight: item.weight ?? item.weigth ?? latestGrowth.weight ?? latestGrowth.weigth,
-            litterLength:
-              item.litterLength ?? item.litterLegth ?? latestGrowth.litterLength ?? latestGrowth.litterLegth,
-            chestGirth: item.chestGirth ?? latestGrowth.chestGirth,
-            adg: item.adg ?? latestGrowth.adg,
-            fcr: item.fcr ?? latestGrowth.fcr,
-          };
-        });
-
-        setPigCurrent(normalized);
+      if (!res.success) {
+        setPigCurrent([]);
+        return;
       }
+
+      const normalized = (res.data || []).map((item: any): PigCurrentResponse => {
+        const latestGrowth = item.latestGrowth || {};
+
+        return {
+          id: item.id || item.pigId || item.pig?.id || '',
+          earTag: item.earTag || item.pigEarTag || item.pig?.earTag || '',
+          type: item.type || item.pig?.type,
+          species: item.species || item.pig?.species,
+          breedName: item.breedName || item.pig?.breedName || item.species || item.pig?.species || '',
+          status: item.status || item.pig?.status,
+          latestTrackingDate:
+            item.latestTrackingDate || item.trackingDate || latestGrowth.trackingDate,
+          weight: item.weight ?? item.weigth ?? latestGrowth.weight ?? latestGrowth.weigth,
+          litterLength:
+            item.litterLength ?? item.litterLegth ?? latestGrowth.litterLength ?? latestGrowth.litterLegth,
+          chestGirth: item.chestGirth ?? latestGrowth.chestGirth,
+          adg: item.adg ?? latestGrowth.adg,
+          fcr: item.fcr ?? latestGrowth.fcr,
+        };
+      });
+
+      setPigCurrent(normalized);
     } finally {
       setLoadingList(false);
     }
@@ -99,7 +103,7 @@ export function usePig() {
   const fetchPregnantPigs = useCallback(async () => {
     setLoadingList(true);
     try {
-      const res = await pigService.getPregnantPigs();
+      const res = await pigService.getPregnantPigs(ReproductionCycle.TRACKING);
       if (res.success) {
         setPregnantPigs(res.data || []);
       }

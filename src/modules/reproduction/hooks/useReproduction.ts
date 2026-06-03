@@ -8,6 +8,7 @@ export function useReproduction() {
   const [sows, setSows] = useState<SowRecord[]>([]);
   const [stats, setStats] = useState<ReproductionStats>({
     totalSows: 0,
+    totalBoars: 0,
     pregnantSows: 0,
     farrowingSoon: 0,
     monthlyLitters: 0,
@@ -37,6 +38,9 @@ export function useReproduction() {
         const sowCandidates = (pigsRes.data || []).filter(
           (pig) => pig.type === PigType.NAI
         );
+        const boarCandidates = (pigsRes.data || []).filter(
+          (pig) => pig.type === PigType.NOC
+        );
 
         const sowRows = await Promise.all(
           sowCandidates.map(async (pig) => {
@@ -60,6 +64,7 @@ export function useReproduction() {
         setStats((prev) => ({
           ...prev,
           totalSows: sowRows.length,
+          totalBoars: boarCandidates.length,
         }));
       } else {
         setSows([]);

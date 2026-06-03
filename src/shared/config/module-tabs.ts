@@ -25,14 +25,13 @@ const reproductionTabs: ModuleTab[] = [
 
 const healthTabs: ModuleTab[] = [
   { name: "Tăng trưởng", href: "/health/growth-tracking", title: "Theo dõi tăng trưởng" },
-  { name: "Bệnh", href: "/health/diseases", title: "Danh mục bệnh" },
-  { name: "Điều trị", href: "/health/treatments", title: "Theo dõi điều trị" },
+  { name: "Tiêm phòng", href: "/health/vaccinations", title: "Quản lý tiêm phòng" },
+  { name: "Bệnh", href: "/health/diseases", title: "Theo dõi bệnh" },
 ];
 
 const penTabs: ModuleTab[] = [
   { name: "Chuồng", href: "/pens", title: "Danh mục chuồng" },
   { name: "Khu vực", href: "/pens/areas", title: "Danh mục khu vực" },
-  { name: "Lịch sử chuồng", href: "/pens/history", title: "Lịch sử chuồng" },
 ];
 
 const tradingTabs: ModuleTab[] = [

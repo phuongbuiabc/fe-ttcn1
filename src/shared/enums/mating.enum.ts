@@ -1,6 +1,5 @@
 export enum MatingStatus {
-    PENDING = 'PENDING',
-    MATED = 'MATED',
-    PREGNANT = 'PREGNANT',
-    FAILED = 'FAILED',
+    TRACKING = 'TRACKING',
+    SUCCESS = 'SUCCESS',
+    FAILURE = 'FAILURE',
 }

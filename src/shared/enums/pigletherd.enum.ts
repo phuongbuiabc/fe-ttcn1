@@ -4,3 +4,8 @@ export enum PigletHerdMovementType {
     INCREASE = 'INCREASE',
     DECREASE = 'DECREASE',
 }
+
+export enum PigletHerdStatus {
+    UNWEANED = 'UNWEANED',
+    WEANED = 'WEANED',
+}

@@ -297,7 +297,7 @@ export default function GrowthTrackingFormModal({ onClose, onSuccess }: GrowthTr
 											<tr key={pigId} className="border-t hover:bg-slate-50">
 												<td className="p-3">{index + 1}</td>
 												<td className="p-3 font-semibold">
-													{isEmptyRow ? '--' : pigDetail?.pig.earTag || '-'}
+													{isEmptyRow ? '--' : pigDetail?.pig.earTag || ''}
 												</td>
 												<td className="p-3">
 													{isEmptyRow ? '--' : pigDetail?.pig.earTag || '-'}

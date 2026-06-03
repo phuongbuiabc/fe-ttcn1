@@ -66,7 +66,7 @@ export function PigDetail({
     <aside className="w-full min-w-0 bg-white shadow-2xl overflow-y-auto flex flex-col h-full">
 
       {/* HEADER */}
-      <div className="p-6 sticky top-0 bg-white z-20 border-b flex justify-between items-center">
+      <div className="p-6 sticky top-0 bg-white z-20 flex justify-between items-center">
         <div>
           <span className="text-[10px] font-bold uppercase text-emerald-600 block">
             Hồ sơ chi tiết
@@ -90,7 +90,7 @@ export function PigDetail({
         <section>
           <h4 className="font-bold mb-4">Thông tin cá thể</h4>
 
-          <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
+            <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
 
             <Info label="Số tai" value={pig.earTag} />
             <Info label="Loại" value={pig.type} />
@@ -103,7 +103,7 @@ export function PigDetail({
 
             <Info
               label="Cân nặng sơ sinh"
-              value={`${data.currentWeight || 0} kg`}
+              value={`${pig.birthWeight || 0} kg`}
               highlight
             />
             <Info
@@ -164,10 +164,9 @@ export function PigDetail({
               <StatCard label="Tổng lứa" value={farrowingSummary.totalLitter} />
               <StatCard label="Tổng con sinh" value={farrowingSummary.totalBorn} />
               <StatCard label="Tổng con sống" value={farrowingSummary.totalAlive} />
-              <StatCard label="TB cân nặng" value={`${averageLitterWeight.toFixed(2)} kg`} />
             </div>
 
-            <div className="w-full max-w-full bg-white border rounded-xl overflow-x-auto overflow-y-hidden">
+            <div className="w-full max-w-full bg-white rounded-xl overflow-x-auto overflow-y-hidden">
               {farrowingLoading ? (
                 <div className="p-4 text-sm text-slate-500">Đang tải lịch sử sinh sản...</div>
               ) : (
@@ -189,7 +188,7 @@ export function PigDetail({
                   <tbody>
                     {farrowingHistory.length ? (
                       farrowingHistory.map((item) => (
-                        <tr key={item.cycleId} className="border-t">
+                        <tr key={item.cycleId}>
                           <td className="p-2 font-medium">{item.cycleId}</td>
                           <td className="p-2">{item.actualFarrowDate}</td>
                           <td className="p-2 text-center">{item.bornCount}</td>
@@ -219,7 +218,7 @@ export function PigDetail({
         <section>
           <h4 className="font-bold mb-4">Theo dõi tăng trưởng</h4>
 
-          <div className="bg-white border rounded-xl overflow-hidden">
+          <div className="bg-white rounded-xl overflow-hidden">
             <table className="w-full text-xs">
               <thead className="bg-gray-50">
                 <tr>
@@ -232,7 +231,7 @@ export function PigDetail({
               <tbody>
                 {growthHistory?.length ? (
                   growthHistory.map((g) => (
-                    <tr key={g.id} className="border-t">
+                    <tr key={g.id}>
                       <td className="p-2">{g.trackingDate}</td>
                       <td className="p-2 font-medium">{g.weight} kg</td>
                       <td className="p-2">{g.chestGirth} cm / {g.litterLength} cm</td>
@@ -254,7 +253,7 @@ export function PigDetail({
         <section>
           <h4 className="font-bold mb-4">Tiền sử bệnh</h4>
 
-          <div className="bg-white border rounded-xl overflow-hidden">
+          <div className="bg-white rounded-xl overflow-hidden">
             <table className="w-full text-xs">
               <thead className="bg-gray-50">
                 <tr>
@@ -269,7 +268,7 @@ export function PigDetail({
               <tbody>
                 {diseaseHistory?.length ? (
                   diseaseHistory.map((d) => (
-                    <tr key={d.id} className="border-t">
+                    <tr key={d.id}>
                       <td className="p-2">{d.diseaseName}</td>
                       <td className="p-2">{d.sickDate}</td>
                       <td className="p-2">{d.recoveryDate || '--'}</td>
@@ -317,7 +316,7 @@ function Info({
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border bg-slate-50 px-4 py-3">
+    <div className="rounded-xl bg-slate-50 px-4 py-3">
       <div className="text-[10px] uppercase tracking-[0.16em] text-slate-500 font-bold">
         {label}
       </div>
