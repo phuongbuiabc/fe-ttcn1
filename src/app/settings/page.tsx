@@ -18,13 +18,13 @@ import {
   MapPin,
   Camera,
   Check,
-  Languages,
-  DollarSign
+  X,
+  Clock
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/utils/utils";
 import Image from "next/image";
-import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { useAuth } from "@/shared/components/AuthProvider";
 import { staffService } from "@/modules/staff/api/staff.service";
 import { Employee } from "@/shared/types";
 
@@ -52,14 +52,55 @@ function SettingsContent() {
   const { user, logout } = useAuth();
   const tabParam = searchParams.get("tab");
 
-  const activeTab = tabParam || "general";
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [profile, setProfile] = useState<Employee | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const [activityLogs, setActivityLogs] = useState<any[]>([]);
+  const [systemNotifications, setSystemNotifications] = useState<any[]>([]);
+
+  const addActivityLog = (action: string) => {
+    const savedLogs = localStorage.getItem("mdfarm_activity_logs");
+    let logs = [];
+    if (savedLogs) {
+      try {
+        logs = JSON.parse(savedLogs);
+      } catch (e) {
+        console.error("Failed to parse activity logs", e);
+      }
+    }
+    const newLog = {
+      id: Math.random().toString(36).substring(2, 11),
+      action,
+      ip: "113.190.233.45",
+      device: "Chrome / Windows 11",
+      time: new Date().toLocaleDateString("vi-VN") + " " + new Date().toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' }),
+      status: "Thành công"
+    };
+    const updatedLogs = [newLog, ...logs];
+    localStorage.setItem("mdfarm_activity_logs", JSON.stringify(updatedLogs));
+    setActivityLogs(updatedLogs);
+  };
+
+  const handleClearNotification = (id: string) => {
+    const updated = systemNotifications.filter(n => n.id !== id);
+    setSystemNotifications(updated);
+    localStorage.setItem("mdfarm_system_notifications", JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent("mdfarm-notifications-updated"));
+  };
+
+  const handleToggleReadStatus = (id: string) => {
+    const updated = systemNotifications.map(n => n.id === id ? { ...n, read: !n.read } : n);
+    setSystemNotifications(updated);
+    localStorage.setItem("mdfarm_system_notifications", JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent("mdfarm-notifications-updated"));
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        setLoading(true);
         const res = await staffService.getMe();
         if (res.success && res.data) {
           setProfile(res.data);
@@ -79,9 +120,47 @@ function SettingsContent() {
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProfile();
+
+    // Load activity logs
+    const savedLogs = localStorage.getItem("mdfarm_activity_logs");
+    if (savedLogs) {
+      try {
+        setActivityLogs(JSON.parse(savedLogs));
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      const defaultLogs = [
+        { id: "log-1", action: "Đăng nhập hệ thống", ip: "113.190.233.45", device: "Chrome / Windows 11", time: new Date().toLocaleDateString("vi-VN") + " 10:20", status: "Thành công" },
+        { id: "log-2", action: "Đổi mật khẩu tài khoản", ip: "113.190.233.45", device: "Chrome / Windows 11", time: new Date().toLocaleDateString("vi-VN") + " 09:15", status: "Thành công" },
+        { id: "log-3", action: "Cập nhật cấu hình bảo mật", ip: "113.190.233.45", device: "Chrome / Windows 11", time: new Date().toLocaleDateString("vi-VN") + " 08:30", status: "Thành công" },
+      ];
+      localStorage.setItem("mdfarm_activity_logs", JSON.stringify(defaultLogs));
+      setActivityLogs(defaultLogs);
+    }
+
+    // Load system notifications
+    const loadNotifs = () => {
+      const saved = localStorage.getItem("mdfarm_system_notifications");
+      if (saved) {
+        try {
+          setSystemNotifications(JSON.parse(saved));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    loadNotifs();
+
+    const handleUpdate = () => {
+      loadNotifs();
+    };
+    window.addEventListener("mdfarm-notifications-updated", handleUpdate);
 
     // Load farm settings from localStorage
     const savedSettings = localStorage.getItem("farm_settings");
@@ -92,7 +171,20 @@ function SettingsContent() {
         console.error("Failed to parse saved settings", e);
       }
     }
+
+    return () => {
+      window.removeEventListener("mdfarm-notifications-updated", handleUpdate);
+    };
   }, [user]);
+
+  const isFarmManager = user?.role === 'ADMIN' || user?.role === 'OWNER' || profile?.position === "Quản lý trang trại" || profile?.position === "Quản trị viên" || profile?.position?.toLowerCase().includes("admin");
+  const activeTab = tabParam || (loading ? "account" : (isFarmManager ? "general" : "account"));
+
+  useEffect(() => {
+    if (!loading && !isFarmManager && activeTab === "general") {
+      router.push(`${pathname}?tab=account`);
+    }
+  }, [isFarmManager, activeTab, loading, router, pathname]);
 
   const handleTabChange = (tabId: string) => {
     router.push(`${pathname}?tab=${tabId}`);
@@ -100,10 +192,10 @@ function SettingsContent() {
 
   const [settings, setSettings] = useState<FarmSettings>({
     farmName: "MDFARM - Chăn nuôi lợn giống",
-    ownerName: "Nguyễn Viết ",
+    ownerName: "Nguyễn Viết Trọng ",
     email: "contact@mdfarm.vn",
-    phone: "0901 234 567",
-    address: "Km 15, Quốc lộ 1A, Huyện Thường Tín, Hà Nội",
+    phone: "19001234",
+    address: "Mão Điền, Bắc Ninh",
     language: "Tiếng Việt",
     currency: "VND",
     timezone: "GMT+7 (Hanoi)",
@@ -127,6 +219,7 @@ function SettingsContent() {
 
         if (res.success) {
           setShowSuccess(true);
+          addActivityLog("Cập nhật hồ sơ cá nhân");
           setTimeout(() => setShowSuccess(false), 3000);
         } else {
           alert(res.message || "Không thể cập nhật hồ sơ");
@@ -136,11 +229,13 @@ function SettingsContent() {
         localStorage.setItem("farm_settings", JSON.stringify(settings));
         await new Promise(resolve => setTimeout(resolve, 800));
         setShowSuccess(true);
+        addActivityLog(activeTab === "general" ? "Cập nhật cấu hình trang trại" : "Cập nhật cài đặt nhận thông báo");
         setTimeout(() => setShowSuccess(false), 3000);
       } else {
         // Mock save cho Security
         await new Promise(resolve => setTimeout(resolve, 1000));
         setShowSuccess(true);
+        addActivityLog("Cập nhật thông tin bảo mật");
         setTimeout(() => setShowSuccess(false), 3000);
       }
     } catch (error) {
@@ -152,11 +247,20 @@ function SettingsContent() {
   };
 
   const tabs = [
-    { id: "general", label: "Cài đặt chung", icon: Home },
+    ...(isFarmManager ? [{ id: "general", label: "Cài đặt chung", icon: Home }] : []),
     { id: "account", label: "Tài khoản", icon: User },
     { id: "notifications", label: "Thông báo", icon: Bell },
     { id: "security", label: "Bảo mật", icon: Shield },
+    { id: "activity", label: "Lịch sử hoạt động", icon: Database },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[70vh]">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20">
@@ -300,53 +404,7 @@ function SettingsContent() {
                     </div>
                   </div>
 
-                  <div className="pt-8 border-t border-slate-50">
-                    <h3 className="text-xl font-black text-slate-900 font-headline mb-6">Tùy chọn Hệ thống</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ngôn ngữ</label>
-                        <div className="relative">
-                          <Languages className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select
-                            value={settings.language}
-                            onChange={(e) => setSettings({ ...settings, language: e.target.value })}
-                            className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none appearance-none"
-                          >
-                            <option>Tiếng Việt</option>
-                            <option>English</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tiền tệ</label>
-                        <div className="relative">
-                          <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select
-                            value={settings.currency}
-                            onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
-                            className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none appearance-none"
-                          >
-                            <option>VND</option>
-                            <option>USD</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Múi giờ</label>
-                        <div className="relative">
-                          <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select
-                            value={settings.timezone}
-                            onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
-                            className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none appearance-none"
-                          >
-                            <option>GMT+7 (Hanoi)</option>
-                            <option>GMT+0 (UTC)</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+
                 </motion.div>
               )}
 
@@ -569,6 +627,101 @@ function SettingsContent() {
                             Tải về
                           </button>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === "activity" && (
+                <motion.div
+                  key="activity"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="p-8 space-y-8"
+                >
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    {/* Left side: Account Activity Logs */}
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-xl font-black text-slate-900 font-headline">Nhật ký hoạt động tài khoản</h3>
+                        <p className="text-xs text-slate-400 font-medium mt-1">Lịch sử đăng nhập và các hành động quan trọng thực hiện bởi tài khoản này.</p>
+                      </div>
+
+                      <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1 scrollbar-thin">
+                        {activityLogs.map((log) => (
+                          <div key={log.id} className="p-5 bg-slate-50 border border-slate-100 rounded-3xl flex items-start justify-between gap-4 text-left">
+                            <div className="space-y-1">
+                              <p className="text-sm font-bold text-slate-900">{log.action}</p>
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-bold text-slate-400">
+                                <span>IP: {log.ip}</span>
+                                <span>•</span>
+                                <span>Thiết bị: {log.device}</span>
+                                <span>•</span>
+                                <span className="text-slate-500">{log.time}</span>
+                              </div>
+                            </div>
+                            <span className="shrink-0 px-2.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100/50">
+                              {log.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Right side: System Notifications & Alerts */}
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-xl font-black text-slate-900 font-headline">Thông báo & Cảnh báo hoạt động</h3>
+                        <p className="text-xs text-slate-400 font-medium mt-1">Danh sách cảnh báo kỹ thuật và thông báo vận hành hệ thống.</p>
+                      </div>
+
+                      <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1 scrollbar-thin">
+                        {systemNotifications.length === 0 ? (
+                          <div className="p-12 text-center text-slate-400 font-bold bg-slate-50 rounded-[2rem] border border-slate-100/50">
+                            Không có thông báo hoặc cảnh báo nào.
+                          </div>
+                        ) : (
+                          systemNotifications.map((n) => (
+                            <div key={n.id} className={cn(
+                              "p-5 border rounded-3xl flex items-start justify-between gap-4 text-left transition-all",
+                              n.read ? "bg-slate-50 border-slate-100" : "bg-emerald-50/10 border-emerald-100/60 shadow-sm"
+                            )}>
+                              <div className="flex gap-4">
+                                <div className={cn(
+                                  "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm",
+                                  n.type === "alert" ? "bg-rose-50 text-rose-500" :
+                                    n.type === "warning" ? "bg-amber-50 text-amber-500" :
+                                      n.type === "success" ? "bg-emerald-50 text-emerald-500" : "bg-blue-50 text-blue-500"
+                                )}>
+                                  {n.type === "alert" ? <Clock size={16} /> : n.type === "success" ? <Check size={16} /> : <Bell size={16} />}
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-sm font-bold text-slate-900 leading-snug">{n.title}</p>
+                                  <p className="text-xs text-slate-500 leading-normal font-medium">{n.description}</p>
+                                  <div className="flex items-center gap-2 pt-1">
+                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{n.time}</span>
+                                    <span className="text-slate-300">•</span>
+                                    <button
+                                      onClick={() => handleToggleReadStatus(n.id)}
+                                      className="text-[9px] font-bold text-emerald-600 hover:text-emerald-700 underline"
+                                    >
+                                      {n.read ? "Đánh dấu chưa đọc" : "Đánh dấu đã đọc"}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => handleClearNotification(n.id)}
+                                className="text-slate-300 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                                title="Xóa thông báo"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ))
+                        )}
                       </div>
                     </div>
                   </div>

@@ -10,10 +10,12 @@ import { cn } from "@/shared/utils/utils";
 import { staffService } from "@/modules/staff/api/staff.service";
 import { Employee } from "@/shared/types";
 import { motion } from "motion/react";
-import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { useAuth } from "@/shared/components/AuthProvider";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   const [profile, setProfile] = React.useState<Employee | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -67,7 +69,7 @@ export default function ProfilePage() {
     );
   }
 
-  const isAdmin = profile.position?.toLowerCase().includes("quản trị") || profile.position?.toLowerCase().includes("admin");
+  const isAdmin = profile.position?.toLowerCase().includes("quản trị") || profile.position?.toLowerCase().includes("admin") || profile.position === "Quản lý trang trại";
 
   const InfoItem = ({ label, value, icon: Icon }: any) => (
     <div className={cn(
@@ -198,16 +200,22 @@ export default function ProfilePage() {
             </div>
 
             <div className="pt-2 space-y-2">
-              <button className={cn(
-                "w-full py-3.5 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                isAdmin ? "bg-white border-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white" : "bg-white border-slate-200 text-slate-700 hover:border-emerald-500"
-              )}>
+              <button 
+                onClick={() => router.push(isAdmin ? "/settings?tab=general" : "/settings?tab=security")}
+                className={cn(
+                  "w-full py-3.5 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                  isAdmin ? "bg-white border-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white" : "bg-white border-slate-200 text-slate-700 hover:border-emerald-500"
+                )}
+              >
                 {isAdmin ? "Cài đặt hệ thống" : "Đổi mật khẩu"}
               </button>
-              <button className={cn(
-                "w-full py-3.5 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                isAdmin ? "bg-white border-indigo-100 text-indigo-600 hover:bg-slate-900 hover:text-white" : "bg-white border-slate-200 text-slate-700 hover:border-slate-900"
-              )}>
+              <button 
+                onClick={() => router.push("/settings?tab=activity")}
+                className={cn(
+                  "w-full py-3.5 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                  isAdmin ? "bg-white border-indigo-100 text-indigo-600 hover:bg-slate-900 hover:text-white" : "bg-white border-slate-200 text-slate-700 hover:border-slate-900"
+                )}
+              >
                 {isAdmin ? "Nhật ký truy cập" : "Lịch sử hoạt động"}
               </button>
             </div>

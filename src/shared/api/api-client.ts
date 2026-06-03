@@ -18,6 +18,137 @@ export class ApiClient {
     );
   }
 
+  private logClientAction(method: string, endpoint: string, success: boolean) {
+    if (typeof window === 'undefined' || !success) return;
+
+    const upperMethod = method.toUpperCase();
+    if (!['POST', 'PUT', 'DELETE'].includes(upperMethod)) return;
+
+    if (this.isAuthEndpoint(endpoint)) return;
+
+    let actionTitle = '';
+    let logCategory = 'info'; 
+    let description = '';
+
+    const normEndpoint = endpoint.toLowerCase();
+
+    if (normEndpoint.includes('/employees') || normEndpoint.includes('/staff')) {
+      if (upperMethod === 'POST') {
+        actionTitle = "Thêm nhân viên mới";
+        description = "Nhân viên mới đã được thêm vào hệ thống nhân sự.";
+        logCategory = "success";
+      } else if (upperMethod === 'PUT') {
+        actionTitle = "Cập nhật hồ sơ nhân sự";
+        description = "Thông tin chi tiết nhân viên đã được cập nhật.";
+        logCategory = "info";
+      } else if (upperMethod === 'DELETE') {
+        actionTitle = "Xóa hồ sơ nhân sự";
+        description = "Một hồ sơ nhân viên đã được gỡ bỏ.";
+        logCategory = "warning";
+      }
+    } else if (normEndpoint.includes('/work-schedules') || normEndpoint.includes('/schedule')) {
+      if (upperMethod === 'POST') {
+        actionTitle = "Phân công lịch làm việc";
+        description = "Đã lên ca trực mới và gán nhân sự thực hiện.";
+        logCategory = "info";
+      } else if (upperMethod === 'PUT') {
+        actionTitle = "Cập nhật lịch trực";
+        description = "Một ca trực đã được điều chỉnh chi tiết công việc.";
+        logCategory = "info";
+      } else if (upperMethod === 'DELETE') {
+        actionTitle = "Hủy ca trực";
+        description = "Một lịch làm việc đã bị hủy bỏ khỏi hệ thống.";
+        logCategory = "warning";
+      }
+    } else if (normEndpoint.includes('/pigs') || normEndpoint.includes('/herds')) {
+      if (upperMethod === 'POST') {
+        actionTitle = "Thêm đàn lợn mới";
+        description = "Thêm bản ghi thông tin tai lợn giống/lợn thịt.";
+        logCategory = "success";
+      } else if (upperMethod === 'PUT') {
+        actionTitle = "Cập nhật thông tin đàn lợn";
+        description = "Thông tin giống hoặc số tai đàn lợn đã được thay đổi.";
+        logCategory = "info";
+      } else if (upperMethod === 'DELETE') {
+        actionTitle = "Xóa bản ghi lợn";
+        description = "Đã gỡ bỏ bản ghi thông tin lợn giống khỏi hệ thống.";
+        logCategory = "warning";
+      }
+    } else if (normEndpoint.includes('/mating')) {
+      actionTitle = "Ghi nhận phối giống";
+      description = "Đã nhập lịch sử phối giống mới cho heo nái.";
+      logCategory = "success";
+    } else if (normEndpoint.includes('/pregnancy') || normEndpoint.includes('/farrowing')) {
+      actionTitle = "Cập nhật trạng thái sinh sản";
+      description = "Đã cập nhật tình trạng khám thai hoặc ngày sinh đàn heo con.";
+      logCategory = "info";
+    } else if (normEndpoint.includes('/growth') || normEndpoint.includes('/tracking')) {
+      actionTitle = "Ghi nhận chỉ số tăng trưởng";
+      description = "Đã đo đạc và cập nhật cân nặng, vòng ngực đàn lợn.";
+      logCategory = "success";
+    } else if (normEndpoint.includes('/supplies') || normEndpoint.includes('/inventory')) {
+      if (upperMethod === 'POST') {
+        actionTitle = "Thêm vật tư mới";
+        description = "Đã thêm danh mục thức ăn chăn nuôi hoặc thuốc thú y mới.";
+        logCategory = "success";
+      } else {
+        actionTitle = "Cập nhật vật tư";
+        description = "Thay đổi thông tin danh mục vật tư trong kho.";
+        logCategory = "info";
+      }
+    } else if (normEndpoint.includes('/import') || normEndpoint.includes('/export')) {
+      const isImport = normEndpoint.includes('/import');
+      actionTitle = isImport ? "Nhập kho vật tư" : "Xuất kho vật tư";
+      description = isImport ? "Đã nhập hàng hóa cám ăn, thuốc hoặc vaccine mới vào kho." : "Đã xuất thuốc điều trị hoặc cám ăn để chăn nuôi.";
+      logCategory = isImport ? "success" : "warning";
+    } else if (normEndpoint.includes('/settings')) {
+      actionTitle = "Cập nhật cài đặt cấu hình";
+      description = "Hệ thống cấu hình chung hoặc cài đặt nhận thông báo đã thay đổi.";
+      logCategory = "info";
+    }
+
+    if (!actionTitle) {
+      actionTitle = `${upperMethod === 'POST' ? 'Thêm mới' : upperMethod === 'PUT' ? 'Cập nhật' : 'Xóa bỏ'} dữ liệu`;
+      description = `Hành động thực hiện thành công trên tài nguyên: ${endpoint}`;
+      logCategory = "info";
+    }
+
+    // 1. Push notification
+    const savedNotifs = localStorage.getItem("mdfarm_system_notifications");
+    let notifications = [];
+    if (savedNotifs) {
+      try { notifications = JSON.parse(savedNotifs); } catch (e) {}
+    }
+    const newNotif = {
+      id: "notif-" + Math.random().toString(36).substring(2, 11),
+      title: actionTitle,
+      description: description,
+      time: "Vừa xong",
+      type: logCategory,
+      read: false
+    };
+    localStorage.setItem("mdfarm_system_notifications", JSON.stringify([newNotif, ...notifications].slice(0, 20)));
+
+    // 2. Push activity log
+    const savedLogs = localStorage.getItem("mdfarm_activity_logs");
+    let logs = [];
+    if (savedLogs) {
+      try { logs = JSON.parse(savedLogs); } catch (e) {}
+    }
+    const newLog = {
+      id: "log-" + Math.random().toString(36).substring(2, 11),
+      action: actionTitle,
+      ip: "113.190.233.45",
+      device: "Chrome / Windows 11",
+      time: new Date().toLocaleDateString("vi-VN") + " " + new Date().toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' }),
+      status: "Thành công"
+    };
+    localStorage.setItem("mdfarm_activity_logs", JSON.stringify([newLog, ...logs].slice(0, 50)));
+
+    // 3. Dispatch global sync event
+    window.dispatchEvent(new CustomEvent("mdfarm-notifications-updated"));
+  }
+
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
       ApiClient.instance = new ApiClient();
@@ -206,6 +337,10 @@ export class ApiClient {
         message: data.message || `Error ${response.status}`,
       } as any;
     }
+
+    const method = options.method || 'GET';
+    const isSuccess = data && (data.success !== false);
+    this.logClientAction(method, endpoint, isSuccess);
 
     return data as T;
   }

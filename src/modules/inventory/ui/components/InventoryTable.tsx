@@ -3,7 +3,6 @@ import { Trash2, Edit, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/shared/utils/utils';
 import { Supply, MaterialType } from '@/modules/inventory/model/inventory.model';
-import { useAuth } from '@/shared/components/AuthProvider';
 
 interface InventoryTableProps {
   supplies: Supply[];
@@ -11,7 +10,6 @@ interface InventoryTableProps {
   onEdit: (item: Supply) => void;
   onDelete: (item: Supply) => void;
   onView: (item: Supply) => void;
-  onLoss: (item: Supply) => void;
 }
 
 const materialTypeLabels: Record<string, string> = {
@@ -25,11 +23,8 @@ export function InventoryTable({
   loading, 
   onEdit, 
   onDelete,
-  onView,
-  onLoss
+  onView
 }: InventoryTableProps) {
-  const { user } = useAuth();
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'OWNER';
 
   if (loading) {
     return (
@@ -51,12 +46,9 @@ export function InventoryTable({
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
-          {supplies.map((item, i) => (
-            <motion.tr 
+          {supplies.map((item) => (
+            <tr 
               key={item.id} 
-              initial={{ opacity: 0, y: 10 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ delay: i * 0.03 }} 
               onClick={() => onView(item)} 
               className="hover:bg-slate-50/80 transition-all group cursor-pointer relative"
             >
@@ -70,7 +62,6 @@ export function InventoryTable({
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-slate-800 leading-none group-hover:text-emerald-600 transition-colors">{item.name}</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">ID: {item.id?.slice(0, 8)}</p>
                   </div>
                 </div>
               </td>
@@ -84,12 +75,9 @@ export function InventoryTable({
                 <div className="flex flex-col items-center justify-center">
                   <div className="flex items-center gap-2">
                     {item.quantity < 10 && (
-                      <motion.div
-                        animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
-                        transition={{ repeat: Infinity, duration: 2 }}
-                      >
+                      <div className="animate-pulse">
                         <AlertTriangle size={14} className="text-rose-500" />
-                      </motion.div>
+                      </div>
                     )}
                     <span className={cn("text-xl font-black tracking-tight", item.quantity < 10 ? "text-rose-500" : "text-emerald-600")}>
                       {item.quantity.toLocaleString()}
@@ -99,37 +87,27 @@ export function InventoryTable({
                 </div>
               </td>
               <td className="px-8 py-5 text-right">
-                <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                <div className="flex justify-end gap-1.5">
                   <button 
-                    onClick={(e) => { e.stopPropagation(); onLoss(item); }} 
-                    className="p-2.5 bg-white text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl shadow-sm border border-slate-100 transition-all"
-                    title="Báo hao hụt"
+                    onClick={(e) => { e.stopPropagation(); onEdit(item); }} 
+                    className="p-2.5 bg-white text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl shadow-sm border border-slate-100 transition-all"
                   >
-                    <AlertTriangle size={18}/>
+                    <Edit size={18}/>
                   </button>
-                  {isAdmin && (
-                    <>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); onEdit(item); }} 
-                        className="p-2.5 bg-white text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl shadow-sm border border-slate-100 transition-all"
-                      >
-                        <Edit size={18}/>
-                      </button>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); onDelete(item); }} 
-                        className="p-2.5 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl shadow-sm border border-slate-100 transition-all"
-                      >
-                        <Trash2 size={18}/>
-                      </button>
-                    </>
-                  )}
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onDelete(item); }} 
+                    className="p-2.5 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl shadow-sm border border-slate-100 transition-all"
+                  >
+                    <Trash2 size={18}/>
+                  </button>
                 </div>
               </td>
-            </motion.tr>
+            </tr>
           ))}
         </tbody>
       </table>
     </div>
   );
 }
+
 

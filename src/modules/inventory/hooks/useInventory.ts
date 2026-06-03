@@ -1,114 +1,118 @@
 import { useState, useEffect, useMemo } from "react";
-import { usePathname } from "next/navigation";
-import { Supply, SupplyLoss, MaterialType, SupplyFormInput, LossFormInput, AdjustmentFormInput } from "../model/inventory.model";
-import { Employee } from "@/modules/staff/model/staff.model";
+import { Supply, MaterialType, SupplyFormInput, ReceiptHistoryItem, SupplyLoss } from "../model/inventory.model";
 import { inventoryService } from "../api/inventory.service";
 import { staffService } from "@/modules/staff/api/staff.service";
+import { Employee } from "@/shared/types";
+
+type ModalMode = "create" | "edit" | "view";
 
 export function useInventory() {
-  const pathname = usePathname();
   const [supplies, setSuppliers] = useState<Supply[]>([]);
-  const [lossHistory, setLossHistory] = useState<SupplyLoss[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const [activeTab, setActiveTabState] = useState<"inventory" | "losses">(
-    pathname.endsWith("/losses") ? "losses" : "inventory"
-  );
-
-  // Sync initial tab based on path
-  useEffect(() => {
-    setActiveTabState(pathname.endsWith("/losses") ? "losses" : "inventory");
-  }, [pathname]);
-
-  // Handle browser back/forward and custom tab events seamlessly
-  useEffect(() => {
-    const handlePopState = () => {
-      const isLosses = window.location.pathname.endsWith("/losses");
-      setActiveTabState(isLosses ? "losses" : "inventory");
-    };
-    const handleCustomTabChange = (e: Event) => {
-      const customEvent = e as CustomEvent<string>;
-      const targetPath = customEvent.detail;
-      const isLosses = targetPath.endsWith("/losses");
-      setActiveTabState(isLosses ? "losses" : "inventory");
-    };
-    window.addEventListener("popstate", handlePopState);
-    window.addEventListener("inventory-tab-change", handleCustomTabChange);
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-      window.removeEventListener("inventory-tab-change", handleCustomTabChange);
-    };
-  }, []);
-
-  const setActiveTab = (tab: "inventory" | "losses") => {
-    setActiveTabState(tab);
-    const newPath = tab === "losses" ? "/inventory/losses" : "/inventory";
-    window.history.pushState(null, "", newPath);
-  };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [activeType, setActiveType] = useState("Tất cả");
-  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+
+  // Tab State
+  const [activeTab, setActiveTab] = useState<"stock" | "import" | "export">("stock");
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Modals Status
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isLossModalOpen, setIsLossModalOpen] = useState(false);
-  const [isLossDetailModalOpen, setIsLossDetailModalOpen] = useState(false);
-  const [isAdjustmentModalOpen, setIsAdjustmentModalOpen] = useState(false);
+  // Unified Modals Status
+  const [isSupplyModalOpen, setIsSupplyModalOpen] = useState(false);
+  const [supplyModalMode, setSupplyModalMode] = useState<ModalMode>("create");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
+
+  // New Modals
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [importModalMode, setImportModalMode] = useState<ModalMode>("create");
+  const [exportModalMode, setExportModalMode] = useState<ModalMode>("create");
+
+  // Histories
+  const [receipts, setReceipts] = useState<ReceiptHistoryItem[]>([]);
+  const [issues, setIssues] = useState<SupplyLoss[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  // Employee list for name lookup in tables
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
   // Selected Data
-  const [editingSupply, setEditingSupply] = useState<Supply | null>(null);
-  const [selectedSupplyForDetail, setSelectedSupplyForDetail] = useState<Supply | null>(null);
-  const [selectedSupplyForLoss, setSelectedSupplyForLoss] = useState<Supply | null>(null);
-  const [selectedSupplyForDelete, setSelectedSupplyForDelete] = useState<Supply | null>(null);
-  const [selectedLossForDetail, setSelectedLossForDetail] = useState<SupplyLoss | null>(null);
-  const [selectedLossForVoid, setSelectedLossForVoid] = useState<SupplyLoss | null>(null);
-  const [selectedSupplyForAdjustment, setSelectedSupplyForAdjustment] = useState<Supply | null>(null);
+  const [selectedSupply, setSelectedSupply] = useState<Supply | null>(null);
+  const [selectedImportId, setSelectedImportId] = useState<string | null>(null);
+  const [selectedExportId, setSelectedExportId] = useState<string | null>(null);
+  
+  // Unified Delete target for Custom ConfirmModal
+  const [deleteTarget, setDeleteTarget] = useState<{ type: "supply" | "import" | "export"; id: string; name: string } | null>(null);
 
   // Forms
   const [supplyForm, setSupplyForm] = useState<SupplyFormInput>({ name: "", materialType: MaterialType.FEED, quantity: 0, unit: "Kg", description: "" });
-  const [lossForm, setLossForm] = useState<LossFormInput>({ loss_id: "", date: "", employee_id: "", quantity: 0, reason: "Hỏng hóc", note: "" });
-  const [adjForm, setAdjForm] = useState<AdjustmentFormInput>({ quantity_change: "", reason: "", note: "" });
 
-  // Reset page on tab/search change
+  // Reset page on search/type change
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, debouncedSearchTerm, activeType, dateRange]);
+  }, [debouncedSearchTerm, activeType]);
 
-  const fetchInventoryData = async (showLoading = true) => {
+  // Load all data — supplies FIRST to populate cache, then history in parallel
+  const fetchAllData = async (showLoading = false) => {
+    if (showLoading) {
+      setLoading(true);
+      setLoadingHistory(true);
+    }
     try {
-      if (showLoading) setLoading(true);
-      const [resSupplies, resLosses, resEmployees] = await Promise.all([
-        inventoryService.getSupplies(),
-        inventoryService.getLossHistory(),
-        staffService.getEmployees()
-      ]);
+      // Step 1: populate inventoryCache so history resolves material names correctly
+      const resSupplies = await inventoryService.getSupplies();
       if (resSupplies.success) setSuppliers(resSupplies.data);
-      if (resLosses.success) setLossHistory(resLosses.data);
-      if (resEmployees.success) setEmployees(resEmployees.data as Employee[]);
+
+      // Step 2: fetch history + employees in parallel (cache is now ready)
+      const [resReceipts, resIssues, resEmployees] = await Promise.all([
+        inventoryService.getReceiptHistory(),
+        inventoryService.getLossHistory(),
+        staffService.getEmployees(),
+      ]);
+      if (resReceipts.success) setReceipts(resReceipts.data || []);
+      if (resIssues.success) setIssues(resIssues.data || []);
+      if (resEmployees.success) setEmployees(resEmployees.data || []);
     } finally {
-      if (showLoading) setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+        setLoadingHistory(false);
+      }
     }
   };
 
   useEffect(() => {
-    const cached = inventoryService.getCachedSupplies();
-    if (cached) {
-      setSuppliers(cached);
-      setLoading(false);
-      fetchInventoryData(false);
-    } else {
-      fetchInventoryData(true);
-    }
+    // First load with visual loader
+    fetchAllData(true);
+  }, []);
+
+  // Listen to URL search param changes to sync TopBar tabs click with page activeTab
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab");
+      if (tab === "import") {
+        setActiveTab("import");
+      } else if (tab === "export") {
+        setActiveTab("export");
+      } else {
+        setActiveTab("stock");
+      }
+    };
+
+    window.addEventListener("popstate", handleUrlChange);
+    window.addEventListener("inventory-tab-change", handleUrlChange);
+    
+    // Initial check
+    handleUrlChange();
+
+    return () => {
+      window.removeEventListener("popstate", handleUrlChange);
+      window.removeEventListener("inventory-tab-change", handleUrlChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -118,82 +122,94 @@ export function useInventory() {
 
   // Logic Handlers
   const handleOpenCreateModal = () => {
-    setEditingSupply(null);
+    setSelectedSupply(null);
     setSupplyForm({ name: "", materialType: MaterialType.FEED, quantity: 0, unit: "Kg", description: "" });
-    setIsModalOpen(true);
+    setSupplyModalMode("create");
+    setIsSupplyModalOpen(true);
   };
 
   const handleSaveSupply = async (e: React.FormEvent) => {
-
     e.preventDefault();
     const sanitizedForm = {
       ...supplyForm,
       quantity: supplyForm.quantity === "" ? 0 : Number(supplyForm.quantity)
     };
-    const res = editingSupply 
-      ? await inventoryService.updateSupply(editingSupply.id, sanitizedForm)
+    const res = selectedSupply 
+      ? await inventoryService.updateSupply(selectedSupply.id, sanitizedForm)
       : await inventoryService.createSupply(sanitizedForm);
 
     if (res.success) {
-      fetchInventoryData(false);
-      setIsModalOpen(false);
-    } else alert(res.message);
-  };
-
-  const handleRecordLoss = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedSupplyForLoss) return;
-    const sanitizedLoss = {
-      ...lossForm,
-      supply_id: selectedSupplyForLoss.id,
-      quantity: lossForm.quantity === "" ? 0 : Number(lossForm.quantity)
-    };
-    const res = await inventoryService.recordLoss(sanitizedLoss);
-    if (res.success) {
-      setIsLossModalOpen(false);
-      fetchInventoryData(false);
-    } else alert(res.message);
-  };
-
-  const handleVoidLoss = async () => {
-    if (!selectedLossForVoid) return;
-    const res = await inventoryService.voidLoss(selectedLossForVoid);
-    if (res.success) {
-      fetchInventoryData(false);
-      setIsVoidModalOpen(false);
+      fetchAllData(false);
+      setIsSupplyModalOpen(false);
     } else alert(res.message);
   };
 
   const confirmDelete = async () => {
-    if (!selectedSupplyForDelete) return;
-    const res = await inventoryService.deleteSupply(selectedSupplyForDelete.id);
-    if (res.success) {
-      fetchInventoryData(false);
-      setIsDeleteModalOpen(false);
-    } else alert(res.message);
-  };
-
-  const handleAdjustStock = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedSupplyForAdjustment) return;
-    const change = Number(adjForm.quantity_change);
-    if (isNaN(change) || change === 0) {
-      alert("Vui lòng nhập số lượng thay đổi hợp lệ khác 0");
-      return;
+    if (!deleteTarget) return;
+    
+    let res;
+    if (deleteTarget.type === "supply") {
+      res = await inventoryService.deleteSupply(deleteTarget.id);
+    } else if (deleteTarget.type === "import") {
+      res = await inventoryService.deleteImport(deleteTarget.id);
+    } else {
+      res = await inventoryService.deleteExport(deleteTarget.id);
     }
-    const newQty = Math.max(0, (selectedSupplyForAdjustment.quantity || 0) + change);
-    const res = await inventoryService.updateSupply(selectedSupplyForAdjustment.id, {
-      ...selectedSupplyForAdjustment,
-      quantity: newQty,
-      description: `${selectedSupplyForAdjustment.description || ""}\n[Điều chỉnh: ${change > 0 ? "+" : ""}${change} - Lý do: ${adjForm.reason}]`
-    });
 
     if (res.success) {
-      setIsAdjustmentModalOpen(false);
-      fetchInventoryData(false);
+      fetchAllData(false);
+      setIsDeleteModalOpen(false);
+      setDeleteTarget(null);
     } else {
       alert(res.message);
     }
+  };
+
+  // Import/Export Handlers
+  const handleOpenImportCreate = () => {
+    setSelectedImportId(null);
+    setImportModalMode("create");
+    setIsImportModalOpen(true);
+  };
+
+  const handleOpenImportView = (id: string) => {
+    setSelectedImportId(id);
+    setImportModalMode("view");
+    setIsImportModalOpen(true);
+  };
+
+  const handleOpenImportEdit = (id: string) => {
+    setSelectedImportId(id);
+    setImportModalMode("edit");
+    setIsImportModalOpen(true);
+  };
+
+  const handleDeleteImport = (id: string) => {
+    setDeleteTarget({ type: "import", id, name: id.slice(0, 8) });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleOpenExportCreate = () => {
+    setSelectedExportId(null);
+    setExportModalMode("create");
+    setIsExportModalOpen(true);
+  };
+
+  const handleOpenExportView = (id: string) => {
+    setSelectedExportId(id);
+    setExportModalMode("view");
+    setIsExportModalOpen(true);
+  };
+
+  const handleOpenExportEdit = (id: string) => {
+    setSelectedExportId(id);
+    setExportModalMode("edit");
+    setIsExportModalOpen(true);
+  };
+
+  const handleDeleteExport = (id: string) => {
+    setDeleteTarget({ type: "export", id, name: id.slice(0, 8) });
+    setIsDeleteModalOpen(true);
   };
 
   // Filtered Data
@@ -204,34 +220,41 @@ export function useInventory() {
     ), [supplies, activeType, debouncedSearchTerm]
   );
 
-  const filteredLosses = useMemo(() => 
-    lossHistory.filter(l => {
-      const dateMatch = (!dateRange.start || l.date >= dateRange.start) && (!dateRange.end || l.date <= dateRange.end);
-      const searchMatch = !debouncedSearchTerm || 
-                         l.supply_id?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-                         l.loss_id?.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-      return dateMatch && searchMatch;
-    }), [lossHistory, debouncedSearchTerm, dateRange]
-  );
-
   return {
-    supplies, lossHistory, employees, loading, activeTab, setActiveTab,
-    searchTerm, setSearchTerm, activeType, setActiveType, dateRange, setDateRange,
+    supplies, loading,
+    employees,
+    searchTerm, setSearchTerm, activeType, setActiveType,
     currentPage, setCurrentPage, itemsPerPage,
+    activeTab, setActiveTab,
+    receipts, issues, loadingHistory,
+    selectedImportId, selectedExportId,
+    importModalMode, exportModalMode,
+    deleteTarget, setDeleteTarget,
     modals: {
-      isModalOpen, setIsModalOpen, isDetailModalOpen, setIsDetailModalOpen,
-      isLossModalOpen, setIsLossModalOpen, isLossDetailModalOpen, setIsLossDetailModalOpen,
-      isAdjustmentModalOpen, setIsAdjustmentModalOpen, isDeleteModalOpen, setIsDeleteModalOpen,
-      isVoidModalOpen, setIsVoidModalOpen
+      isSupplyModalOpen, setIsSupplyModalOpen,
+      supplyModalMode, setSupplyModalMode,
+      isDeleteModalOpen, setIsDeleteModalOpen,
+      isImportModalOpen, setIsImportModalOpen,
+      isExportModalOpen, setIsExportModalOpen
     },
     selected: {
-      editingSupply, setEditingSupply, selectedSupplyForDetail, setSelectedSupplyForDetail,
-      selectedSupplyForLoss, setSelectedSupplyForLoss, selectedSupplyForDelete, setSelectedSupplyForDelete,
-      selectedLossForDetail, setSelectedLossForDetail, selectedLossForVoid, setSelectedLossForVoid,
-      selectedSupplyForAdjustment, setSelectedSupplyForAdjustment
+      selectedSupply, setSelectedSupply
     },
-    forms: { supplyForm, setSupplyForm, lossForm, setLossForm, adjForm, setAdjForm },
-    handlers: { handleOpenCreateModal, handleSaveSupply, handleRecordLoss, handleVoidLoss, confirmDelete, handleAdjustStock, fetchInventoryData },
-    filtered: { filteredSupplies, filteredLosses }
+    forms: { supplyForm, setSupplyForm },
+    handlers: { 
+      handleOpenCreateModal, 
+      handleSaveSupply, 
+      confirmDelete, 
+      fetchAllData,
+      handleOpenImportCreate,
+      handleOpenImportView,
+      handleOpenImportEdit,
+      handleDeleteImport,
+      handleOpenExportCreate,
+      handleOpenExportView,
+      handleOpenExportEdit,
+      handleDeleteExport
+    },
+    filtered: { filteredSupplies }
   };
 }

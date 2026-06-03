@@ -9,6 +9,9 @@ import { areaService } from "@/modules/area/api/area.service";
 import { WorkSchedule } from "@/shared/types";
 import { WorkScheduleTable } from "@/modules/schedule/ui/WorkScheduleTable";
 import { WorkScheduleFormModal } from "@/modules/schedule/ui/WorkScheduleFormModal";
+import { WorkScheduleDetailModal } from "@/modules/schedule/ui/WorkScheduleDetailModal";
+import { ConfirmModal } from "@/shared/components/ui/ConfirmModal";
+import { useAuth } from "@/shared/components/AuthProvider";
 
 export default function WorkSchedulePage() {
   const [schedules, setSchedules] = React.useState<WorkSchedule[]>([]);
@@ -17,6 +20,33 @@ export default function WorkSchedulePage() {
   const [selectedSchedule, setSelectedSchedule] = React.useState<WorkSchedule | null>(null);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [activeShift, setActiveShift] = React.useState("ALL");
+
+  const { user } = useAuth();
+  const [profile, setProfile] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const res = await staffService.getMe();
+        if (res.success && res.data) {
+          setProfile(res.data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchMe();
+  }, [user]);
+
+  const isFarmManager = user?.role === 'ADMIN' || user?.role === 'OWNER' || profile?.position === "Quản lý trang trại" || profile?.position === "Quản trị viên" || profile?.position?.toLowerCase().includes("admin");
+
+  // Detail modal state
+  const [isDetailOpen, setIsDetailOpen] = React.useState(false);
+  const [selectedScheduleForDetail, setSelectedScheduleForDetail] = React.useState<WorkSchedule | null>(null);
+
+  // Delete modal state
+  const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
+  const [selectedScheduleForDelete, setSelectedScheduleForDelete] = React.useState<WorkSchedule | null>(null);
 
   const fetchSchedules = async () => {
     setLoading(true);
@@ -62,6 +92,18 @@ export default function WorkSchedulePage() {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (selectedScheduleForDelete) {
+      try {
+        await scheduleService.deleteSchedule(selectedScheduleForDelete.id);
+        setIsDeleteOpen(false);
+        fetchSchedules();
+      } catch (error) {
+        console.error("Delete error:", error);
+      }
+    }
+  };
+
   const filtered = schedules.filter(s => {
     const matchesSearch = s.workName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          s.employeeName?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -76,12 +118,14 @@ export default function WorkSchedulePage() {
         <div className="space-y-1">
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">Kế hoạch Phân ca</h1>
         </div>
-        <button 
-          onClick={() => { setSelectedSchedule(null); setIsFormOpen(true); }}
-          className="px-8 py-3 bg-[#00a67d] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/10 flex items-center gap-2 hover:bg-[#008f6b] active:scale-95 transition-all"
-        >
-          <Plus size={18} /> Tạo lịch trực mới
-        </button>
+        {isFarmManager && (
+          <button 
+            onClick={() => { setSelectedSchedule(null); setIsFormOpen(true); }}
+            className="px-8 py-3 bg-[#00a67d] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/10 flex items-center gap-2 hover:bg-[#008f6b] active:scale-95 transition-all"
+          >
+            <Plus size={18} /> Tạo lịch trực mới
+          </button>
+        )}
       </div>
 
       {/* Synchronized Control Bar */}
@@ -119,8 +163,9 @@ export default function WorkSchedulePage() {
           schedules={filtered} 
           loading={loading}
           onEdit={(s) => { setSelectedSchedule(s); setIsFormOpen(true); }}
-          onDelete={(id) => scheduleService.deleteSchedule(id).then(fetchSchedules)}
-          onView={(s) => {}} 
+          onDelete={(s) => { setSelectedScheduleForDelete(s); setIsDeleteOpen(true); }}
+          onView={(s) => { setSelectedScheduleForDetail(s); setIsDetailOpen(true); }} 
+          isFarmManager={isFarmManager}
         />
       </div>
 
@@ -129,6 +174,23 @@ export default function WorkSchedulePage() {
         onClose={() => setIsFormOpen(false)}
         onSave={handleSave}
         editingSchedule={selectedSchedule}
+      />
+
+      <WorkScheduleDetailModal
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+        schedule={selectedScheduleForDetail}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteOpen && !!selectedScheduleForDelete}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Xác nhận xóa?"
+        description={`Lịch trực của nhân viên ${selectedScheduleForDelete?.employeeName || ""} vào ngày ${selectedScheduleForDelete?.workDate || ""} sẽ bị gỡ khỏi hệ thống.`}
+        confirmText="Xác nhận xóa"
+        cancelText="Hủy bỏ"
+        type="danger"
       />
     </div>
   );

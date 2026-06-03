@@ -35,8 +35,8 @@ const penTabs: ModuleTab[] = [
 ];
 
 const tradingTabs: ModuleTab[] = [
-  { name: "Nhập hàng", href: "/trading/import" },
-  { name: "Bán hàng", href: "/trading/export" },
+  { name: "Nhập lợn", href: "/trading/import" },
+  { name: "Xuất lợn", href: "/trading/export" },
 ];
 
 const staffTabs: ModuleTab[] = [
@@ -45,8 +45,9 @@ const staffTabs: ModuleTab[] = [
 ];
 
 const inventoryTabs: ModuleTab[] = [
-  { name: "Kho hàng", href: "/inventory", title: "Danh mục Vật tư" },
-  { name: "Hao hụt", href: "/inventory/losses", title: "Quản lý hao hụt" },
+  { name: "Kho vật tư", href: "/inventory", title: "Kho vật tư" },
+  { name: "Lịch sử nhập", href: "/inventory?tab=import", title: "Lịch sử nhập kho" },
+  { name: "Lịch sử xuất", href: "/inventory?tab=export", title: "Lịch sử xuất kho" },
 ];
 
 

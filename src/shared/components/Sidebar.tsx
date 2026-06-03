@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -30,34 +30,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/shared/utils/utils";
 import { motion, AnimatePresence } from "motion/react";
+import { useAuth } from "@/shared/components/AuthProvider";
+import { staffService } from "@/modules/staff/api/staff.service";
 
-const navItems = [
-  { name: "Bảng điều khiển", icon: LayoutDashboard, href: "/" },
-  { name: "Quản lý Đàn lợn", icon: PawPrint, href: "/pigs" },
-  { name: "Sinh sản", icon: Baby, href: "/reproductions" },
-  { name: "Sức khỏe", icon: Stethoscope, href: "/health/growth-tracking" },
-  { name: "Chuồng nuôi", icon: Warehouse, href: "/pens" },
-  { name: "Vật tư", icon: Database, href: "/inventory" },
-  { 
-    name: "Mua bán", 
-    icon: ShoppingCart, 
-    href: "/trading",
-    children: [
-      { name: "Nhập hàng", icon: ArrowDownLeft, href: "/trading/import" },
-      { name: "Bán hàng", icon: ArrowUpRight, href: "/trading/export" },
-    ]
-  },
-  { name: "Nhà cung cấp", icon: Truck, href: "/suppliers" },
-  { 
-    name: "Nhân sự", 
-    icon: Users, 
-    href: "/staff",
-    children: [
-      { name: "Nhân viên", icon: User, href: "/staff" },
-      { name: "Lịch làm việc", icon: Calendar, href: "/work-schedules" },
-    ]
-  },
-];
+
 
 const bottomItems = [
   { name: "Cài đặt", icon: Settings, href: "/settings" },
@@ -66,6 +42,51 @@ const bottomItems = [
 
 export function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    if (user) {
+      staffService.getMe().then(res => {
+        if (res.success) setProfile(res.data);
+      });
+    }
+  }, [user]);
+
+  const isFarmManager = user?.role === 'ADMIN' || user?.role === 'OWNER' || profile?.position === "Quản lý trang trại" || profile?.position === "Quản trị viên" || profile?.position?.toLowerCase().includes("admin");
+
+  const navItems = [
+    { name: "Bảng điều khiển", icon: LayoutDashboard, href: "/" },
+    { name: "Quản lý Đàn lợn", icon: PawPrint, href: "/pigs" },
+    { name: "Sinh sản", icon: Baby, href: "/reproductions" },
+    { name: "Sức khỏe", icon: Stethoscope, href: "/health/growth-tracking" },
+    { name: "Chuồng nuôi", icon: Warehouse, href: "/pens" },
+    { name: "Vật tư", icon: Database, href: "/inventory" },
+    { 
+      name: "Mua bán", 
+      icon: ShoppingCart, 
+      href: "/trading",
+      children: [
+        { name: "Nhập lợn", icon: ArrowDownLeft, href: "/trading/import" },
+        { name: "Xuất lợn", icon: ArrowUpRight, href: "/trading/export" },
+      ]
+    },
+    { name: "Nhà cung cấp", icon: Truck, href: "/suppliers" },
+    ...(isFarmManager ? [
+      { 
+        name: "Nhân sự", 
+        icon: Users, 
+        href: "/staff",
+        children: [
+          { name: "Nhân viên", icon: User, href: "/staff" },
+          { name: "Lịch làm việc", icon: Calendar, href: "/work-schedules" },
+        ]
+      }
+    ] : [
+      { name: "Lịch làm việc", icon: Calendar, href: "/work-schedules" }
+    ])
+  ];
+
   const [expandedItems, setExpandedItems] = useState<string[]>(() => {
     const expanded = [];
     if (pathname.startsWith("/staff") || pathname.startsWith("/work-schedules")) expanded.push("Nhân sự");

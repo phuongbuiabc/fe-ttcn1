@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/shared/utils/utils";
+import { CustomSelect } from "@/shared/components/ui/CustomSelect";
 
 interface StaffFormModalProps {
   isOpen: boolean;
@@ -192,14 +193,23 @@ export function StaffFormModal({
                     <input type="text" required value={formData.phone || ""} onChange={e => setFormData({...formData, phone: e.target.value})} className={inputClasses} placeholder="09xx xxx xxx" />
                   </InputGroup>
 
-                  <InputGroup label="Chức vụ" icon={Briefcase}>
-                    <select value={formData.position || "Công nhân"} onChange={e => setFormData({...formData, position: e.target.value})} className={cn(inputClasses, "appearance-none cursor-pointer")}>
-                      <option value="Quản trị viên">Quản trị viên</option>
-                      <option value="Kỹ thuật viên">Kỹ thuật viên</option>
-                      <option value="Công nhân">Công nhân</option>
-                      <option value="Kế toán">Kế toán</option>
-                    </select>
-                  </InputGroup>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest flex items-center gap-1.5">
+                      <Briefcase size={12} className="text-slate-300" />
+                      Chức vụ
+                    </label>
+                    <CustomSelect
+                      value={formData.position || "Nhân viên chăm sóc"}
+                      onChange={val => setFormData({...formData, position: val})}
+                      options={[
+                        { value: "Thú y", label: "Thú y" },
+                        { value: "Nhân viên chăm sóc", label: "Nhân viên chăm sóc" },
+                        { value: "Quản lý trang trại", label: "Quản lý trang trại" },
+                        { value: "Thủ kho", label: "Thủ kho" },
+                      ]}
+                      icon={Briefcase}
+                    />
+                  </div>
 
                   <InputGroup label="Email liên hệ" icon={Mail} className="col-span-2">
                     <input type="email" required value={formData.email || ""} onChange={e => setFormData({...formData, email: e.target.value})} className={inputClasses} placeholder="example@gmail.com" />

@@ -77,7 +77,7 @@ export function PenPigForm({
 	if (!open) return null;
 
 	const selectedPenName = pens.find((pen) => pen.id === form.penId)?.name || '';
-	const selectedPigLabel = pigs.find((pig) => pig.id === form.pigId)?.pigCode || '';
+	const selectedPigLabel = pigs.find((pig) => pig.id === form.pigId)?.earTag || '';
 
 	const handleSubmit = async () => {
 		if (!form.penId || !form.pigId) {
@@ -140,8 +140,7 @@ export function PenPigForm({
 							<option value="">Chọn lợn</option>
 							{pigs.map((pig) => (
 								<option key={pig.id} value={pig.id}>
-									{pig.pigCode}
-									{pig.earTag ? ` - ${pig.earTag}` : ''}
+									{pig.earTag || pig.id}
 								</option>
 							))}
 						</select>

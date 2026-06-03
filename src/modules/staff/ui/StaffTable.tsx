@@ -9,9 +9,10 @@ interface StaffTableProps {
   onEdit: (staff: any) => void;
   onDelete: (staff: any) => void;
   onView: (staff: any) => void;
+  isFarmManager?: boolean;
 }
 
-export function StaffTable({ staffs, loading, onEdit, onDelete, onView }: StaffTableProps) {
+export function StaffTable({ staffs, loading, onEdit, onDelete, onView, isFarmManager = false }: StaffTableProps) {
   if (loading) {
     return (
       <div className="py-20 text-center text-slate-400 font-bold">
@@ -62,18 +63,22 @@ export function StaffTable({ staffs, loading, onEdit, onDelete, onView }: StaffT
                   >
                     <Eye size={14} />
                   </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); onEdit(staff); }}
-                    className="p-1.5 text-slate-400 hover:text-blue-600 transition-all"
-                  >
-                    <Edit size={14} />
-                  </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); onDelete(staff); }}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 transition-all"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {isFarmManager && (
+                    <>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onEdit(staff); }}
+                        className="p-1.5 text-slate-400 hover:text-blue-600 transition-all"
+                      >
+                        <Edit size={14} />
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onDelete(staff); }}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 transition-all"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </td>
             </tr>
