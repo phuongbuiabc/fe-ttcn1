@@ -168,7 +168,15 @@ export default function PenPage() {
       <TransferPigModal
         isOpen={isTransferModalOpen}
         onClose={() => setIsTransferModalOpen(false)}
-        barns={pens as any}
+        pens={pens}
+        areas={areas}
+        onTransferred={async (sourcePenId) => {
+          await fetchPens();
+
+          if (selectedPenId === sourcePenId) {
+            await fetchPenDetail(sourcePenId);
+          }
+        }}
       />
     </div>
   );

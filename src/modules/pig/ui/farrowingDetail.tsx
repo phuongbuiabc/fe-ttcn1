@@ -24,7 +24,12 @@ export function FarrowingDetail({ sow }: Props) {
       try {
         const res = await pigService.getPigHistoryFarrowing(sow.id);
         if (res.success) {
-          setHistory(res.data || []);
+          const sorted = (res.data || []).slice().sort((a, b) => {
+            const da = a?.actualFarrowDate ? new Date(a.actualFarrowDate).getTime() : 0;
+            const db = b?.actualFarrowDate ? new Date(b.actualFarrowDate).getTime() : 0;
+            return db - da; // newest first
+          });
+          setHistory(sorted);
         } else {
           setHistory([]);
         }
@@ -65,9 +70,9 @@ export function FarrowingDetail({ sow }: Props) {
             </thead>
 
             <tbody>
-              {history.map((item) => (
+              {history.map((item, index) => (
                 <tr key={item.cycleId} className="border-t">
-                  <td className="p-2 font-medium">{item.cycleId}</td>
+                  <td className="p-2 font-medium">{index + 1}</td>
                   <td className="p-2">{item.actualFarrowDate}</td>
                   <td className="p-2 text-center">{item.bornCount}</td>
                   <td className="p-2 text-center">{item.aliveCount}</td>

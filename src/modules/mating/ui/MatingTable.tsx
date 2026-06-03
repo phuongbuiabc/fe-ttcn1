@@ -187,12 +187,12 @@ export function MatingTable({
               <th className="px-6 py-3 text-[9px] font-black uppercase text-slate-400">
                 Giống đực
               </th>
-              <th className="px-6 py-3 text-[9px] font-black uppercase text-slate-400 text-center">
+              {/* <th className="px-6 py-3 text-[9px] font-black uppercase text-slate-400 text-center">
                 Lứa đẻ
-              </th>
-              <th className="px-6 py-3 text-[9px] font-black uppercase text-slate-400 text-center">
+              </th> */}
+              {/* <th className="px-6 py-3 text-[9px] font-black uppercase text-slate-400 text-center">
                 Số con
-              </th>
+              </th> */}
               <th className="px-6 py-3 text-[9px] font-black uppercase text-slate-400 text-center">
                 Ngày phối
               </th>
@@ -243,17 +243,17 @@ export function MatingTable({
                     </span>
                   </td>
 
-                  <td className="px-6 py-3 text-center">
+                  {/* <td className="px-6 py-3 text-center">
                     <span className="text-sm font-bold text-slate-900">
                       {mating.matingRound}
                     </span>
-                  </td>
+                  </td> */}
 
-                  <td className="px-6 py-3 text-center">
+                  {/* <td className="px-6 py-3 text-center">
                     <span className="text-sm font-bold text-slate-900">
                       {mating.litterLength}
                     </span>
-                  </td>
+                  </td> */}
 
                   <td className="px-6 py-3 text-center">
                     <span className="text-xs text-slate-700">

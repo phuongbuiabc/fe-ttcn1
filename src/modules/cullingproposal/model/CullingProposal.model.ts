@@ -16,6 +16,7 @@ export interface CullingProposalResponse {
 export interface CreateCullingProposalRequest {
   pigEarTag: string;
   proposalType: CullingProposalType;
+  status: CullingProposalStatus;
   reason?: string;
 }
 

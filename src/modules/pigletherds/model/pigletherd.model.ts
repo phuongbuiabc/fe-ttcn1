@@ -1,13 +1,10 @@
-export enum PigletHerdStatus {
-  UNWEANED = 'UNWEANED',
-  WEANED = 'WEANED',
-}
-
+import { PigletHerdStatus } from "@/shared/enums/pigletherd.enum";
 export interface PigletHerdResponse {
   id: string;
   herdName: string;
   litterNumber: number;
   penId?: string;
+  penName?: string;
   motherId?: string;
   motherEarTag?: string;
   motherBreed?: string;
@@ -61,4 +58,33 @@ export interface UpdatePigletHerdRequest {
   semenId?: string;
   status?: PigletHerdStatus;
   isSold?: boolean;
+}
+
+export interface PigletHerdGrowthHistoryItemResponse {
+  id: string;
+  herdId: string;
+  trackingDate: string;
+  averageWeight: number;
+  note?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PigletHerdMovementHistoryItemResponse {
+  id: string;
+  herdId: string;
+  movementType: string;
+  sourceHerdId?: string;
+  targetHerdId?: string;
+  movementDate: string;
+  quantity: number;
+  reason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PigletHerdDetailResponse {
+  herd: PigletHerdResponse;
+  growthHistory: PigletHerdGrowthHistoryItemResponse[];
+  movementHistory: PigletHerdMovementHistoryItemResponse[];
 }

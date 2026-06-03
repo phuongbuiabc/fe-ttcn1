@@ -7,7 +7,7 @@ import { CreateCullingProposalRequest } from '@/modules/cullingproposal/model/Cu
 import { usePig } from '@/modules/pig/hooks/usePig';
 import { PigResponse } from '@/modules/pig/model/pig.model';
 import { useAuth } from '@/shared/components/AuthProvider';
-import { CullingProposalType } from '@/shared/enums/cullingproposal.enum';
+import { CullingProposalStatus, CullingProposalType } from '@/shared/enums/cullingproposal.enum';
 
 interface ProposalRow {
 	id: string;
@@ -143,14 +143,14 @@ export const CullingProposalForm: React.FC<Props> = ({ isOpen, onClose, onSucces
 
 		setLoading(true);
 		try {
-			const proposals = rows.map((row) => ({
+			const proposals: CreateCullingProposalRequest[] = rows.map((row) => ({
 				pigEarTag: (row.pigEarTag || row.earTagInput || '').trim(),
 				proposalType: row.proposalType,
+				status: CullingProposalStatus.PENDING,
 				reason: row.reason || undefined,
 			}));
 
-			// backend expects array of { pigEarTag, proposalType, reason }
-			await cullingProposalService.createBulk(proposals as any);
+			await cullingProposalService.createBulk(proposals);
 
 			alert('Thêm đề xuất thành công!');
 			setRows([createEmptyRow()]);

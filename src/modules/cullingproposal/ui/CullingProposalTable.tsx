@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import {
 	CheckCircle2,
-	CalendarDays,
 	CircleX,
 	FilterX,
 } from "lucide-react";
@@ -32,6 +31,11 @@ const statusMeta: Record<CullingProposalStatus, { label: string; className: stri
 		label: "Chờ duyệt",
 		className: "bg-amber-50 text-amber-600",
 	},
+};
+
+const proposalTypeMeta: Record<CullingProposalType, string> = {
+	[CullingProposalType.CULLING]: "Tiêu hủy",
+	[CullingProposalType.SELL_OFF]: "Bán loại",
 };
 
 const bucketMeta: Record<ProposalBucket, { title: string; emptyLabel: string }> = {
@@ -100,6 +104,10 @@ const getStatusMeta = (status?: CullingProposalStatus) => {
 		label: status,
 		className: "bg-slate-100 text-slate-600",
 	};
+};
+
+const getProposalTypeLabel = (proposalType: CullingProposalType) => {
+	return proposalTypeMeta[proposalType] ?? proposalType;
 };
 
 const BucketTable = ({
@@ -223,7 +231,7 @@ const BucketTable = ({
 											)}
 										</td>
 										<td className="px-4 py-3 text-sm text-slate-600">{row.pigEarTag || "--"}</td>
-										<td className="px-4 py-3 text-sm text-slate-600">{row.proposalType}</td>
+										<td className="px-4 py-3 text-sm text-slate-600">{getProposalTypeLabel(row.proposalType)}</td>
 										<td className="px-4 py-3 text-sm text-slate-600">{row.reason || "--"}</td>
 										<td className="px-4 py-3 text-sm text-slate-600">{row.employeeName}</td>
 										<td className="px-4 py-3 text-sm text-slate-600">{formatDateTime(row.createdAt)}</td>

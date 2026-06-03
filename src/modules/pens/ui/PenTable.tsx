@@ -134,9 +134,6 @@ export function PenTable({ pens, areas: propAreas, loading, onView, onEdit, onDe
                     <p className="text-sm font-semibold text-slate-800">
                       {item.name}
                     </p>
-                    <p className="text-[10px] text-slate-400">
-                      ID: {item.id}
-                    </p>
                   </div>
                 </div>
               </td>

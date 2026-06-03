@@ -9,6 +9,8 @@ import {
 export function usePigletHerd() {
   const [herds, setHerds] = useState<PigletHerdResponse[]>([]);
   const [loading, setLoading] = useState(false);
+  const [herdDetail, setHerdDetail] = useState<any | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   // GET ALL
   const fetchHerds = useCallback(async () => {
@@ -53,12 +55,35 @@ export function usePigletHerd() {
     }
   };
 
+  // FETCH DETAIL
+  const fetchHerdDetail = useCallback(async (id: string) => {
+    setLoadingDetail(true);
+    try {
+      const res = await pigletHerdService.getDetail(id);
+      if (res.success) {
+        setHerdDetail(res.data || null);
+        return res.data;
+      }
+      setHerdDetail(null);
+      return null;
+    } catch (err) {
+      console.error(err);
+      setHerdDetail(null);
+      return null;
+    } finally {
+      setLoadingDetail(false);
+    }
+  }, []);
+
   return {
     herds,
+    herdDetail,
     loading,
+    loadingDetail,
     fetchHerds,
     createHerd,
     updateHerd,
     deleteHerd
+    ,fetchHerdDetail
   };
 }

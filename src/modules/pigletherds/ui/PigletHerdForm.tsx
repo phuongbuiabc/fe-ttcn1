@@ -8,8 +8,8 @@ import {
   CreatePigletHerdRequest,
   UpdatePigletHerdRequest,
   PigletHerdResponse,
-  PigletHerdStatus,
 } from '../model/pigletherd.model';
+import { PigletHerdStatus } from '@/shared/enums/pigletherd.enum';
 
 interface Props {
   initialData?: PigletHerdResponse | null;

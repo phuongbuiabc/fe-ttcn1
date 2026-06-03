@@ -64,7 +64,7 @@ export function PenForm({ open, onClose, onSubmit, initialData }: Props) {
       <div className="bg-white w-[400px] p-6 rounded-xl space-y-4">
 
         <h3 className="font-bold text-lg">
-          {initialData ? 'Sửa chuồng' : 'Thêm chuồng'}
+          {initialData ? 'Sửa thông tin chuồng' : 'Thêm chuồng'}
         </h3>
 
         {/* NAME */}

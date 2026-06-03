@@ -137,6 +137,8 @@ export const MatingForm: React.FC<Props> = ({
   };
 
   const effectiveLoading = loading ?? matingLoading;
+  const fieldClassName =
+    'mt-1 w-full px-3 py-2 rounded-xl text-sm bg-slate-100 text-slate-800 placeholder:text-slate-500 border-0 focus:outline-none focus:ring-2 focus:ring-emerald-500';
 
   return (
     <AnimatePresence>
@@ -161,9 +163,9 @@ export const MatingForm: React.FC<Props> = ({
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 p-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-4">
                 <div className="relative">
-                  <label className="text-xs font-bold text-slate-600">Nái</label>
+                  <label className="block text-sm font-semibold text-slate-800">Nái</label>
                   <input
                     value={sowQuery}
                     onChange={(event) => {
@@ -172,12 +174,12 @@ export const MatingForm: React.FC<Props> = ({
                       const matchedSow = sows.find((s) => s.earTag.toLowerCase() === value.trim().toLowerCase());
                       update('sowPigId', matchedSow?.id || '');
                     }}
-                    className="mt-1 w-full px-3 py-2 border rounded-xl text-sm"
+                    className={fieldClassName}
                     placeholder="Nhập số tai nái"
                     autoComplete="off"
                   />
                   {sowSuggestions.length > 0 && (
-                    <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+                    <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl bg-slate-900 shadow-lg ring-1 ring-slate-700">
                       {sowSuggestions.map((s: SowResponse) => (
                         <button
                           key={s.id}
@@ -187,7 +189,7 @@ export const MatingForm: React.FC<Props> = ({
                             setSowQuery(s.earTag);
                             update('sowPigId', s.id);
                           }}
-                          className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-slate-50"
+                          className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-slate-100 hover:bg-slate-800"
                         >
                           <span>{s.earTag}</span>
                           <span className="text-xs text-slate-500">{s.breedName || '--'}</span>
@@ -198,11 +200,11 @@ export const MatingForm: React.FC<Props> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-600">Nọc</label>
+                  <label className="block text-sm font-semibold text-slate-800">Nọc</label>
                   <select
                     value={form.semenId}
                     onChange={(event) => update('semenId', event.target.value)}
-                    className="mt-1 w-full px-3 py-2 border rounded-xl text-sm"
+                    className={fieldClassName}
                   >
                     <option value="">-- Chọn nọc --</option>
                     {semens.map((semen) => (
@@ -215,23 +217,12 @@ export const MatingForm: React.FC<Props> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-600">Ngày phối</label>
+                  <label className="block text-sm font-semibold text-slate-800">Ngày phối</label>
                   <input
                     type="date"
                     value={form.matingDate || today}
                     onChange={(event) => update('matingDate', event.target.value)}
-                    className="mt-1 w-full px-3 py-2 border rounded-xl text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-slate-600">Lần phối</label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={form.matingRound}
-                    onChange={(event) => update('matingRound', Number(event.target.value))}
-                    className="mt-1 w-full px-3 py-2 border rounded-xl text-sm"
+                    className={fieldClassName}
                   />
                 </div>
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { Footer } from "../../shared/components/Footer";
@@ -13,6 +13,7 @@ import { cn } from "@/shared/utils/utils";
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const previousPathnameRef = useRef<string | null>(null);
   const router = useRouter();
   const { user, loading } = useAuth();
 
@@ -24,12 +25,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, isAuthPage, router]);
 
-  // Close sidebar when route changes on mobile
+  // Close sidebar only when pathname actually changes.
   useEffect(() => {
-    if (isSidebarOpen) {
-      const timer = setTimeout(() => setIsSidebarOpen(false), 0);
-      return () => clearTimeout(timer);
+    if (previousPathnameRef.current !== null && previousPathnameRef.current !== pathname && isSidebarOpen) {
+      setIsSidebarOpen(false);
     }
+
+    previousPathnameRef.current = pathname;
   }, [pathname, isSidebarOpen]);
 
   if (isAuthPage) {
