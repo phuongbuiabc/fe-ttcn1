@@ -67,8 +67,8 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
       icon: ShoppingCart, 
       href: "/trading",
       children: [
-        { name: "Nhập hàng", icon: ArrowDownLeft, href: "/trading/import" },
-        { name: "Bán hàng", icon: ArrowUpRight, href: "/trading/export" },
+        { name: "Nhập lợn", icon: ArrowDownLeft, href: "/trading/import" },
+        { name: "Xuất lợn", icon: ArrowUpRight, href: "/trading/export" },
       ]
     },
     { name: "Nhà cung cấp", icon: Truck, href: "/suppliers" },

@@ -36,8 +36,8 @@ const penTabs: ModuleTab[] = [
 ];
 
 const tradingTabs: ModuleTab[] = [
-  { name: "Nhập hàng", href: "/trading/import" },
-  { name: "Bán hàng", href: "/trading/export" },
+  { name: "Nhập lợn", href: "/trading/import" },
+  { name: "Xuất lợn", href: "/trading/export" },
 ];
 
 const staffTabs: ModuleTab[] = [
