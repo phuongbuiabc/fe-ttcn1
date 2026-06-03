@@ -1,4 +1,5 @@
 import { apiClient } from "@/shared/api/api-client";
+import { ApiResponse } from "@/shared/types";
 import {
   PigletHerdResponse,
   CreatePigletHerdRequest,
@@ -14,7 +15,7 @@ export const pigletHerdService = {
   getById: (id: string) =>
     apiClient.get<{ data: PigletHerdResponse }>(`${BASE_URL}/${id}`),
   getDetail: (id: string) =>
-    apiClient.get<{ data: any }>(`${BASE_URL}/${id}/detail`),
+    apiClient.get<ApiResponse<any>>(`${BASE_URL}/${id}/detail`),
 
   create: (data: CreatePigletHerdRequest) =>
     apiClient.post<{ data: PigletHerdResponse }>(BASE_URL, data),
