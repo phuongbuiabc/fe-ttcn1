@@ -1,29 +1,29 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Plus, 
-  Search, 
-  Trash2, 
-  Calendar, 
-  Truck, 
-  Package, 
-  CheckCircle2, 
-  Clock, 
-  FileText, 
-  Eye, 
-  X, 
-  ChevronLeft, 
-  ChevronRight, 
-  PlusCircle, 
-  AlertCircle, 
-  Download, 
-  TrendingUp, 
-  Scale, 
-  DollarSign, 
-  Edit, 
-  User, 
-  Mail, 
+import {
+  Plus,
+  Search,
+  Trash2,
+  Calendar,
+  Truck,
+  Package,
+  CheckCircle2,
+  Clock,
+  FileText,
+  Eye,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  PlusCircle,
+  AlertCircle,
+  Download,
+  TrendingUp,
+  Scale,
+  DollarSign,
+  Edit,
+  User,
+  Mail,
   Phone,
   Info
 } from "lucide-react";
@@ -249,9 +249,9 @@ export default function ExportPage() {
 
   // Filter records
   const filteredRecords = records.filter(record => {
-    const matchesSearch = record.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          record.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          record.phone.includes(searchTerm);
+    const matchesSearch = record.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.phone.includes(searchTerm);
     const matchesStatus = filterStatus === "Tất cả" || record.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -293,7 +293,7 @@ export default function ExportPage() {
     setEmail(invoice.email);
     setExportDate(invoice.date);
     setStatus(invoice.status);
-    
+
     // Map details to lines
     const pigs = invoice.details
       .filter(d => d.subjectType === "Lợn")
@@ -333,7 +333,7 @@ export default function ExportPage() {
     localStorage.setItem("mdfarm_export_invoices", JSON.stringify(updated));
     setIsDeleteModalOpen(false);
     setInvoiceToDelete(null);
-    
+
     // Send action event
     window.dispatchEvent(new CustomEvent("mdfarm-notifications-updated"));
   };
@@ -562,7 +562,7 @@ export default function ExportPage() {
           <button className="px-4 py-2 bg-white text-slate-600 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-slate-50 border border-slate-100 transition-all active:scale-95">
             <Download size={16} /> Xuất báo cáo Excel
           </button>
-          <button 
+          <button
             onClick={handleOpenAddModal}
             className="px-6 py-2 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/20 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all"
           >
@@ -577,16 +577,16 @@ export default function ExportPage() {
           <div key={idx} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-5">
               <stat.icon size={64} className={cn(
-                stat.color === "emerald" ? "text-emerald-600" : 
-                stat.color === "amber" ? "text-amber-500" : "text-blue-500"
+                stat.color === "emerald" ? "text-emerald-600" :
+                  stat.color === "amber" ? "text-amber-500" : "text-blue-500"
               )} />
             </div>
             <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest mb-2">{stat.label}</p>
             <h3 className="text-3xl font-headline font-black text-slate-900">{stat.value}</h3>
             <div className={cn(
               "mt-4 h-1 w-12 rounded-full",
-              stat.color === "emerald" ? "bg-emerald-500" : 
-              stat.color === "amber" ? "bg-amber-500" : "bg-blue-500"
+              stat.color === "emerald" ? "bg-emerald-500" :
+                stat.color === "amber" ? "bg-amber-500" : "bg-blue-500"
             )} />
           </div>
         ))}
@@ -598,9 +598,9 @@ export default function ExportPage() {
           <div className="flex items-center gap-4 flex-1 min-w-[300px]">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Tìm kiếm mã đơn, tên khách hàng, số điện thoại..." 
+              <input
+                type="text"
+                placeholder="Tìm kiếm mã đơn, tên khách hàng, số điện thoại..."
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium text-slate-800"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -609,7 +609,7 @@ export default function ExportPage() {
           </div>
           <div className="flex bg-slate-100 p-1.5 rounded-2xl">
             {["Tất cả", "Chờ thanh toán", "Đã thanh toán", "Đã xuất kho"].map((st) => (
-              <button 
+              <button
                 key={st}
                 onClick={() => setFilterStatus(st)}
                 className={cn(
@@ -670,31 +670,31 @@ export default function ExportPage() {
                     <td className="px-6 py-5">
                       <span className={cn(
                         "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 w-fit shadow-sm",
-                        invoice.status === "Đã thanh toán" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : 
-                        invoice.status === "Đã xuất kho" ? "bg-blue-50 text-blue-600 border border-blue-100" : "bg-amber-50 text-amber-600 border border-amber-100"
+                        invoice.status === "Đã thanh toán" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+                          invoice.status === "Đã xuất kho" ? "bg-blue-50 text-blue-600 border border-blue-100" : "bg-amber-50 text-amber-600 border border-amber-100"
                       )}>
-                        {invoice.status === "Đã thanh toán" ? <CheckCircle2 size={12} /> : 
-                         invoice.status === "Đã xuất kho" ? <Package size={12} /> : <Clock size={12} />}
+                        {invoice.status === "Đã thanh toán" ? <CheckCircle2 size={12} /> :
+                          invoice.status === "Đã xuất kho" ? <Package size={12} /> : <Clock size={12} />}
                         {invoice.status}
                       </span>
                     </td>
                     <td className="px-6 py-5 text-right">
                       <div className="flex items-center justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                        <button 
+                        <button
                           onClick={() => handleOpenDetailModal(invoice)}
                           className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
                           title="Xem chi tiết"
                         >
                           <Eye size={18} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleOpenEditModal(invoice)}
                           className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                           title="Chỉnh sửa"
                         >
                           <Edit size={18} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleOpenDeleteModal(invoice)}
                           className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                           title="Xóa đơn hàng"
@@ -757,8 +757,8 @@ export default function ExportPage() {
                   <span className="text-xs font-bold text-slate-700 flex items-center gap-2"><Calendar size={12} className="text-slate-400" /> {selectedInvoice.date}</span>
                   <span className={cn(
                     "px-2.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider flex items-center gap-1 w-fit shadow-inner",
-                    selectedInvoice.status === "Đã thanh toán" ? "bg-emerald-100 text-emerald-800" : 
-                    selectedInvoice.status === "Đã xuất kho" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
+                    selectedInvoice.status === "Đã thanh toán" ? "bg-emerald-100 text-emerald-800" :
+                      selectedInvoice.status === "Đã xuất kho" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
                   )}>
                     {selectedInvoice.status}
                   </span>
@@ -846,7 +846,7 @@ export default function ExportPage() {
 
             {/* Actions */}
             <div className="flex justify-end gap-3">
-              <button 
+              <button
                 onClick={() => setIsDetailModalOpen(false)}
                 className="px-6 py-3 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all active:scale-95"
               >
@@ -888,8 +888,8 @@ export default function ExportPage() {
               }}
               className={cn(
                 "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                formStep === "customer" 
-                  ? "bg-white text-emerald-700 shadow-sm" 
+                formStep === "customer"
+                  ? "bg-white text-emerald-700 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
               )}
             >
@@ -904,8 +904,8 @@ export default function ExportPage() {
               }}
               className={cn(
                 "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                formStep === "details" 
-                  ? "bg-white text-emerald-700 shadow-sm" 
+                formStep === "details"
+                  ? "bg-white text-emerald-700 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
               )}
             >
@@ -1276,7 +1276,7 @@ export default function ExportPage() {
                 Hủy bỏ
               </button>
             )}
-            
+
             <button
               type="submit"
               className="flex-1 py-3.5 bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/25 active:scale-95 flex items-center justify-center gap-2"
