@@ -114,12 +114,13 @@ export const inventoryService = {
       // 2. Kết hợp dữ liệu (Join) - Sử dụng cache từ các lần load trước
       const mergedHistory: SupplyLoss[] = details.map(detail => {
         const parentIssue = issues.find(i => i.id === detail.issueId);
-        const supplyInfo = inventoryCache?.find(s => s.id === detail.itemId);
+        const itemId = detail.itemId ?? (detail as any).item_id;
+        const supplyInfo = inventoryCache?.find(s => s.id === itemId);
         
         return {
           id: detail.id,
           loss_id: parentIssue?.id || `ISSUE-${detail.id.slice(0,4)}`,
-          supply_id: supplyInfo?.name || detail.itemId,
+          supply_id: supplyInfo?.name || itemId || "Không rõ",
           date: parentIssue?.issueDate || "N/A",
           employee_id: parentIssue?.employeeId || "N/A",
           quantity: detail.quantity,
@@ -180,12 +181,13 @@ export const inventoryService = {
 
       const mergedHistory: ReceiptHistoryItem[] = details.map(detail => {
         const parent = receipts.find(r => r.id === detail.receiptId);
-        const supplyInfo = inventoryCache?.find(s => s.id === detail.itemId);
+        const itemId = detail.itemId ?? (detail as any).item_id;
+        const supplyInfo = inventoryCache?.find(s => s.id === itemId);
         
         return {
           id: detail.id,
           receipt_id: parent?.id || `REC-${detail.id.slice(0,4)}`,
-          supply_id: supplyInfo?.name || detail.itemId,
+          supply_id: supplyInfo?.name || itemId || "Không rõ",
           date: parent?.receiptDate || "N/A",
           supplier: parent?.supplierName || "N/A",
           quantity: detail.quantity,
@@ -529,6 +531,7 @@ export const inventoryService = {
       const exportData = exportRes.data;
 
       for (const detail of exportData.details) {
+        if (!detail.materialId) continue;
         let currentSupply = inventoryCache?.find(s => s.id === detail.materialId);
         if (!currentSupply) {
           const supplyRes = await apiClient.get<ApiResponse<Supply>>(`${ENDPOINT}/${detail.materialId}`);
@@ -666,6 +669,7 @@ export const inventoryService = {
       const tempStockMap: Record<string, { supply: Supply, tempQuantity: number }> = {};
 
       for (const detail of oldExport.details) {
+        if (!detail.materialId) continue;
         let currentSupply = inventoryCache?.find(s => s.id === detail.materialId);
         if (!currentSupply) {
           const supplyRes = await apiClient.get<ApiResponse<Supply>>(`${ENDPOINT}/${detail.materialId}`);
@@ -686,6 +690,7 @@ export const inventoryService = {
       }
 
       for (const detail of data.details) {
+        if (!detail.materialId) continue;
         if (!tempStockMap[detail.materialId]) {
           let currentSupply = inventoryCache?.find(s => s.id === detail.materialId);
           if (!currentSupply) {
@@ -706,6 +711,7 @@ export const inventoryService = {
       }
 
       for (const detail of data.details) {
+        if (!detail.materialId) continue;
         const stockData = tempStockMap[detail.materialId];
         if (!stockData || stockData.tempQuantity < detail.quantity) {
           const name = stockData?.supply.name || detail.materialId;
@@ -720,6 +726,7 @@ export const inventoryService = {
       }
 
       for (const detail of oldExport.details) {
+        if (!detail.materialId) continue;
         const currentSupply = tempStockMap[detail.materialId]?.supply;
         if (currentSupply) {
           const rolledBackQty = (currentSupply.quantity || 0) + detail.quantity;
