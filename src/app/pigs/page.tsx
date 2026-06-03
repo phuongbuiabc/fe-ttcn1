@@ -15,6 +15,7 @@ import { PigFormModal } from '@/modules/pig/ui/PigFormModal';
 import { ActionConfirmModal } from '@/modules/pig/ui/ActionConfirmModal';
 import { PigDetail } from '@/modules/pig/ui/PigDetail';
 import KPICard from '@/shared/components/KPICard';
+import { SelectOption } from '@/shared/components/Filter';
 
 import { PigType, PigStatus } from '@/shared/enums/pig.enum';
 import { PigResponse, CreatePigRequest } from '@/modules/pig/model/pig.model';
