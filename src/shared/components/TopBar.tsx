@@ -21,9 +21,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useModuleTabs } from "@/shared/hooks/useModuleTabs";
 
 
-const notifications = [
+const DEFAULT_NOTIFICATIONS = [
   {
-    id: 1,
+    id: "notif-1",
     title: "Cảnh báo nhiệt độ",
     description: "Chuồng A-01 vượt ngưỡng 30°C",
     time: "2 phút trước",
@@ -31,7 +31,7 @@ const notifications = [
     read: false,
   },
   {
-    id: 2,
+    id: "notif-2",
     title: "Lịch tiêm phòng",
     description: "Đàn P-2024-05 cần tiêm Vaccine FMD",
     time: "1 giờ trước",
@@ -39,7 +39,15 @@ const notifications = [
     read: false,
   },
   {
-    id: 3,
+    id: "notif-3",
+    title: "Báo cáo tồn kho",
+    description: "Cám hỗn hợp lợn thịt sắp hết trong kho 2",
+    time: "3 giờ trước",
+    type: "warning",
+    read: false,
+  },
+  {
+    id: "notif-4",
     title: "Báo cáo tháng",
     description: "Báo cáo doanh thu tháng 3 đã sẵn sàng",
     time: "5 giờ trước",
@@ -59,8 +67,51 @@ export function TopBar({ onMenuClick }: TopBarProps) {
 
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  
   const [currentPath, setCurrentPath] = useState("");
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  const loadNotifications = () => {
+    const saved = localStorage.getItem("mdfarm_system_notifications");
+    if (saved) {
+      try {
+        setNotifications(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse notifications", e);
+        setNotifications(DEFAULT_NOTIFICATIONS);
+      }
+    } else {
+      localStorage.setItem("mdfarm_system_notifications", JSON.stringify(DEFAULT_NOTIFICATIONS));
+      setNotifications(DEFAULT_NOTIFICATIONS);
+    }
+  };
+
+  useEffect(() => {
+    loadNotifications();
+
+    const handleUpdate = () => {
+      loadNotifications();
+    };
+    window.addEventListener("mdfarm-notifications-updated", handleUpdate);
+    return () => {
+      window.removeEventListener("mdfarm-notifications-updated", handleUpdate);
+    };
+  }, []);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const handleMarkAsRead = (id: string) => {
+    const updated = notifications.map(n => n.id === id ? { ...n, read: true } : n);
+    setNotifications(updated);
+    localStorage.setItem("mdfarm_system_notifications", JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent("mdfarm-notifications-updated"));
+  };
+
+  const handleMarkAllAsRead = () => {
+    const updated = notifications.map(n => ({ ...n, read: true }));
+    setNotifications(updated);
+    localStorage.setItem("mdfarm_system_notifications", JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent("mdfarm-notifications-updated"));
+  };
 
   useEffect(() => {
     setCurrentPath(window.location.pathname + window.location.search);
@@ -169,7 +220,9 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             )}
           >
             <Bell size={16} />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-rose-500 rounded-full border-2 border-white pointer-events-none group-hover:scale-110 transition-transform shadow-[0_0_8px_rgba(244,63,94,0.5)] animate-pulse"></span>
+            {unreadCount > 0 && (
+              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white pointer-events-none group-hover:scale-110 transition-transform shadow-[0_0_8px_rgba(244,63,94,0.5)] animate-pulse"></span>
+            )}
           </button>
 
           <AnimatePresence>
@@ -181,31 +234,53 @@ export function TopBar({ onMenuClick }: TopBarProps) {
                 className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden"
               >
                 <div className="px-4 py-3 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-                  <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Thông báo mới</h4>
-                  <button className="text-[9px] font-black text-emerald-600 hover:text-emerald-700 uppercase tracking-tighter">Đánh dấu tất cả</button>
+                  <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Thông báo ({unreadCount})</h4>
+                  <button 
+                    onClick={handleMarkAllAsRead}
+                    className="text-[9px] font-black text-emerald-600 hover:text-emerald-700 uppercase tracking-tighter"
+                  >
+                    Đánh dấu tất cả
+                  </button>
                 </div>
                 <div className="max-h-[300px] overflow-y-auto">
-                  {notifications.map((n) => (
-                    <div key={n.id} className={cn(
-                      "p-3 flex gap-3 hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 last:border-0",
-                      !n.read && "bg-emerald-50/20"
-                    )}>
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
-                        n.type === "alert" ? "bg-rose-50 text-rose-500" : 
-                        n.type === "success" ? "bg-emerald-50 text-emerald-500" : "bg-blue-50 text-blue-500"
-                      )}>
-                        {n.type === "alert" ? <Clock size={14} /> : n.type === "success" ? <Check size={14} /> : <Bell size={14} />}
-                      </div>
-                      <div className="space-y-0.5">
-                        <p className="text-[11px] font-bold text-slate-900 leading-tight">{n.title}</p>
-                        <p className="text-[10px] text-slate-500 leading-tight line-clamp-1">{n.description}</p>
-                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">{n.time}</p>
-                      </div>
+                  {notifications.length === 0 ? (
+                    <div className="p-6 text-center text-xs text-slate-400 font-bold">
+                      Không có thông báo nào
                     </div>
-                  ))}
+                  ) : (
+                    notifications.map((n) => (
+                      <div 
+                        key={n.id} 
+                        onClick={() => handleMarkAsRead(n.id)}
+                        className={cn(
+                          "p-3 flex gap-3 hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 last:border-0 text-left",
+                          !n.read && "bg-emerald-50/20"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
+                          n.type === "alert" ? "bg-rose-50 text-rose-500" : 
+                          n.type === "warning" ? "bg-amber-50 text-amber-500" :
+                          n.type === "success" ? "bg-emerald-50 text-emerald-500" : "bg-blue-50 text-blue-500"
+                        )}>
+                          {n.type === "alert" ? <Clock size={14} /> : n.type === "success" ? <Check size={14} /> : <Bell size={14} />}
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-[11px] font-bold text-slate-900 leading-tight">{n.title}</p>
+                          <p className="text-[10px] text-slate-500 leading-tight line-clamp-1">{n.description}</p>
+                          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">{n.time}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
-                <button className="w-full py-2.5 text-[10px] font-black text-slate-400 hover:text-emerald-600 hover:bg-slate-50 transition-all border-t border-slate-50 uppercase tracking-widest">
+                <button 
+                  onClick={() => {
+                    setIsNotificationsOpen(false);
+                    router.push("/settings?tab=activity");
+                  }}
+                  className="w-full py-2.5 text-[10px] font-black text-slate-400 hover:text-emerald-600 hover:bg-slate-50 transition-all border-t border-slate-50 uppercase tracking-widest"
+                >
                   Xem tất cả
                 </button>
               </motion.div>

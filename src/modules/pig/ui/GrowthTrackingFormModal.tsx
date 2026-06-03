@@ -158,19 +158,13 @@ export default function GrowthTrackingFormModal({ onClose, onSuccess }: GrowthTr
 				const payload: CreateGrowthTrackingRequest = {
 					pigId: draft.pigId,
 					trackingDate: draft.trackingDate,
-					...(toNumberOrUndefined(draft.litterLength) !== undefined
-						? { litterLength: toNumberOrUndefined(draft.litterLength) }
-						: {}),
-					...(toNumberOrUndefined(draft.chestGirth) !== undefined
-						? { chestGirth: toNumberOrUndefined(draft.chestGirth) }
-						: {}),
-					...(toNumberOrUndefined(draft.weight) !== undefined
-						? { weight: toNumberOrUndefined(draft.weight) }
-						: {}),
+					litterLength: toNumberOrUndefined(draft.litterLength) ?? 0,
+					chestGirth: toNumberOrUndefined(draft.chestGirth) ?? 0,
+					weight: toNumberOrUndefined(draft.weight) ?? 0,
 					growthRate: 0,
 					adg: 0,
 					fcr: 0,
-					...(draft.note.trim() ? { note: draft.note.trim() } : {}),
+					note: draft.note.trim(),
 				};
 
 				return payload;
@@ -303,7 +297,7 @@ export default function GrowthTrackingFormModal({ onClose, onSuccess }: GrowthTr
 											<tr key={pigId} className="border-t hover:bg-slate-50">
 												<td className="p-3">{index + 1}</td>
 												<td className="p-3 font-semibold">
-													{isEmptyRow ? '--' : pigDetail?.pig.pigCode}
+													{isEmptyRow ? '--' : pigDetail?.pig.earTag || '-'}
 												</td>
 												<td className="p-3">
 													{isEmptyRow ? '--' : pigDetail?.pig.earTag || '-'}

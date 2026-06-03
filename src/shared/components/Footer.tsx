@@ -1,5 +1,4 @@
-"use client";
-import React from "react";
+import Link from "next/link";
 import { Package, Activity } from "lucide-react";
 
 export function Footer() {
@@ -23,11 +22,11 @@ export function Footer() {
 
         {/* Middle: Fast Links (Optional but compact) */}
         <div className="flex gap-4 items-center">
-            <a href="#" className="text-[11px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">Hướng dẫn</a>
+            <Link href="/support?doc=Hướng dẫn bắt đầu nhanh" className="text-[11px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">Hướng dẫn</Link>
             <span className="text-slate-200">•</span>
-            <a href="#" className="text-[11px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">Bảo mật</a>
+            <Link href="/support?doc=Chính sách bảo mật" className="text-[11px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">Bảo mật</Link>
             <span className="text-slate-200">•</span>
-            <a href="#" className="text-[11px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">hotline: 1900-1234</a>
+            <Link href="/support?contact=phone" className="text-[11px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">hotline: 1900-1234</Link>
         </div>
 
         {/* Right Side: Copyright & Version */}

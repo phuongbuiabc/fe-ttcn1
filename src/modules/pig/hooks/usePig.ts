@@ -76,6 +76,7 @@ export function usePig() {
             earTag: item.earTag || item.pigEarTag || item.pig?.earTag || '',
             type: item.type || item.pig?.type,
             species: item.species || item.pig?.species,
+            breedName: item.breedName || item.pig?.breedName || item.breed || '',
             status: item.status || item.pig?.status,
             latestTrackingDate:
               item.latestTrackingDate || item.trackingDate || latestGrowth.trackingDate,

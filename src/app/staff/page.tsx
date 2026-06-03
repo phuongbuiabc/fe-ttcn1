@@ -10,17 +10,38 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { staffService } from "@/modules/staff/api/staff.service";
 import { authService } from "@/modules/auth/api/auth.service";
+import { useAuth } from "@/modules/auth/hooks/useAuth";
 
 import { Employee, CreateEmployeeRequest } from "@/shared/types";
 import { StaffFormModal } from "@/modules/staff/ui/StaffFormModal";
 import { StaffDetailModal } from "@/modules/staff/ui/StaffDetailModal";
 import { StaffTable } from "@/modules/staff/ui/StaffTable";
+import { ConfirmModal } from "@/shared/components/ui/ConfirmModal";
 
 export default function StaffPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [members, setMembers] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { user } = useAuth();
+  const [myProfile, setMyProfile] = useState<Employee | null>(null);
+
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const res = await staffService.getMe();
+        if (res.success && res.data) {
+          setMyProfile(res.data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchMe();
+  }, [user]);
+
+  const isFarmManager = user?.role === 'ADMIN' || user?.role === 'OWNER' || myProfile?.position === "Quản lý trang trại" || myProfile?.position === "Quản trị viên" || myProfile?.position?.toLowerCase().includes("admin");
   
   // Modals Status
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,7 +54,7 @@ export default function StaffPage() {
   const [selectedStaffForDelete, setSelectedStaffForDelete] = useState<Employee | null>(null);
 
   const [formData, setFormData] = useState<any>({
-    userId: "", firstName: "", lastName: "", email: "", phone: "", dateOfBirth: "", gender: "MALE", currentAddress: "", position: "Công nhân",
+    userId: "", firstName: "", lastName: "", email: "", phone: "", dateOfBirth: "", gender: "MALE", currentAddress: "", position: "Nhân viên chăm sóc",
     password: ""
   });
 
@@ -41,7 +62,31 @@ export default function StaffPage() {
     try {
       if (showLoading) setLoading(true);
       const res = await staffService.getEmployees();
-      if (res.success) setMembers(res.data);
+      if (res.success) {
+        let employeeList = [...res.data];
+        
+        // Find if current user email exists in the list
+        const hasCurrentUser = user && employeeList.some(e => e.email === user.email);
+        
+        if (!hasCurrentUser && user) {
+          // Add manager/admin to the list so it matches profile info
+          employeeList.push({
+            id: user.id,
+            firstName: user.givenName || "",
+            lastName: user.familyName || "Admin",
+            email: user.email,
+            phone: "Chưa cập nhật",
+            dateOfBirth: "Chưa cập nhật",
+            gender: "MALE",
+            permanentAddress: "",
+            currentAddress: "Hệ thống Quản trị",
+            position: user.role === 'ADMIN' ? "Quản lý trang trại" : "Chủ trang trại",
+            employmentStatus: "Đang làm việc"
+          });
+        }
+        
+        setMembers(employeeList);
+      }
     } finally {
       if (showLoading) setLoading(false);
     }
@@ -50,18 +95,17 @@ export default function StaffPage() {
   useEffect(() => {
     const cached = staffService.getCachedEmployees();
     if (cached) {
-      setMembers(cached);
-      setLoading(false);
+      // Sync on user change
       fetchMembers(false);
     } else {
       fetchMembers(true);
     }
-  }, []);
+  }, [user]);
 
   const openAddModal = () => {
     setEditingMember(null);
     setFormData({
-      userId: "", firstName: "", lastName: "", email: "", phone: "", dateOfBirth: "", gender: "MALE", currentAddress: "", position: "Kỹ thuật viên",
+      userId: "", firstName: "", lastName: "", email: "", phone: "", dateOfBirth: "", gender: "MALE", currentAddress: "", position: "Nhân viên chăm sóc",
       password: ""
     });
 
@@ -138,12 +182,14 @@ export default function StaffPage() {
         <div className="space-y-1">
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight font-headline uppercase">Hồ sơ Nhân sự</h1>
         </div>
-        <button
-          onClick={openAddModal}
-          className="px-8 py-3 bg-[#00a67d] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/10 flex items-center gap-2 hover:bg-[#008f6b] active:scale-95 transition-all"
-        >
-          <UserPlus size={18} /> Thêm nhân viên
-        </button>
+        {isFarmManager && (
+          <button
+            onClick={openAddModal}
+            className="px-8 py-3 bg-[#00a67d] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/10 flex items-center gap-2 hover:bg-[#008f6b] active:scale-95 transition-all"
+          >
+            <UserPlus size={18} /> Thêm nhân viên
+          </button>
+        )}
       </div>
 
       {/* Control Bar */}
@@ -171,6 +217,7 @@ export default function StaffPage() {
           onView={(s) => { setSelectedForDetail(s); setIsDetailModalOpen(true); }}
           onEdit={(s) => { setEditingMember(s); setFormData(s); setIsModalOpen(true); }}
           onDelete={(s) => { setSelectedStaffForDelete(s); setIsDeleteModalOpen(true); }}
+          isFarmManager={isFarmManager}
         />
       </div>
 
@@ -190,14 +237,16 @@ export default function StaffPage() {
         staff={selectedForDetail} 
       />
 
-      {/* Delete Confirmation (Could be moved to Shared later) */}
-      <AnimatePresence>
-        {isDeleteModalOpen && selectedStaffForDelete && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl p-10 text-center"><div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-6"><Trash2 size={32} /></div><p className="text-xl font-extrabold text-slate-800 mb-2 uppercase">Xác nhận xóa?</p><p className="text-slate-500 text-sm mb-8 leading-relaxed">Hồ sơ nhân viên <span className="font-bold text-slate-900">{selectedStaffForDelete.firstName} {selectedStaffForDelete.lastName}</span> sẽ bị gỡ khỏi hệ thống.</p><div className="flex gap-4"><button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-700 rounded-2xl text-sm font-bold">Hủy bỏ</button><button onClick={confirmDelete} className="flex-1 py-4 bg-rose-500 text-white rounded-2xl text-sm font-bold shadow-lg shadow-rose-900/20 active:scale-95 transition-all">Xác nhận xóa</button></div></motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <ConfirmModal
+        isOpen={isDeleteModalOpen && !!selectedStaffForDelete}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Xác nhận xóa?"
+        description={`Hồ sơ nhân viên ${selectedStaffForDelete?.firstName || ""} ${selectedStaffForDelete?.lastName || ""} sẽ bị gỡ khỏi hệ thống.`}
+        confirmText="Xác nhận xóa"
+        cancelText="Hủy bỏ"
+        type="danger"
+      />
     </div>
   );
 }
