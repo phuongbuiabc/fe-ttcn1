@@ -57,12 +57,29 @@ export function PigDetail({
     }
   );
 
-  const averageLitterWeight =
-    farrowingSummary.totalLitter > 0
-      ? farrowingSummary.totalWeight / farrowingSummary.totalLitter
-      : 0;
+   const averageLitterWeight =
+     farrowingSummary.totalLitter > 0
+       ? farrowingSummary.totalWeight / farrowingSummary.totalLitter
+       : 0;
 
-  return (
+   const getPigTypeVietnamese = (type: PigType): string => {
+     switch (type) {
+       case PigType.NAI:
+         return 'Nái';
+       case PigType.NOC:
+         return 'Nọc';
+       case PigType.NAI_THIT:
+         return 'Nái thịt';
+       case PigType.NOC_THIT:
+         return 'Nọc thịt';
+       case PigType.THIT:
+         return 'Thịt';
+       default:
+         return type;
+     }
+   };
+
+   return (
     <aside className="w-full min-w-0 bg-white shadow-2xl overflow-y-auto flex flex-col h-full">
 
       {/* HEADER */}
@@ -92,8 +109,8 @@ export function PigDetail({
 
             <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
 
-            <Info label="Số tai" value={pig.earTag} />
-            <Info label="Loại" value={pig.type} />
+        <Info label="Số tai" value={pig.earTag} />
+        <Info label="Loại" value={getPigTypeVietnamese(pig.type)} />
 
             <Info label="Giống" value={pig.breedName} />
             <Info label="Trạng thái" value={pig.status} />
@@ -156,12 +173,11 @@ export function PigDetail({
             <div className="flex items-center justify-between gap-3 mb-4">
               <h4 className="font-bold">Lịch sử sinh sản</h4>
               <span className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-bold">
-                {farrowingHistory.length} lứa
+                {farrowingHistory.length} Lần
               </span>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-              <StatCard label="Tổng lứa" value={farrowingSummary.totalLitter} />
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-3 mb-4">
               <StatCard label="Tổng con sinh" value={farrowingSummary.totalBorn} />
               <StatCard label="Tổng con sống" value={farrowingSummary.totalAlive} />
             </div>
@@ -173,7 +189,7 @@ export function PigDetail({
                 <table className="min-w-[980px] w-full text-xs">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="p-2 text-left">Lứa</th>
+                      <th className="p-2 text-left">Lần</th>
                       <th className="p-2 text-left">Ngày đẻ</th>
                       <th className="p-2 text-center">Sinh</th>
                       <th className="p-2 text-center">Sống</th>
@@ -185,29 +201,34 @@ export function PigDetail({
                     </tr>
                   </thead>
 
-                  <tbody>
-                    {farrowingHistory.length ? (
-                      farrowingHistory.map((item) => (
-                        <tr key={item.cycleId}>
-                          <td className="p-2 font-medium">{item.cycleId}</td>
-                          <td className="p-2">{item.actualFarrowDate}</td>
-                          <td className="p-2 text-center">{item.bornCount}</td>
-                          <td className="p-2 text-center">{item.aliveCount}</td>
-                          <td className="p-2 text-center">{item.deadCount}</td>
-                          <td className="p-2 text-center">{item.crushedCount}</td>
-                          <td className="p-2 text-center">{item.deformedCount}</td>
-                          <td className="p-2 text-center">{item.averageWeight}</td>
-                          <td className="p-2">{item.status}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={9} className="p-4 text-center text-gray-400">
-                          Không có dữ liệu sinh sản
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
+                   <tbody>
+                     {farrowingHistory.length ? (
+                       farrowingHistory.map((item, index) => {
+                         // Calculate litter number from oldest to newest (farthest to nearest)
+                         // Assuming farrowingHistory is sorted newest to oldest (most recent first)
+                         const litterNumber = farrowingHistory.length - index;
+                         return (
+                           <tr key={item.cycleId}>
+                             <td className="p-2 font-medium">{litterNumber}</td>
+                             <td className="p-2">{item.actualFarrowDate}</td>
+                             <td className="p-2 text-center">{item.bornCount}</td>
+                             <td className="p-2 text-center">{item.aliveCount}</td>
+                             <td className="p-2 text-center">{item.deadCount}</td>
+                             <td className="p-2 text-center">{item.crushedCount}</td>
+                             <td className="p-2 text-center">{item.deformedCount}</td>
+                             <td className="p-2 text-center">{item.averageWeight}</td>
+                             <td className="p-2">{item.status}</td>
+                           </tr>
+                         );
+                       })
+                     ) : (
+                       <tr>
+                         <td colSpan={9} className="p-4 text-left text-gray-400">
+                           Không có dữ liệu sinh sản
+                         </td>
+                       </tr>
+                     )}
+                   </tbody>
                 </table>
               )}
             </div>
@@ -239,7 +260,7 @@ export function PigDetail({
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={2} className="p-2 text-center text-gray-400">
+                    <td colSpan={2} className="p-2 text-left text-gray-400">
                       Không có dữ liệu
                     </td>
                   </tr>
@@ -277,7 +298,7 @@ export function PigDetail({
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={2} className="p-2 text-center text-gray-400">
+                    <td colSpan={2} className="p-2 text-left text-gray-400">
                       Không có dữ liệu
                     </td>
                   </tr>

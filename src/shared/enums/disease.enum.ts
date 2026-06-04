@@ -1,0 +1,4 @@
+export enum DiseaseType {
+  INFECTIOUS = 'INFECTIOUS',
+  NON_INFECTIOUS = 'NON_INFECTIOUS',
+}

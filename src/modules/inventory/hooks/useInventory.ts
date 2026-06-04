@@ -120,6 +120,12 @@ export function useInventory() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  const feedOptions = useMemo(() => {
+    return supplies.filter(
+      (s) => s.materialType === MaterialType.FEED
+    );
+  }, [supplies]);
+
   // Logic Handlers
   const handleOpenCreateModal = () => {
     setSelectedSupply(null);
@@ -255,6 +261,7 @@ export function useInventory() {
       handleOpenExportEdit,
       handleDeleteExport
     },
-    filtered: { filteredSupplies }
+    filtered: { filteredSupplies },
+    feedOptions
   };
 }

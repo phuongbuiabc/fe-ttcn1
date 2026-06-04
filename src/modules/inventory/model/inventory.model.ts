@@ -15,7 +15,6 @@ export interface LivestockMaterial {
   updatedAt?: string;
 }
 
-
 // Keeping Supply alias for backward compatibility during migration
 export type Supply = LivestockMaterial;
 

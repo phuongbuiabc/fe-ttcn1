@@ -34,3 +34,7 @@ export interface UpdateDiseaseHistoryRequest {
   status?: string;
   note?: string;
 }
+
+export interface DeleteDiseaseHistory {
+  id: string;
+}

@@ -21,8 +21,7 @@ export interface PenPigSummary {
 }
 
 export interface PenPigletHerdSummary {
-  id: string;
-  herdCode: string;
+  herdId: string;
   herdName: string;
   quantity: number;
   averageWeight: number;

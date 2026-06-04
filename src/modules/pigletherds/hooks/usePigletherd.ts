@@ -55,6 +55,16 @@ export function usePigletHerd() {
     }
   };
 
+  // SPLIT
+  const splitHerd = async (id: string, data: any) => {
+    try {
+      await pigletHerdService.split(id, data);
+      await fetchHerds();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   // FETCH DETAIL
   const fetchHerdDetail = useCallback(async (id: string) => {
     setLoadingDetail(true);
@@ -83,7 +93,8 @@ export function usePigletHerd() {
     fetchHerds,
     createHerd,
     updateHerd,
-    deleteHerd
-    ,fetchHerdDetail
+    deleteHerd,
+    splitHerd,
+    fetchHerdDetail
   };
 }
