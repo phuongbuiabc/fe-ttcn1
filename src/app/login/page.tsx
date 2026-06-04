@@ -362,17 +362,6 @@ export default function LoginPage() {
                     </p>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-xl shadow-slate-900/10 hover:bg-slate-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
-                  >
-                    {isLoading ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <>Tạo tài khoản <ArrowRight size={18} /></>
-                    )}
-                  </button>
                 </form>
 
                 <p className="mt-8 text-center text-sm font-medium text-slate-500">
