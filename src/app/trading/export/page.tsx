@@ -648,7 +648,11 @@ export default function ExportPage() {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filteredRecords.map((invoice) => (
-                  <tr key={invoice.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <tr
+                    key={invoice.id}
+                    onClick={() => handleOpenDetailModal(invoice)}
+                    className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                  >
                     <td className="px-6 py-5">
                       <span className="font-black text-slate-900 text-sm">{invoice.id}</span>
                     </td>
@@ -681,21 +685,21 @@ export default function ExportPage() {
                     <td className="px-6 py-5 text-right">
                       <div className="flex items-center justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => handleOpenDetailModal(invoice)}
+                          onClick={(e) => { e.stopPropagation(); handleOpenDetailModal(invoice); }}
                           className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
                           title="Xem chi tiết"
                         >
                           <Eye size={18} />
                         </button>
                         <button
-                          onClick={() => handleOpenEditModal(invoice)}
+                          onClick={(e) => { e.stopPropagation(); handleOpenEditModal(invoice); }}
                           className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                           title="Chỉnh sửa"
                         >
                           <Edit size={18} />
                         </button>
                         <button
-                          onClick={() => handleOpenDeleteModal(invoice)}
+                          onClick={(e) => { e.stopPropagation(); handleOpenDeleteModal(invoice); }}
                           className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                           title="Xóa đơn hàng"
                         >

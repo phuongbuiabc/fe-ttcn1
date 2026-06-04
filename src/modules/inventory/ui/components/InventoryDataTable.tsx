@@ -185,16 +185,19 @@ function ReceiptRows({ receipts, supplies, onView, onEdit, onDelete }: Omit<Rece
   return (
     <>
       {receipts.map((rec) => (
-        <tr key={rec.id} className="hover:bg-slate-50/70 transition-colors group cursor-default">
+        <tr
+          key={rec.id}
+          onClick={() => onView(rec.receipt_id)}
+          className="hover:bg-slate-50/70 transition-colors group cursor-pointer"
+        >
           <TD>
             <div className="flex items-center gap-3.5">
               <BadgeIcon color="bg-blue-50 text-blue-500">
                 <ArrowDownToLine size={14} />
               </BadgeIcon>
               <div>
-                <p className="text-sm font-bold text-slate-800 leading-none">{resolveMaterialName(rec.supply_id)}</p>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
-                  #{rec.receipt_id?.slice(0, 8)}
+                <p className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+                  {resolveMaterialName(rec.supply_id)}
                 </p>
               </div>
             </div>
@@ -282,16 +285,19 @@ function IssueRows({ issues, supplies, employees, onView, onEdit, onDelete }: Om
   return (
     <>
       {issues.map((issue) => (
-        <tr key={issue.id} className="hover:bg-slate-50/70 transition-colors group cursor-default">
+        <tr
+          key={issue.id}
+          onClick={() => onView(issue.loss_id)}
+          className="hover:bg-slate-50/70 transition-colors group cursor-pointer"
+        >
           <TD>
             <div className="flex items-center gap-3.5">
               <BadgeIcon color="bg-rose-50 text-rose-500">
                 <ArrowUpFromLine size={14} />
               </BadgeIcon>
               <div>
-                <p className="text-sm font-bold text-slate-800 leading-none">{resolveMaterialName(issue.supply_id)}</p>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
-                  #{issue.loss_id?.slice(0, 8)}
+                <p className="text-sm font-bold text-slate-800 group-hover:text-rose-600 transition-colors">
+                  {resolveMaterialName(issue.supply_id)}
                 </p>
               </div>
             </div>

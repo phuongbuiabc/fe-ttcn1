@@ -95,6 +95,7 @@ export default function ImportPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   // Selections
   const [selectedInvoice, setSelectedInvoice] = useState<PigImportInvoiceResponse | null>(null);
@@ -204,17 +205,27 @@ export default function ImportPage() {
   };
 
   const handleOpenDetailModal = async (id: string) => {
-    try {
-      const res = await importService.getInvoiceById(id);
-      if (res.success) {
-        setSelectedInvoice(res.data);
-        setIsDetailModalOpen(true);
-      } else {
-        alert(res.message || "Không thể tải chi tiết hóa đơn");
+    const summary = invoices.find(i => i.id === id);
+    if (summary) {
+      setSelectedInvoice(summary);
+      setIsDetailModalOpen(true);
+      setLoadingDetail(true);
+
+      try {
+        const res = await importService.getInvoiceById(id);
+        if (res.success && res.data) {
+          setSelectedInvoice(res.data);
+        } else {
+          alert(res.message || "Không thể tải chi tiết hóa đơn");
+          setIsDetailModalOpen(false);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Lỗi kết nối hệ thống");
+        setIsDetailModalOpen(false);
+      } finally {
+        setLoadingDetail(false);
       }
-    } catch (err) {
-      console.error(err);
-      alert("Lỗi kết nối hệ thống");
     }
   };
 
@@ -573,9 +584,11 @@ export default function ImportPage() {
 
   // Pig Type Options
   const pigTypeOptions = [
-    { value: PigType.NAI, label: "Lợn Nái (NAI)" },
-    { value: PigType.NOC, label: "Lợn Nọc (NOC)" },
-    { value: PigType.THIT, label: "Lợn Thịt (THIT)" }
+    { value: PigType.NAI, label: "Lợn nái" },
+    { value: PigType.NOC, label: "Lợn nọc" },
+    { value: PigType.THIT, label: "Lợn thịt" },
+    { value: PigType.NOC_THIT, label: "Lợn nọc thịt" },
+    { value: PigType.NAI_THIT, label: "Lợn nái thịt" }
   ];
 
   // Pen Options
@@ -586,7 +599,7 @@ export default function ImportPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Hóa đơn nhập lợn</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-headline">Nhập lợn</h1>
           <p className="text-slate-500 text-sm mt-1"></p>
         </div>
         <div className="flex gap-2">
@@ -666,7 +679,11 @@ export default function ImportPage() {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filteredInvoices.map((record) => (
-                  <tr key={record.id} className="hover:bg-slate-50 transition-colors group">
+                  <tr
+                    key={record.id}
+                    onClick={() => handleOpenDetailModal(record.id)}
+                    className="hover:bg-slate-50 transition-colors group cursor-pointer"
+                  >
                     <td className="px-6 py-4">
                       <span className="font-bold text-slate-900 text-sm">{record.invoiceCode}</span>
                     </td>
@@ -686,14 +703,14 @@ export default function ImportPage() {
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
-                          onClick={() => handleOpenDetailModal(record.id)}
+                          onClick={(e) => { e.stopPropagation(); handleOpenDetailModal(record.id); }}
                           className="p-2 text-slate-400 hover:text-[#006c49] transition-colors"
                           title="Xem chi tiết"
                         >
                           <Eye size={18} />
                         </button>
                         <button
-                          onClick={() => handleOpenDeleteModal(record)}
+                          onClick={(e) => { e.stopPropagation(); handleOpenDeleteModal(record); }}
                           className="p-2 text-slate-400 hover:text-rose-600 transition-colors"
                           title="Xóa hóa đơn"
                         >
@@ -1195,63 +1212,76 @@ export default function ImportPage() {
                   </div>
                 </div>
 
-                {/* Details Table */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">Bản kê chi tiết (CTHDN)</h4>
-                  <div className="border border-slate-100 rounded-2xl overflow-hidden">
-                    <table className="w-full text-left border-collapse text-xs">
-                      <thead className="bg-slate-50">
-                        <tr>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mã giống</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tên giống</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phân loại</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Số lượng</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Đơn giá</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Thành tiền</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-50">
-                        {selectedInvoice.details.map((detail) => (
-                          <tr key={detail.id} className="hover:bg-slate-50/50">
-                            <td className="px-6 py-3 text-slate-500 font-mono text-[11px]">{detail.breedId}</td>
-                            <td className="px-6 py-3 font-bold text-slate-700">{detail.breedName}</td>
-                            <td className="px-6 py-3 font-bold text-slate-500">{detail.type}</td>
-                            <td className="px-6 py-3 font-bold text-slate-900 text-right">{detail.quantity} con</td>
-                            <td className="px-6 py-3 font-bold text-slate-700 text-right">{formatCurrency(detail.unitPrice)}</td>
-                            <td className="px-6 py-3 font-black text-slate-900 text-right">{formatCurrency(detail.lineTotal)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                {loadingDetail ? (
+                  <div className="py-20 text-center flex flex-col items-center justify-center gap-3">
+                    <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-slate-400 font-bold text-sm">Đang tải chi tiết hóa đơn nhập...</p>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    {/* Details Table */}
+                    {selectedInvoice.details && selectedInvoice.details.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">Bản kê chi tiết (CTHDN)</h4>
+                        <div className="border border-slate-100 rounded-2xl overflow-hidden">
+                          <table className="w-full text-left border-collapse text-xs">
+                            <thead className="bg-slate-50">
+                              <tr>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mã giống</th>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tên giống</th>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phân loại</th>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Số lượng</th>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Đơn giá</th>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Thành tiền</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                              {selectedInvoice.details.map((detail) => (
+                                <tr key={detail.id} className="hover:bg-slate-50/50">
+                                  <td className="px-6 py-3 text-slate-500 font-mono text-[11px]">{detail.breedId}</td>
+                                  <td className="px-6 py-3 font-bold text-slate-700">{detail.breedName}</td>
+                                  <td className="px-6 py-3 font-bold text-slate-500">{detail.type}</td>
+                                  <td className="px-6 py-3 font-bold text-slate-900 text-right">{detail.quantity} con</td>
+                                  <td className="px-6 py-3 font-bold text-slate-700 text-right">{formatCurrency(detail.unitPrice)}</td>
+                                  <td className="px-6 py-3 font-black text-slate-900 text-right">{formatCurrency(detail.lineTotal)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
 
-                {/* Pigs list */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">Danh sách lợn đã nhập kèm theo</h4>
-                  <div className="border border-slate-100 rounded-2xl overflow-hidden max-h-[300px] overflow-y-auto">
-                    <table className="w-full text-left border-collapse text-xs">
-                      <thead className="bg-slate-50 sticky top-0 z-10">
-                        <tr>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">STT</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mã lợn (ID)</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Số tai</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Chuồng được xếp</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-50">
-                        {selectedInvoice.details.flatMap(d => d.pigs).map((pig, idx) => (
-                          <tr key={pig.id} className="hover:bg-slate-50/50">
-                            <td className="px-6 py-3 text-slate-400 text-center font-bold">{idx + 1}</td>
-                            <td className="px-6 py-3 text-slate-500 font-mono text-[11px]">{pig.pigId}</td>
-                            <td className="px-6 py-3 font-bold text-emerald-700">{pig.earTag}</td>
-                            <td className="px-6 py-3 font-bold text-slate-700">{getPenName(pig.penId)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                    {/* Pigs list */}
+                    {selectedInvoice.details && selectedInvoice.details.flatMap(d => d.pigs || []).length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">Danh sách lợn đã nhập kèm theo</h4>
+                        <div className="border border-slate-100 rounded-2xl overflow-hidden max-h-[300px] overflow-y-auto">
+                          <table className="w-full text-left border-collapse text-xs">
+                            <thead className="bg-slate-50 sticky top-0 z-10">
+                              <tr>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">STT</th>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mã lợn (ID)</th>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Số tai</th>
+                                <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Chuồng được xếp</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                              {selectedInvoice.details.flatMap(d => d.pigs || []).map((pig, idx) => (
+                                <tr key={pig.id} className="hover:bg-slate-50/50">
+                                  <td className="px-6 py-3 text-slate-400 text-center font-bold">{idx + 1}</td>
+                                  <td className="px-6 py-3 text-slate-500 font-mono text-[11px]">{pig.pigId}</td>
+                                  <td className="px-6 py-3 font-bold text-emerald-700">{pig.earTag}</td>
+                                  <td className="px-6 py-3 font-bold text-slate-700">{getPenName(pig.penId)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
 
               <div className="p-6 border-t border-slate-100 flex justify-end bg-slate-50 shrink-0">
