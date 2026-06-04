@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Calendar, User, Truck, FileText, Plus, Trash2, DollarSign, Package } from "lucide-react";
 import { BaseModal } from "@/shared/components/ui/BaseModal";
 import { CustomSelect } from "@/shared/components/ui/CustomSelect";
@@ -32,6 +32,8 @@ export function ImportModal({ isOpen, onClose, onSuccess, mode = "create", selec
   const [loadingOptions, setLoadingOptions] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  const optionsLoadedRef = useRef(false);
+
   // Form states
   const [importDate, setImportDate] = useState<string>(
     new Date().toISOString().split("T")[0]
@@ -50,15 +52,18 @@ export function ImportModal({ isOpen, onClose, onSuccess, mode = "create", selec
     const loadData = async () => {
       setLoadingOptions(true);
       try {
-        const [empRes, supRes, matRes] = await Promise.all([
-          staffService.getEmployees(),
-          supplierService.getSuppliers(),
-          inventoryService.getSupplies()
-        ]);
+        if (!optionsLoadedRef.current) {
+          const [empRes, supRes, matRes] = await Promise.all([
+            staffService.getEmployees(),
+            supplierService.getSuppliers(),
+            inventoryService.getSupplies()
+          ]);
 
-        if (empRes.success) setEmployees(empRes.data || []);
-        if (supRes.success) setSuppliers(supRes.data || []);
-        if (matRes.success) setSupplies(matRes.data || []);
+          if (empRes.success) setEmployees(empRes.data || []);
+          if (supRes.success) setSuppliers(supRes.data || []);
+          if (matRes.success) setSupplies(matRes.data || []);
+          optionsLoadedRef.current = true;
+        }
 
         if ((mode === "edit" || mode === "view") && selectedId) {
           const res = await inventoryService.getImportById(selectedId);
