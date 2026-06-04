@@ -559,9 +559,7 @@ export default function ExportPage() {
           <p className="text-slate-500 text-sm mt-1"></p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-white text-slate-600 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-slate-50 border border-slate-100 transition-all active:scale-95">
-            <Download size={16} /> Xuất báo cáo Excel
-          </button>
+
           <button
             onClick={handleOpenAddModal}
             className="px-6 py-2 bg-gradient-to-br from-[#006c49] to-[#10b981] text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-900/20 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all"
