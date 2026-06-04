@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { 
-  Sprout, 
-  Mail, 
-  Lock, 
+import {
+  Sprout,
+  Mail,
+  Lock,
   User,
-  ArrowRight, 
+  ArrowRight,
   Eye,
   EyeOff,
   AlertCircle,
@@ -26,11 +26,11 @@ export default function LoginPage() {
   const [isRegister, setIsRegister] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Login Form States
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   // Register Form States
   const [fullName, setFullName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -82,7 +82,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
-    
+
     try {
       await login({ email, username: email, password });
     } catch (err: any) {
@@ -155,7 +155,7 @@ export default function LoginPage() {
       isRegister ? "flex-row-reverse" : "flex-row"
     )}>
       {/* Left/Right Side - Form Container */}
-      <motion.div 
+      <motion.div
         layout
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-24 xl:px-32 relative z-10 bg-white"
@@ -251,15 +251,7 @@ export default function LoginPage() {
                   </button>
                 </form>
 
-                <p className="mt-8 text-center text-sm font-medium text-slate-500">
-                  Chưa có tài khoản?{" "}
-                  <button 
-                    onClick={() => toggleMode(true)}
-                    className="text-emerald-600 font-black hover:text-emerald-700 underline underline-offset-4 cursor-pointer"
-                  >
-                    Đăng ký ngay
-                  </button>
-                </p>
+
               </motion.div>
             ) : (
               <motion.div
@@ -350,12 +342,12 @@ export default function LoginPage() {
                   </div>
 
                   <div className="flex items-start gap-3 ml-1 py-1">
-                    <input 
-                      type="checkbox" 
-                      required 
+                    <input
+                      type="checkbox"
+                      required
                       checked={agreeTerms}
                       onChange={(e) => setAgreeTerms(e.target.checked)}
-                      className="mt-1 w-4 h-4 rounded border-slate-200 text-emerald-600 focus:ring-emerald-500 cursor-pointer" 
+                      className="mt-1 w-4 h-4 rounded border-slate-200 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                     />
                     <p className="text-xs font-medium text-slate-500 leading-relaxed">
                       Tôi đồng ý với <Link href="#" className="text-emerald-600 font-bold hover:underline">Điều khoản dịch vụ</Link> và <Link href="#" className="text-emerald-600 font-bold hover:underline">Chính sách bảo mật</Link> của MDFARM.
@@ -366,7 +358,7 @@ export default function LoginPage() {
 
                 <p className="mt-8 text-center text-sm font-medium text-slate-500">
                   Đã có tài khoản?{" "}
-                  <button 
+                  <button
                     onClick={() => toggleMode(false)}
                     className="text-emerald-600 font-black hover:text-emerald-700 underline underline-offset-4 cursor-pointer"
                   >
@@ -380,7 +372,7 @@ export default function LoginPage() {
       </motion.div>
 
       {/* Left/Right Side - Visual Column */}
-      <motion.div 
+      <motion.div
         layout
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className="hidden lg:flex flex-1 bg-slate-900 relative overflow-hidden items-center justify-center p-12"
@@ -394,7 +386,7 @@ export default function LoginPage() {
         <div className="relative z-10 max-w-lg">
           <AnimatePresence mode="wait">
             {!isRegister ? (
-              <motion.div 
+              <motion.div
                 key="login-marketing"
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -471,7 +463,7 @@ export default function LoginPage() {
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           animate={{ y: [0, 15, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           className="absolute bottom-20 left-20 bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl"
